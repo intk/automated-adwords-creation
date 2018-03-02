@@ -5,6 +5,7 @@ class Campaign {
 	private $title;
 	private $subtitle;
 	private $venue;
+	
 	private $location;
     public function __construct($production) {
 		//Parse campaign info
