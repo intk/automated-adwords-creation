@@ -105,6 +105,13 @@ class Campaign {
 			$tLabel = array('voorstelling', 'een voorstelling');
 		}
 		
+		//If performance month is equal to May, don't use a dot in the heading.
+		if (strpos($this->date->AdDate, 'mei') !== false) {
+			$hDate = substr($this->date->AdDate, 0, -1);
+		} else {
+			$hDate = $this->date->AdDate;
+		}
+		
 		if ($type == 'title') {
 			
 			//Templates Title ad
@@ -112,24 +119,29 @@ class Campaign {
 			//Check if titles length is more than 30 characters. Depend heading values on that
 			if (strlen($title) > 30) {
 				//Divide heading1 and heading2 in 2 elements
-				$heading[0] = array($artist.' - '.ucfirst($this->genre), $this->date->AdDate.' in '.$this->location);
+				$heading[0] = array($artist.' - '.ucfirst($this->genre), $hDate.' in '.$this->location);
 				$heading[1] = array(ucfirst($this->genre).' - '.$artist, $this->venue);
 				$heading[2] = array($artist.' - '.ucfirst($this->genre), $this->venue);
 			} else {
 				//Divide heading1 and heading2 in 2 elements
-				$heading[0] = array($title, $this->date->AdDate.' in '.$this->location);
+				$heading[0] = array($title, $hDate.' in '.$this->location);
 				$heading[1] = array($title, $artist);
 				$heading[2] = array($title, $this->venue);
 			}
 			
+			//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
 			$template[0] = array(
-				"Naar ".$tLabel[1]." in ".$this->location."? Koop nu mijn kaarten voor ".$title.".",
+				"Naar ".$tLabel[1]." in ".$this->location."? Koop kaarten voor ".$title.".",
+				"Naar ".$tLabel[1]." in ".$this->location."? Bestel nu mijn kaarten voor ".$title.".",
 			);
 			$template[1] = array(
+				"Kom naar ".$title." in ".$this->location.". Koop tickets voor ".$this->date->AdDate,
+				"Kom naar ".$title." in ".$this->venue.". Koop tickets voor ".$this->date->AdDate,
 				"Kom naar ".$title." in ".$this->venue.". Bestel nu mijn tickets voor ".$this->date->AdDate,
 			);
 			$template[2] = array(
-				"Geniet van ".$title." door ".$artist.". Koop nu tickets voor ".$this->date->AdDate,
+				"Geniet van ".$title." door ".$artist.". Koop tickets voor ".$this->date->AdDate,
+				"Geniet van ".$title." door ".$artist.". Koop nu mijn tickets voor ".$this->date->AdDate,
 			);
 			
 		} 
@@ -138,17 +150,22 @@ class Campaign {
 			$performance = trim($this->title);
 			
 			//Templates Artist ad
-			$heading[0] = array($title, $this->date->AdDate.' in '.$this->location);
+			$heading[0] = array($title, $hDate.' in '.$this->location);
 			$heading[1] = array($title, $performance);
 			$heading[2] = array($title, $this->venue);
 			
 			$template[0] = array(
-				"Naar ".$tLabel[1]." in ".$this->location."? Koop nu mijn kaarten voor ".$title.".",
+				"Naar ".$tLabel[1]." in ".$this->location."? Koop kaarten voor ".$title.".",
+				"Naar ".$tLabel[1]." in ".$this->location."? Bestel nu mijn kaarten voor ".$title.".",
+				
 			);
 			$template[1] = array(
+				"Kom naar ".$title." in ".$this->location.". Koop tickets voor ".$this->date->AdDate,
+				"Kom naar ".$title." in ".$this->venue.". Koop tickets voor ".$this->date->AdDate,
 				"Kom naar ".$title." in ".$this->venue.". Bestel nu mijn tickets voor ".$this->date->AdDate,
 			);
 			$template[2] = array(
+				"Geniet van ".$title." in ".$performance.". Koop tickets voor ".$this->date->AdDate,
 				"Geniet van ".$title." in ".$performance.". Koop nu tickets voor ".$this->date->AdDate,
 			);
 		}
@@ -157,7 +174,18 @@ class Campaign {
 			foreach($template as $key => $tpl) {
 				$ad[$key]->heading[0] = $heading[$key][0];
 				$ad[$key]->heading[1] = $heading[$key][1];
-				$ad[$key]->description = $template[$key][0];
+				
+				foreach ($template[$key] as $description) {
+					//Check if description length <= 80 characters
+					if (strlen($description) <= 80) {
+						$ad[$key]->description = $description;
+					}
+				}
+				
+				//If the description length is still empty because > 80 characters, use the first (shortest) description
+				if ($ad[$key]->description == '') {
+					$ad[$key]->description = $template[$key][0];
+				}
 				
 				$pathString = strtolower(trim(preg_replace('/(de | een | en | het )/', ' ', $title)));
 				
@@ -200,6 +228,7 @@ class Campaign {
 			$genre = $this->genre;
 		
 			$keywordList = array();
+			array_push($keywordList, strtolower($name));
 		
 			//Loop keyword list
 			foreach($placements as $keyWord => $keyValue) {
@@ -207,17 +236,14 @@ class Campaign {
 				if (stripos($genre, $keyWord) !== false) {
 						foreach($keyValue as $tempKey => $tempVal) {
 							//Add keywords
-								if (stripos($name, $tempVal) != false) {
-									array_push($keywordList, strtolower($name));
-								} else {
+								if (stripos($name, $tempVal) === false) {
 									array_push($keywordList, strtolower($name).' '.strtolower($tempVal));
 								}
-							//}
 							
 							}
 							
 				}
-					//}
+	
 			}
 		
 		return $keywordList;
