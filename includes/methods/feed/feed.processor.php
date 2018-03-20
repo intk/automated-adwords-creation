@@ -3,6 +3,11 @@
 $source = $url;
 $productions = array();
 
+//Sanitize & trim string
+function trimString($string) {
+	return filter_var(trim($string), FILTER_SANITIZE_STRING);
+}
+
 // XML scraper
 $xml = simplexml_load_file($source, 'SimpleXMLElement', LIBXML_NOCDATA);
 foreach ($xml->production as $production) {
@@ -12,14 +17,18 @@ foreach ($xml->production as $production) {
 	if (date('Y-m', $time) == $month) {
 		$productionObj = new stdClass();
 		// Put data to object
-		$productionObj->title = filter_var(trim(str_replace('14+', '',$production->title)), FILTER_SANITIZE_STRING);
-		$productionObj->subtitle = filter_var(trim($production->subtitle), FILTER_SANITIZE_STRING);
+		$productionObj->title = trimString($production->title);
+		$productionObj->subtitle = trimString($production->subtitle);
+		$productionObj->venue = trimString($production->location->venue);
+		$productionObj->location = $location;
 		$productionObj->genre = filter_var(trim($production->genres->genre[0]->attributes()->code), FILTER_SANITIZE_STRING);
 		$productionObj->link = filter_var(trim($production->link), FILTER_SANITIZE_URL);
 		$productionObj->date->time = $time;
 		$productionObj->date->dateString = date('d-m-Y H:i', $productionObj->date->time);
 		// Push object to productions array
-		array_push($productions, $productionObj);
+		if (strpos($exclude, $productionObj->genre) === false && stripos($productionObj->title, 'inleiding') === false) {
+			array_push($productions, $productionObj);
+		}
 	}
 }
 ?>
