@@ -5,7 +5,6 @@ class Campaign {
 	private $title;
 	private $subtitle;
 	private $venue;
-	
 	private $location;
     public function __construct($production) {
 		//Parse campaign info
@@ -55,10 +54,19 @@ class Campaign {
 			foreach($tempAdgroup as $gkey => $gval) {
 				//Remove numbers, special characters (excl. '’&-) and unnecessary mentions between brackets
 				$this->adgroup[$i]->name = preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'’&-]+/u", " ", $gval)));
+				
+				//Check if misplaced dash (-) occurs in campaign name
+				if (strpos($this->adgroup[$i]->name, '-') == (strlen($this->adgroup[$i]->name) -1)) {
+					$this->adgroup[$i]->name = str_replace('-', '', $this->adgroup[$i]->name);
+				}
+				//Check if misplaced dash (-) occurs in performance title
+				if (strpos($this->title, '-') == (strlen($this->title) -1)) {
+					$this->title = str_replace('-', '', $this->title);
+				}
 				$this->adgroup[$i]->type = $heading['type'];
 				
 				$this->adgroup[$i]->ad = $this->createAds(trim($this->adgroup[$i]->name), $this->adgroup[$i]->type, $this->trimArtist($this->subtitle));
-				$this->adgroup[$i]->keywords = $this->createKeywords(trim($this->adgroup[$i]->name));
+				$this->adgroup[$i]->keywords = $this->createKeywords(trim($this->adgroup[$i]->name),  $this->adgroup[$i]->type);
 				$i++;
 			}
 		}
@@ -73,6 +81,7 @@ class Campaign {
 	
 	private function trimArtist($artist) {
 		$tempArtist = preg_split('(,| en | /| Producties)', $artist);
+		
 		return trim($tempArtist[0]);
 	}
 
@@ -92,6 +101,7 @@ class Campaign {
 		$pLabel->cabaret = array('cabaret', 'cabaret');
 		$pLabel->musical = array('musical', 'een musical');
 		$pLabel->familievoorstelling = array("voorstelling", "een voorstelling");
+		$pLabel->jeugd = array("toneel", "toneel");
 		$pLabel->dans = array('dans', 'een danssshow');
 		$pLabel->concert = array('concert', 'een concert');
 		$pLabel->muziek = array('concert', 'een concert');
@@ -119,7 +129,7 @@ class Campaign {
 			//Check if titles length is more than 30 characters. Depend heading values on that
 			if (strlen($title) > 30) {
 				//Divide heading1 and heading2 in 2 elements
-				$heading[0] = array($artist.' - '.ucfirst($this->genre), $hDate.' in '.$this->location);
+				$heading[0] = array($artist, $hDate.' in '.$this->location);
 				$heading[1] = array(ucfirst($this->genre).' - '.$artist, $this->venue);
 				$heading[2] = array($artist.' - '.ucfirst($this->genre), $this->venue);
 			} else {
@@ -127,6 +137,11 @@ class Campaign {
 				$heading[0] = array($title, $hDate.' in '.$this->location);
 				$heading[1] = array($title, $artist);
 				$heading[2] = array($title, $this->venue);
+			}
+			
+			//Check if heading 2 is still empty
+			if ($performance == null) {
+				$heading[1] = array($title, $hDate.' - '.ucfirst($this->genre).' in '.$this->location);
 			}
 			
 			//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
@@ -140,6 +155,9 @@ class Campaign {
 				"Kom naar ".$title." in ".$this->venue.". Bestel nu mijn tickets voor ".$this->date->AdDate,
 			);
 			$template[2] = array(
+				"Geniet van ".$title.". Koop nu tickets.",
+			    "Geniet van ".$title.". Koop nu tickets voor ".$this->date->AdDate,
+				"Geniet van ".$title." met ".$artist.". Koop nu tickets voor ".$this->date->AdDate,
 				"Geniet van ".$title." door ".$artist.". Koop tickets voor ".$this->date->AdDate,
 				"Geniet van ".$title." door ".$artist.". Koop nu mijn tickets voor ".$this->date->AdDate,
 			);
@@ -151,7 +169,12 @@ class Campaign {
 			
 			//Templates Artist ad
 			$heading[0] = array($title, $hDate.' in '.$this->location);
-			$heading[1] = array($title, $performance);
+			//If no title available
+			if ($performance == null) {
+				$heading[1] = array($title, $hDate.' - '.ucfirst($this->genre).' in '.$this->location);
+			} else {
+				$heading[1] = array($title, $performance);
+			}
 			$heading[2] = array($title, $this->venue);
 			
 			$template[0] = array(
@@ -165,6 +188,9 @@ class Campaign {
 				"Kom naar ".$title." in ".$this->venue.". Bestel nu mijn tickets voor ".$this->date->AdDate,
 			);
 			$template[2] = array(
+				"Geniet van ".$title.". Koop nu tickets",
+			    "Geniet van ".$title.". Koop nu tickets voor ".$this->date->AdDate,
+			    "Geniet van ".$title." in ".$performance.". Koop nu tickets.",
 				"Geniet van ".$title." in ".$performance.". Koop tickets voor ".$this->date->AdDate,
 				"Geniet van ".$title." in ".$performance.". Koop nu tickets voor ".$this->date->AdDate,
 			);
@@ -185,6 +211,12 @@ class Campaign {
 				//If the description length is still empty because > 80 characters, use the first (shortest) description
 				if ($ad[$key]->description == '') {
 					$ad[$key]->description = $template[$key][0];
+					//If third ad
+					if ($key == 2) {
+						$ad[$key]->heading[0] = $heading[0][0];
+						$ad[$key]->heading[1] = $heading[0][1];
+						$ad[$key]->description = $template[$key][1];
+					}
 				}
 				
 				$pathString = strtolower(trim(preg_replace('/(de | een | en | het )/', ' ', $title)));
@@ -206,10 +238,10 @@ class Campaign {
 		return $ad;
 	}
 	
-	private function createKeywords($name) {
+	private function createKeywords($name, $type) {
 			$placements = new stdClass();
-			$placements->toneel = array('voorstelling', 'toneel', 'toneelstuk', 'tickets', 'theater');
-			$placements->cabaret = array('cabaret', 'show', 'theater', 'tickets');
+			$placements->toneel = array('voorstelling', 'toneel', 'tickets', 'theater');
+			$placements->cabaret = array('cabaret', 'theater', 'tickets');
 			$placements->musical = array('show', 'theater');
 			$placements->college = array('college', 'theater');
 			$placements->familie = array("familie", "theater");
@@ -229,6 +261,19 @@ class Campaign {
 		
 			$keywordList = array();
 			array_push($keywordList, strtolower($name));
+			
+			//Combine performer and performance name as keyword
+			if ($type == 'title') {
+				array_push($keywordList, strtolower($name).' '.strtolower($this->trimArtist($this->subtitle)));
+			}
+		    //Combine venue or location and performance name as keyword
+			if (strlen($name) > 15) {
+				array_push($keywordList, strtolower($name).' '.strtolower($this->location));
+			} else {
+				array_push($keywordList, strtolower($name).' '.strtolower($this->location));
+			    array_push($keywordList, strtolower($name).' '.strtolower($this->venue));
+			}
+
 		
 			//Loop keyword list
 			foreach($placements as $keyWord => $keyValue) {
