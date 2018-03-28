@@ -3,7 +3,6 @@
 //Contains name, date, target location, sitelink extentions, AdGroups, Ads, keywords
 class Campaign {
 	private $title;
-	private $subtitle;
 	private $venue;
 	private $location;
 	private $performers;
@@ -19,24 +18,27 @@ class Campaign {
 		$this->performers = $production->performers;
 		$this->date->GaDate = $this->formatDate($itemDate)[0];	
 		$this->date->AdDate = $this->formatDate($itemDate)[1];
+		$this->date->AdDateFull = $this->formatDate($itemDate)[2];
 		//$this->date->dateString = $production->date->dateString;
     }
 	
 	private function trimStr($string) {
 		//Replacements for unnecessary abbreviations
-		$replace = array('e.a.', 'e.v.a.');
-		$replacement = array('', '');
-		return preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'’&-]+/u", " ", str_replace($replace, $replacement, $string))));
+		$replace = array('e.a.', 'e.v.a.', '/');
+		$replacement = array('', '', ' - ');
+		return str_replace('+', '', preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'’&-,]+/u", " ", str_replace($replace, $replacement, $string)))));
 	}
 	
 	//Format timestamp to different date strings
 	private function formatDate($time) {
 		$monthNL = array('jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec');
+		$monthNLFull = array('januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december');
 		$monthEN = array('jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec');
 		$day = date('d', $time);
 		if ($day < 10) { $day = substr($day, 1); }
 		$output[0] = date('M d, Y', $time);
 		$output[1] = $day.' '.str_ireplace($monthEN, $monthNL, date('M', $time)).'.';
+		$output[2] = $day.' '.str_ireplace($monthEN, $monthNLFull, date('M', $time));
 		return $output;
 	}
 		
@@ -53,7 +55,7 @@ class Campaign {
 		$i = 0;
 		foreach ($tempHeadings as $key => $heading) {
 			if ($heading['type'] == 'artist') {
-				$tempAdgroup = preg_split('(,| en | /)', $heading['value']);
+				$tempAdgroup = $this->trimArtist($heading['value']);
 			} 
 			else {
 				$tempAdgroup[0] = $heading['value'];
@@ -63,7 +65,7 @@ class Campaign {
 				// Create adGroup for multiple artists (keyword insertion)
 				foreach($tempAdgroup as $gkey => $gval) {
 					//Remove numbers, special characters (excl. '’&-) and unnecessary mentions between brackets
-					$this->adgroup[$i]->name = 'performers';
+					$this->adgroup[$i]->name = 'Performers';
 
 					//Check if misplaced dash (-) occurs in performance title
 					if (strpos($this->title, '-') == (strlen($this->title) -1)) {
@@ -109,9 +111,14 @@ class Campaign {
 	}
 	
 	private function trimArtist($artist) {
-		$tempArtist = preg_split('(,| en | /| Producties)', $artist);
-		
-		return trim($tempArtist[0]);
+		// Check whether artist value consits of multiple performers that have to be splitted into their own adgroup
+		if (strpos($artist, ',') !== false || (strpos($artist, ',') < strpos($artist, ' en '))) {
+			$tempArtist = preg_split('(,| en )', $artist);
+		}
+		if (strpos($artist, ' en ') !== false && strpos($artist, '&') !== false) {
+			$tempArtist = preg_split('(,| & )', $artist);
+		}
+		return $tempArtist;
 	}
 
 	
@@ -124,6 +131,8 @@ class Campaign {
 	}
 	
 	private function createAds($title, $type, $artist) {
+		//Get first artist in the list
+		$artist = $artist[0];
 		$ad = array();
 		$pLabel = new stdClass();
 		$pLabel->toneel = array('toneel', 'toneel');
@@ -159,8 +168,13 @@ class Campaign {
 			if (strlen($title) > 30) {
 				//Divide heading1 and heading2 in 2 elements
 				$heading[0] = array($artist, $hDate.' in '.$this->location);
-				$heading[1] = array(ucfirst($this->genre).' - '.$artist, $this->venue);
-				$heading[2] = array($artist.' - '.ucfirst($this->genre), $this->venue);
+				if (strlen(ucfirst($this->genre).' - '.$artist) > 30) {
+					$heading[1] = array($artist, $this->venue);
+					$heading[2] = array($artist, $this->date->AdDateFull.' in '.$this->location);
+				} else {
+					$heading[1] = array(ucfirst($this->genre).' - '.$artist, $this->venue);
+					$heading[2] = array($artist.' - '.ucfirst($this->genre), $this->venue);
+				}
 			} else {
 				//Divide heading1 and heading2 in 2 elements
 				$heading[0] = array($title, $hDate.' in '.$this->location);
@@ -169,9 +183,10 @@ class Campaign {
 			}
 			
 			//Check if heading 2 is still empty
-			if ($performance == null) {
+			/*if ($performance == null) {
 				$heading[1] = array($title, $hDate.' - '.ucfirst($this->genre).' in '.$this->location);
 			}
+			*/
 			
 			//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
 			$template[0] = array(
@@ -193,20 +208,36 @@ class Campaign {
 			
 		} 
 		if ($type == 'artist' || $type == 'multiple-artists') {
-			
-			$performance = trim($this->title);
+			//If performance title exist
+			if (strlen($this->title)>1) {
+				$performance = trim($this->title);
+			} else {
+				$performance = $this->trimArtist($this->subtitle)[0];
+			}
 			
 			if ($type == 'multiple-artists') {
 				$title = '{KeyWord:'.$this->performers[0].'}';
 			}
 			
 			//Templates Artist ad
-			$heading[0] = array('Naar '.$title.'?', $hDate.' in '.$this->location);
+			//Check if title will be longer than 30 characters
+			//-10 characers for keyword insertion
+			//+6 characters for additional string 'Naar ?'
+			if (strlen($title)+6 > 30 || ($type == 'multiple-artists' && strlen($title)-4 > 30)) {
+				$heading[0] = array($title, $hDate.' in '.$this->location);
+			} else {
+				$heading[0] = array('Naar '.$title.'?', $hDate.' in '.$this->location);
+			}
+			
 			//If no title available
-			if ($performance == null) {
+			if (trim($this->title) == null) {
 				$heading[1] = array($title, $hDate.' - '.ucfirst($this->genre).' in '.$this->location);
 			} else {
-				$heading[1] = array($title, $performance);
+				if (strlen($performance) > 30) {
+					$heading[1] = array($title, $this->date->AdDateFull.' in '.$this->location);
+				} else {
+					$heading[1] = array($title, $performance);
+				}
 			}
 			$heading[2] = array($title, $this->venue);
 			
@@ -255,22 +286,28 @@ class Campaign {
 					}
 				}
 				
-				$pathString = strtolower(trim(preg_replace('/(de | een | en | het )/', ' ', $title)));
+				if ($type == 'multiple-artists') {
+					if (strlen($this->title)>1) {
+						$pathTitle = $this->title;
+					} else {
+						$pathTitle = $this->subtitle;
+					}
+					$pathString = strtolower(trim(preg_replace('/(de | een | en | het )/', ' ', trim($pathTitle))));
+				} else {
+					$pathString = strtolower(trim(preg_replace('/(de | een | en | het )/', ' ', $title)));
+				}
 				
 				//Check if pathString length <= 15 characters
 				if (strlen($pathString) <= 15) {
 					$ad[$key]->path[0] = strtolower($this->genre);
-					$ad[$key]->path[1] = str_replace(' ', '-', $title);
+					$ad[$key]->path[1] = str_replace('--', '-', str_replace(' ', '-', $pathString));
 				}
 				
 				//Check if pathstring has more than 15 characters and split the words to the path fields
 				else if (strlen($pathString) > 15) {
 					//Check if keyword insertion has been applied. If keyword doesn't fit, choose performance name for display url fields
-					if ($type == 'multiple-artists') {
-						$pathString = $performance;
-					}
-					$ad[$key]->path[0] = str_replace(' ', '-', trim($this->truncate($pathString, 15)));
-					$ad[$key]->path[1] = str_replace(' ', '-', trim($this->truncate(substr($pathString, strlen($this->truncate($pathString, 15)), 30), 15)));
+						$ad[$key]->path[0] = str_replace('--', '-', str_replace(' ', '-', trim($this->truncate($pathString, 15))));
+						$ad[$key]->path[1] = str_replace('--', '-', str_replace(' ', '-', trim($this->truncate(substr($pathString, strlen($this->truncate($pathString, 15)), 30), 15))));
 				}
 			}
 			
@@ -302,7 +339,7 @@ class Campaign {
 			$keywordList = array();
 			
 			//Check if keyword insertion has been applied
-			if ($type = 'multiple-artists') {
+			if ($type == 'multiple-artists') {
 				$keywordList = $name;
 			} else {
 				array_push($keywordList, strtolower($name));
