@@ -3,18 +3,20 @@
 //Contains name, date, target location, sitelink extentions, AdGroups, Ads, keywords
 class Campaign {
 	private $title;
+	private $subtitle;
 	private $venue;
 	private $location;
 	private $performers;
     public function __construct($production) {
 		//Parse campaign info
+		$itemDate = $production->date->time;
 		$this->title = $this->trimStr($production->title);
 		$this->subtitle = $this->trimStr($production->subtitle);
-		$this->name = trim(ucfirst($production->genre).': '.$this->title.' - '.$production->subtitle);
+		//Campaign name format [[YYYY-MM-DD]] [performance] - [performer]
+		$this->name = trim('['.$this->formatDate($itemDate)[3].'] '.$this->title.' - '.$production->subtitle);
 		$this->venue = $production->venue;
 		$this->location = $production->location;
-		$this->genre = trim($production->genre);
-		$itemDate = $production->date->time;
+		$this->genre = $production->genre;
 		$this->performers = $production->performers;
 		$this->date->GaDate = $this->formatDate($itemDate)[0];	
 		$this->date->AdDate = $this->formatDate($itemDate)[1];
@@ -39,6 +41,7 @@ class Campaign {
 		$output[0] = date('M d, Y', $time);
 		$output[1] = $day.' '.str_ireplace($monthEN, $monthNL, date('M', $time)).'.';
 		$output[2] = $day.' '.str_ireplace($monthEN, $monthNLFull, date('M', $time));
+		$output[3] = date('Y-m-d', $time);
 		return $output;
 	}
 		
@@ -111,6 +114,7 @@ class Campaign {
 	}
 	
 	private function trimArtist($artist) {
+		$tempArtist[0] = $artist;
 		// Check whether artist value consits of multiple performers that have to be splitted into their own adgroup
 		if (strpos($artist, ',') !== false || (strpos($artist, ',') < strpos($artist, ' en '))) {
 			$tempArtist = preg_split('(,| en )', $artist);
@@ -142,10 +146,12 @@ class Campaign {
 		$pLabel->jeugd = array("toneel", "toneel");
 		$pLabel->dans = array('dans', 'een danssshow');
 		$pLabel->concert = array('concert', 'een concert');
+		$pLabel->theaterconcert = array('concert', 'een concert');
+		$pLabel->opera = array('opera', 'opera');
 		$pLabel->muziek = array('concert', 'een concert');
 		$pLabel->klassiek = array('concert', 'een concert');
 		
-		$genre = $this->genre;
+		$genre = $this->genre[0];
 	
 		if ($pLabel->$genre != null) {
 			$tLabel = $pLabel->$genre;
@@ -168,12 +174,12 @@ class Campaign {
 			if (strlen($title) > 30) {
 				//Divide heading1 and heading2 in 2 elements
 				$heading[0] = array($artist, $hDate.' in '.$this->location);
-				if (strlen(ucfirst($this->genre).' - '.$artist) > 30) {
+				if (strlen(ucfirst($genre).' - '.$artist) > 30) {
 					$heading[1] = array($artist, $this->venue);
 					$heading[2] = array($artist, $this->date->AdDateFull.' in '.$this->location);
 				} else {
-					$heading[1] = array(ucfirst($this->genre).' - '.$artist, $this->venue);
-					$heading[2] = array($artist.' - '.ucfirst($this->genre), $this->venue);
+					$heading[1] = array(ucfirst($genre).' - '.$artist, $this->venue);
+					$heading[2] = array($artist.' - '.ucfirst($genre), $this->venue);
 				}
 			} else {
 				//Divide heading1 and heading2 in 2 elements
@@ -231,7 +237,7 @@ class Campaign {
 			
 			//If no title available
 			if (trim($this->title) == null) {
-				$heading[1] = array($title, $hDate.' - '.ucfirst($this->genre).' in '.$this->location);
+				$heading[1] = array($title, $hDate.' - '.ucfirst($genre).' in '.$this->location);
 			} else {
 				if (strlen($performance) > 30) {
 					$heading[1] = array($title, $this->date->AdDateFull.' in '.$this->location);
@@ -244,9 +250,9 @@ class Campaign {
 			
 			$template[0] = array(
 				"Naar ".$title."? Koop kaarten voor ".$tLabel[1]." in ".$this->location.".",
-				"Naar ".$title."? Bestel nu mijn kaarten voor ".$tLabel[1]." in ".$this->location.".",
 				"Naar ".$title."? Koop kaarten voor ".$performance.".",
 				"Naar ".$title."? Koop nu kaarten voor ".$performance.".",
+				"Naar ".$title."? Bestel nu mijn kaarten voor ".$tLabel[1]." in ".$this->location.".",
 				
 			);
 			$template[1] = array(
@@ -292,14 +298,14 @@ class Campaign {
 					} else {
 						$pathTitle = $this->subtitle;
 					}
-					$pathString = strtolower(trim(preg_replace('/(de | een | en | het )/', ' ', trim($pathTitle))));
+					$pathString = strtolower(trim(preg_replace('/( de | een | en | het )/', ' ', trim($pathTitle))));
 				} else {
-					$pathString = strtolower(trim(preg_replace('/(de | een | en | het )/', ' ', $title)));
+					$pathString = strtolower(trim(preg_replace('/( de | een | en | het )/', ' ', $title)));
 				}
 				
 				//Check if pathString length <= 15 characters
 				if (strlen($pathString) <= 15) {
-					$ad[$key]->path[0] = strtolower($this->genre);
+					$ad[$key]->path[0] = strtolower($genre);
 					$ad[$key]->path[1] = str_replace('--', '-', str_replace(' ', '-', $pathString));
 				}
 				
@@ -334,7 +340,7 @@ class Campaign {
 			$placements->specials = array('voorstelling', 'theater');
 			$placements->circus = array('circus', 'theater');
 			$placements->entertainment = array('show', 'theater');
-			$genre = $this->genre;
+			$genre = $this->genre[0];
 		
 			$keywordList = array();
 			
