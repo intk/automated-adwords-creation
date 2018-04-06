@@ -1,0 +1,164 @@
+.wrapper span {
+	display: block;
+	font-size:16px;
+	font-family: "Open Sans";
+	text-align: center;
+	font-weight: 400;
+	padding:0 0 20px 0;
+}
+
+#csvInput {
+	display: none;
+	width:100%;
+	height:50px;
+	overflow-x:hidden;
+	overflow-y:auto;
+	font-size:12px;
+	font-family: "Open Sans";
+	color:#aaa;
+	border:1px solid #f3f3f3;
+}
+
+#csvInput::selection {
+	color:#aaa;
+	background:transparent;
+}
+
+
+.wrapper form {
+	padding:0;
+	margin:0;
+	display: block;
+	left:50%;
+	top:50%;
+	transform:translate(-50%, -50%);
+	position: absolute;
+	width:auto;
+	text-align: center;
+}
+
+.wrapper form input[type=submit], .wrapper form input[type=button] {
+	background-color:#307F7B;
+	padding:28px 30px;
+	border:0px;
+	font-size:16px;
+	color:#fff;
+	cursor: pointer;
+	outline:none;
+}
+
+.wrapper form input[type=submit]:hover, .wrapper form input[type=button]:hover {
+	background-color:#4C9F9B;
+
+}
+
+html,body{
+    height:100%;
+}
+
+#wrapper{
+    position:relative;
+    /*background:#333;*/
+    height:100%;
+}
+
+.loader {
+	display: none;
+	margin:0 auto;
+    width:70px;
+    height:70px;
+	position:relative;
+}
+
+
+.loader:before {
+  content: '';
+  display: block;
+  padding-top: 100%;
+}
+
+.circular-loader {
+  -webkit-animation: rotate 2s linear infinite;
+          animation: rotate 2s linear infinite;
+  height: 100%;
+  -webkit-transform-origin: center center;
+      -ms-transform-origin: center center;
+          transform-origin: center center;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: auto;
+}
+
+.loader-path {
+  stroke-dasharray: 150,200;
+  stroke-dashoffset: -10;
+  -webkit-animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+          animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+  stroke: #307F7B;
+  stroke-linecap: round;
+  stroke-width:2px;
+}
+
+@-webkit-keyframes rotate {
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+@keyframes rotate {
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes dash {
+  0% {
+    stroke-dasharray: 1,200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -124;
+  }
+}
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1,200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -124;
+  }
+}
+
+@keyframes color {
+  0% {
+    stroke: #307F7B;
+  }
+  40% {
+    stroke: #9A4444;
+  }
+  66% {
+    stroke: #E1C054;
+  }
+  80%, 90% {
+    stroke: #639440;
+  }
+}
+
+
+.wrapper form input[type=button] {
+	display: none;
+}
