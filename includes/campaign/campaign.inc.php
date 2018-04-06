@@ -27,7 +27,7 @@ class Campaign {
 		//Replacements for unnecessary abbreviations
 		$replace = array('e.a.', 'e.v.a.');
 		$replacement = array('', '');
-		return str_replace('+', '', preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'’&,-]+/u", " ", str_replace($replace, $replacement, $string)))));
+		return str_replace('+', '', preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'’&,-.:]+/u", " ", str_replace($replace, $replacement, $string)))));
 	}
 	
 	//Format timestamp to different date strings
@@ -43,13 +43,46 @@ class Campaign {
 		$output[3] = date('Y-m-d', $time);
 		return $output;
 	}
+	
+	private function sortByDescLength($a,$b) {
+    	return strlen($b)-strlen($a);
+	}
+	
+	//Split performers from string
+	private function getPerformers($string) {
+		$replace = array('e.a.', 'e.v.a.');
+		$replacement = array('', '');
+		
+		$performerString = str_replace($replace, $replacement, trim($string));
+		$performers = preg_split('/(,| en | i.s.m. |met )+/i', $performerString);
+		$performers = array_map('trim', array_unique($performers, SORT_STRING));
+		foreach($performers as $key => $performer) {
+			//Check if misplaced dash (-) occurs in string
+			if (strpos($performer, '-') == (strlen($performer) -1)) {
+				unset($performers[$key]);
+			}
+		}
+		usort($performers,array($this, 'sortByDescLength'));
+		return $performers;
+	}
 		
 	public function createAdgroup() {
 		$tempHeadings = array();
 		$adGroups = array();
 		//Check whether title values exist or not and push to headings array
-		if (strlen($this->title)>1) { array_push($tempHeadings, array("value"=>$this->title,"type"=>"title")); }
-		if (strlen($this->subtitle)>1) { array_push($tempHeadings, array("value"=>$this->subtitle,"type"=>"artist")); }
+		//Check if title contains listed artists
+		if (strpos($this->title, ',') > 1) {
+			$this->performers = $this->getPerformers($this->title);
+		} else {
+			if (strlen($this->title)>1) { array_push($tempHeadings, array("value"=>$this->title,"type"=>"title")); }
+		}
+		
+		//Check if subtitle contains listed artists
+		if (strpos($this->subtitle, ',') > 1) {
+			$this->performers = $this->getPerformers($this->subtitle);
+		} else {
+			if (strlen($this->subtitle)>1) { array_push($tempHeadings, array("value"=>$this->subtitle,"type"=>"artist")); }
+		}
 		if ($this->performers !== false) { array_push($tempHeadings, array("value"=>$this->performers,"type"=>"multiple-artists")); }
 
 		
@@ -84,7 +117,7 @@ class Campaign {
 				// Create adGroup for single artist / performance
 				foreach($tempAdgroup as $gkey => $gval) {
 					//Remove numbers, special characters (excl. '’&-) and unnecessary mentions between brackets
-					$this->adgroup[$i]->name = ucfirst(preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'’&-]+/u", " ", $gval))));
+					$this->adgroup[$i]->name = ucfirst(preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'’&-.:]+/u", " ", $gval))));
 
 					//Check if misplaced dash (-) occurs in campaign name
 					if (strpos($this->adgroup[$i]->name, '-') == (strlen($this->adgroup[$i]->name) -1)) {
@@ -129,7 +162,7 @@ class Campaign {
 		else if (strpos($artist, ' - ') !== false) {
 			$tempArtist = explode(' - ', $artist);
 		} else {
-			$tempArtist[0] = $artist;
+			$tempArtist =  preg_split('/(, | i.s.m. |met )+/i', $artist);
 		}
 		return $tempArtist;
 	}
@@ -180,6 +213,40 @@ class Campaign {
 			$hDate = $this->date->AdDate;
 		}
 		
+		//Set location values for the headings
+		if (strlen($this->date->AdDateFull.' in '.$this->venue[0]) > 30) {
+				if (count($this->venue) > 1 && strlen($this->date->AdDateFull.' in '.$this->venue[1]) <= 30) {
+					$hLocation[0] = $this->venue[1];
+				} else {
+					$hLocation[0] = $this->location;
+				}
+			} else {
+				$hLocation[0] = $this->venue[0];
+			}
+			
+			$hLocation[1] = $this->venue[0];
+			
+			
+			if (strlen($hDate.' in '.$this->venue[0]) > 30) {
+				if (count($this->venue) > 1 && strlen($hDate.' in '.$this->venue[1]) <= 30) {
+					$hLocation[1] = $this->venue[1];
+				} else {
+					$hLocation[1] = $this->location;
+				}
+			} else {
+				$hLocation[1] = $this->venue[0];
+			}
+			
+			$hLocation[2] = $this->venue[0];
+			
+			if (count($this->venue) > 1) {
+				$venue[0] = $this->venue[0];
+				$venue[1] = $this->venue[1];
+			} else {
+				$venue[0] = $this->venue[0];
+				$venue[1] = $this->location;
+			}
+		
 		if ($type == 'title') {
 			
 			//Templates Title ad
@@ -201,6 +268,7 @@ class Campaign {
 					}
 					
 				}
+				
 				//If artist value contains a colon (:), only use the value after the colon
 				if (strpos($artist, ':') !== false) {
 					$hArtist = substr($artist, strpos($artist, ':')+1);
@@ -210,27 +278,33 @@ class Campaign {
 				$hArtist = $artist;
 			}
 			
+			//If title value contains a colon (:) and is longer than 30 characters, only use the value after the colon
+			if (strpos($title, ':') !== false && strlen($title) > 30) {
+				$title = trim(substr($title, strpos($title, ':')+1));
+			}
+			
+			
 			//Check if titles length is more than 30 characters. Depend heading values on that
 			if (strlen($title) > 30) {
 				//Divide heading1 and heading2 in 2 elements
-				$heading[0] = array($hArtist, $hDate.' in '.$this->location);
+				$heading[0] = array($hArtist, $this->date->AdDateFull.' in '.$hLocation[0]);
 				if (strlen(ucfirst($genre).' - '.$hArtist) > 30) {
-					$heading[1] = array($hArtist, $this->venue);
-					$heading[2] = array($hArtist, $this->date->AdDateFull.' in '.$this->location);
+					$heading[1] = array($hArtist, $hDate.' in '.$this->venue[0]);
+					$heading[2] = array($hArtist, $hLocation[2]);
 				} else {
-					$heading[1] = array(ucfirst($genre).' - '.$hArtist, $this->venue);
-					$heading[2] = array($hArtist.' - '.ucfirst($genre), $this->venue);
+					$heading[1] = array(ucfirst($genre).' - '.$hArtist, $hLocation[1]);
+					$heading[2] = array($hArtist.' - '.ucfirst($genre), $hLocation[2]);
 				}
 			} else {
 				//Divide heading1 and heading2 in 2 elements
-				$heading[0] = array($title, $hDate.' in '.$this->location);
+				$heading[0] = array($title, $this->date->AdDateFull.' in '.$hLocation[0]);
 				//Determine if artist heading value is too long or doesn't exist
 				if (strlen($hArtist) > 30 || strlen($hArtist) === 0) {
-					$heading[1] = array($title, $this->date->AdDateFull.' in '.$this->location);
+					$heading[1] = array($title, $hDate.' in '.$this->venue[0]);
 				} else {
 					$heading[1] = array($title, $hArtist);
 				}
-				$heading[2] = array($title, $this->venue);
+				$heading[2] = array($title, $hLocation[2]);
 			}
 			
 			//Check if heading 2 is still empty
@@ -239,15 +313,21 @@ class Campaign {
 			}
 			*/
 			
+			
 			//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
 			$template[0] = array(
+				"Naar ".$title." in ".$this->location."? Koop nu kaarten.",
 				"Naar ".$tLabel[1]." in ".$this->location."? Koop kaarten voor ".$title.".",
 				"Naar ".$tLabel[1]." in ".$this->location."? Bestel nu je kaarten voor ".$title.".",
+				"Naar ".$title." in ".$venue[1]."? Bestel nu kaarten voor ".$this->date->AdDate,
+				"Naar ".$title." in ".$venue[0]."? Bestel nu kaarten voor ".$this->date->AdDate,
 			);
 			$template[1] = array(
+				"Kom naar ".$title." in ".$this->location.". Koop nu tickets.",
+				"Kom naar ".$title." in ".$venue[1].". Koop nu tickets.",
 				"Kom naar ".$title." in ".$this->location.". Koop tickets voor ".$this->date->AdDate,
-				"Kom naar ".$title." in ".$this->venue.". Koop tickets voor ".$this->date->AdDate,
-				"Kom naar ".$title." in ".$this->venue.". Bestel nu je tickets voor ".$this->date->AdDate,
+				"Kom naar ".$title." in ".$venue[1].". Koop tickets voor ".$this->date->AdDate,
+				"Kom naar ".$title." in ".$venue[0].". Bestel nu je tickets voor ".$this->date->AdDate,
 			);
 			$template[2] = array(
 				"Geniet van ".$title.". Koop nu tickets.",
@@ -290,7 +370,7 @@ class Campaign {
 					$heading[1] = array($title, $performance);
 				}
 			}
-			$heading[2] = array($title, $this->venue);
+			$heading[2] = array($title, $hLocation[2]);
 			
 			
 			$template[0] = array(
@@ -303,8 +383,8 @@ class Campaign {
 			);
 			$template[1] = array(
 				"Kom naar ".$title." in ".$this->location.". Koop tickets voor ".$this->date->AdDate,
-				"Kom naar ".$title." in ".$this->venue.". Koop tickets voor ".$this->date->AdDate,
-				"Kom naar ".$title." in ".$this->venue.". Bestel nu je tickets voor ".$this->date->AdDate,
+				"Kom naar ".$title." in ".$venue[1].". Koop tickets voor ".$this->date->AdDate,
+				"Kom naar ".$title." in ".$venue[0].". Bestel nu je tickets voor ".$this->date->AdDate,
 			);
 			$template[2] = array(
 				"Geniet van ".$title.". Koop nu je tickets",
@@ -389,30 +469,44 @@ class Campaign {
 			$placements->entertainment = array('show', 'theater');
 			$genre = $this->genre[0];
 		
+			if (count($this->venue) > 1) {
+				$venue[0] = $this->venue[0];
+				$venue[1] = $this->venue[1];
+			} else {
+				$venue[0] = $this->venue[0];
+				$venue[1] = $this->location;
+			}
+		
+			if (strpos($name, ':') !== false && strlen($name) > 30) {
+				$name = substr($name, strpos($name, ':')+1);
+			}
+		
 			$keywordList = array();
+			array_push($keywordList, strtolower($name));
 			
 			//Check if keyword insertion has been applied
 			if ($type == 'multiple-artists') {
 				$keywordList = $name;
 			} else {
-				array_push($keywordList, strtolower($name));
-
 				//Combine performer and performance name as keyword
 				if ($type == 'title') {
-					array_push($keywordList, strtolower($name).' '.strtolower($this->trimArtist($this->subtitle)));
+					$subKeyword = strtolower($name.' '.$this->trimArtist($this->subtitle)[0]);
+					if (strlen($subKeyword) <= 30) {
+						array_push($keywordList, $subKeyword);
+					}
 				}
 				//Combine venue or location and performance name as keyword
 				if (strlen($name) > 15) {
-					array_push($keywordList, strtolower($name).' '.strtolower($this->location));
+					array_push($keywordList, strtolower($name).' '.strtolower($venue[1]));
 				} else {
 					array_push($keywordList, strtolower($name).' '.strtolower($this->location));
-					array_push($keywordList, strtolower($name).' '.strtolower($this->venue));
+					array_push($keywordList, strtolower($name).' '.strtolower($venue[0]));
 				}
 			}
 
 		
 			//Loop keyword list
-			foreach($placements as $keyWord => $keyValue) {
+			/*foreach($placements as $keyWord => $keyValue) {
 				//Check if genre has keyword array
 				if (stripos($genre, $keyWord) !== false) {
 						foreach($keyValue as $tempKey => $tempVal) {
@@ -425,7 +519,7 @@ class Campaign {
 							
 				}
 	
-			}
+			}*/
 		//Remove single words from keywords list
 		foreach ($keywordList as $key => $word) {
 			if (strpos($word, ' ') === false) {
