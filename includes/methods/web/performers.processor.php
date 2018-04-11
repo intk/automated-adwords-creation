@@ -55,7 +55,7 @@ function getWebPage($url){
     	return $header['content'];
 }
 
-function getPerformers($url) {
+function getPerformers($url, $tag) {
 	//Create return object to store performers
 	$performerObj = new stdClass();
 	$performerObj->success = false;
@@ -68,33 +68,75 @@ function getPerformers($url) {
 
 	if (strlen($content)>1) {
 		
-		//Find words with a colon (e.g. regie:) and add it with its delimiter to the array
-		$credits = preg_split("/(\w*: )/", $content, -1, PREG_SPLIT_DELIM_CAPTURE);
-		$credits = array_chunk(array_slice($credits, 1, -1, true), 2, false);
-										
-		$performers = array();
-		
-		$replace = array('e.a.', 'e.v.a.');
-		$replacement = array('', '');
-		
-		$excludePattern = "muzikale leiding";
-		$rolePattern = "spelers,spel,regie,eindregie,tekst,compositie,met,musici,muzikale leiding,muziek,muzikant,muzikanten";
-		$filteredRoles = "";
-		
+		//Check if predefined performers tag exists and if it only contains words/names
+		if (count($tag) > 0 && strlen($tag['performers']) > 1) {
+			$performers = array();
+			$credits = preg_split("/(\w*: )/", $dom->find($tag['performers'], -1)->plaintext);
+			$credits = implode(', ', $credits);
+			
+			$credits = explode(', ', preg_replace("/\s+/", " ", $credits));
+			
+			//Only remain names
+			foreach ($credits as $ckey => $credit) {
+				if (preg_match('#[0-9]#', $credit)){
+					unset($credits[$ckey]);
+				} else {
+					$tempstr = explode(' ', trim($credit));
+					//Empty array element
+					$credits[$ckey] = '';
+					
+					//Add relevant string elements as performer name
+					foreach ($tempstr as $tkey => $strelem) {
+						if ($tkey == 0) {
+							$credits[$ckey] .= $strelem;
+						}
+						if ($tkey == 1) {
+							$credits[$ckey] .= ' '.$strelem;
+						}
+						if ($tkey == 2 && ($tempstr[1] == 'van' || $tempstr[1] == 'ten' || $tempstr[1] == 'de' || $tempstr[1] == 'den')) {
+							$credits[$ckey] .= ' '.$strelem;
+						}
+						if ($tkey == 3 && ($tempstr[1] == 'van' && $tempstr[2] == 'der')) {
+							$credits[$ckey] .= ' '.$strelem;
+						}
+					}
+					if (strlen($credit) == 0 || count($tempstr) <= 1) {
+						unset($credits[$ckey]);
+					}
+				}
+			}
+			if (count($credits)>1) {
+				$performers = $credits;
+			}
+		} else {
+			//Find words with a colon (e.g. regie:) and add it with its delimiter to the array
+			$credits = preg_split("/(\w*: )/", $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+			$credits = array_chunk(array_slice($credits, 1, -1, true), 2, false);
 
-		//Loop each role
-		foreach($credits as $role) {
-			$role[0] = str_replace(':','', $role[0]);
-			if (strlen(trim($role[0])) > 2) {
-				if (stripos($rolePattern, trim($role[0]), 0) !== false && stripos($filteredRoles, trim($role[0]), 0) === false) {
-					//Add role to 'filteredRoles' string
-					$filteredRoles .=  trim($role[0]).',';
-					//Loop each performer, add them to array
-					$performer = preg_split('/(,| en | i.s.m.)+/i', $role[1]);
-					foreach($performer as $val) {
-						//Check if string isn't empty and doesn't include any words or characters that need to be excluded
-						if (strlen($val)>1 && stripos($excludePattern, trim($val)) === false && stripos($val, '#', 0) === false) {
-							array_push($performers, trim($val));
+			$performers = array();
+
+			$replace = array('e.a.', 'e.v.a.');
+			$replacement = array('', '');
+
+			$excludePattern = "muzikale leiding";
+			$rolePattern = "spelers,spel,regie,eindregie,tekst,compositie,met,musici,muzikale leiding,muziek,muzikant,muzikanten";
+			$filteredRoles = "";
+
+
+			//Loop each role
+			foreach($credits as $role) {
+				$role[0] = str_replace(':','', $role[0]);
+				if (strlen(trim($role[0])) > 2) {
+					if (stripos($rolePattern, trim($role[0]), 0) !== false && stripos($filteredRoles, trim($role[0]), 0) === false) {
+						//Add role to 'filteredRoles' string
+						$filteredRoles .=  trim($role[0]).',';
+						//Loop each performer, add them to array
+						$performer = preg_split('/(,| en | i.s.m.)+/i', $role[1]);
+						foreach($performer as $val) {
+							//Check if string isn't empty and doesn't include any words or characters that need to be excluded
+							if (strlen($val)>1 && stripos($excludePattern, trim($val)) === false && stripos($val, '#', 0) === false) {
+								array_push($performers, str_replace($replace, $replacement, trim($val)));
+							}
 						}
 					}
 				}
@@ -118,5 +160,5 @@ function getPerformers($url) {
 		return false;
 	}
 }
-//print_r(getPerformers("http://www.stadsschouwburg-utrecht.nl/voorstellingen/7664/Slikken_en_Stikken/De_Verleiders/"));
+//print_r(getPerformers("https://www.bimhuis.nl/agenda/tommy-got-waxed/", array("performers"=>".intro")));
 ?>
