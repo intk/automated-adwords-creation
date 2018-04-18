@@ -119,10 +119,8 @@ function getPerformers($url, $tag) {
 			$replacement = array('', '');
 
 			$excludePattern = "muzikale leiding";
-			$rolePattern = "spelers,spel,regie,eindregie,tekst,compositie,met,musici,muzikale leiding,muziek,muzikant,muzikanten";
+			$rolePattern = "spelers,spel,regie,regisseur,schrijver,schijver,eindregie,tekst,compositie,met,musici,muzikale leiding,muziek,muzikant,muzikanten";
 			$filteredRoles = "";
-
-
 			//Loop each role
 			foreach($credits as $role) {
 				$role[0] = str_replace(':','', $role[0]);
@@ -132,21 +130,73 @@ function getPerformers($url, $tag) {
 						$filteredRoles .=  trim($role[0]).',';
 						//Loop each performer, add them to array
 						$performer = preg_split('/(,| en | i.s.m.)+/i', $role[1]);
+						
+						$noList = true;
+						//Check if performer roles exist in splitted values. If so, split new values on their performer role
+						foreach($performer as $key => $combined) {
+							//Loop each word of performer value and check if performer role exists in the value
+							foreach(explode(' ', $combined) as $val) {
+								if (stripos($rolePattern, $val.',') !== false && strlen($val) > 3) {
+									$combined = trim(str_ireplace($val, ', ', $combined));
+									$noList = false;
+								} 
+							}
+							
+							// If performers could be splitted, loop each splitted performer and check if it's a name
+							if ($noList == false && strpos($combined, ',') !== false) {
+								foreach(explode(', ', $combined) as $ckey => $val) {
+									if (strlen($val) > 1) {
+										$tempstr = explode(' ', trim($val));
+										//Empty array element
+										$credits[$ckey] = '';
+
+										//Add relevant string elements as performer name
+										foreach ($tempstr as $tkey => $strelem) {
+											if ($tkey == 0) {
+												$credits[$ckey] .= $strelem;
+											}
+											if ($tkey == 1) {
+												$credits[$ckey] .= ' '.$strelem;
+											}
+											if ($tkey == 2 && ($tempstr[1] == 'van' || $tempstr[1] == 'ten' || $tempstr[1] == 'de' || $tempstr[1] == 'den')) {
+												$credits[$ckey] .= ' '.$strelem;
+											}
+											if ($tkey == 3 && ($tempstr[1] == 'van' && $tempstr[2] == 'der')) {
+												$credits[$ckey] .= ' '.$strelem;
+											}
+										}
+										
+										array_push($performers, $credits[$ckey]);
+									}
+
+								}
+							}
+							
+							// If performer roles aren't listed in the performer value, add the full performer value to the performer list
+							if ($noList == true) {
+								array_push($performers, $combined);
+							}
+							
+							
+						}
+						
+						/*
 						foreach($performer as $val) {
 							//Check if string isn't empty and doesn't include any words or characters that need to be excluded
-							if (strlen($val)>1 && stripos($excludePattern, trim($val)) === false && stripos($val, '#', 0) === false) {
+							if ((strlen($val)>1 && strlen($val)<1000) && stripos($excludePattern, trim($val)) === false && stripos($val, '#', 0) === false) {
 								array_push($performers, str_replace($replace, $replacement, trim($val)));
 							}
 						}
+						*/
 					}
 				}
 			}
 		}
 		
 		if (count($performers) >= 1) {
-			$performers = array_unique($performers, SORT_STRING);
+			//$performers = array_unique($performers, SORT_STRING);
 			//Sort performers by length for keyword insertion
-			usort($performers,'sortByLength');
+			//usort($performers,'sortByLength');
 			$performerObj->success = true;
 			$performerObj->performers = $performers;
 		}
@@ -160,5 +210,5 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
-//print_r(getPerformers("https://www.bimhuis.nl/agenda/tommy-got-waxed/", array("performers"=>".intro")));
+//getPerformers("https://www.theaterbellevue.nl/agenda/1602/De_Tekstsmederij/De_Tekstsmederij_Leest_/", array("performers"=>""));
 ?>
