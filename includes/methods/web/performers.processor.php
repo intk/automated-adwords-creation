@@ -70,9 +70,20 @@ function getPerformers($url, $tag) {
 		
 		//Check if predefined performers tag exists and if it only contains words/names
 		if (count($tag) > 0 && strlen($tag['performers']) > 1) {
-			$performers = array();
-			$credits = preg_split("/(\w*: )/", $dom->find($tag['performers'], -1)->plaintext);
-			$credits = implode(', ', $credits);
+			//Check if multiple selectors are given in performers tag
+			if (count(explode(' + ', $tag['performers'])) > 1) {
+				foreach(explode(' + ', $tag['performers']) as $key => $tagString) {
+					$credit = preg_split("/(\w*: )/", $dom->find($tagString, -1)->plaintext);
+					if ($key > 0) {
+						$credits .= ', '.implode(', ', $credit);
+					} else {
+						$credits .= implode(', ', $credit);
+					}	
+				}
+			} else {
+				$credits = preg_split("/(\w*: )/", $dom->find($tag['performers'], -1)->plaintext);
+				$credits .= implode(', ', $credit);
+			}
 			
 			$credits = explode(', ', preg_replace("/\s+/", " ", $credits));
 			
@@ -105,7 +116,7 @@ function getPerformers($url, $tag) {
 					}
 				}
 			}
-			if (count($credits)>1) {
+			if (count($credits)>0) {
 				$performers = $credits;
 			}
 		} else {
@@ -194,9 +205,9 @@ function getPerformers($url, $tag) {
 		}
 		
 		if (count($performers) >= 1) {
-			//$performers = array_unique($performers, SORT_STRING);
+			$performers = array_unique($performers, SORT_STRING);
 			//Sort performers by length for keyword insertion
-			//usort($performers,'sortByLength');
+			usort($performers,'sortByLength');
 			$performerObj->success = true;
 			$performerObj->performers = $performers;
 		}
@@ -210,5 +221,5 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
-//getPerformers("https://www.theaterbellevue.nl/agenda/1602/De_Tekstsmederij/De_Tekstsmederij_Leest_/", array("performers"=>""));
+//print_r(getPerformers("https://www.dedomijnen.nl/podium/film/the-florida-project/?time=201804201600", array("performers"=>"")));
 ?>
