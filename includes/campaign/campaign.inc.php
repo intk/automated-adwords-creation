@@ -108,7 +108,7 @@ class Campaign {
 		}
 		
 		//Check if subtitle contains listed artists
-		if (strpos($this->subtitle, ',') > 1 || strpos($this->subtitle, '/') > 1) {
+		if (strpos($this->subtitle, ',') > 1 || strpos($this->subtitle, ' - ') > 1) {
 			$this->performers = $this->getPerformers($this->subtitle);
 		} else {
 			if (strlen($this->subtitle)>1) { array_push($tempHeadings, array("value"=>$this->subtitle,"type"=>"artist")); }
@@ -222,6 +222,7 @@ class Campaign {
 		$pLabel->familievoorstelling = array("voorstelling", "een voorstelling");
 		$pLabel->jeugd = array("toneel", "toneel");
 		$pLabel->dans = array('dans', 'een danssshow');
+		$pLabel->film = array('film', 'de film', 'een film');
 		$pLabel->concert = array('concert', 'een concert');
 		$pLabel->theaterconcert = array('concert', 'een concert');
 		$pLabel->opera = array('opera', 'opera');
@@ -275,6 +276,12 @@ class Campaign {
 			} else {
 				$venue[0] = $this->venue[0];
 				$venue[1] = $this->location;
+			}
+		
+		if ($this->genre[0] == 'film') {
+				$hGenre = ' - '.ucfirst($this->genre[0]);
+			} else {
+				$hGenre = '';
 			}
 		
 		if ($type == 'title') {
@@ -334,14 +341,14 @@ class Campaign {
 				}
 			} else {
 				//Divide heading1 and heading2 in 2 elements
-				$heading[0] = array($this->trimHead($title), $this->date->AdDateFull.' in '.$hLocation[0]);
+				$heading[0] = array($this->trimHead($title).$hGenre, $this->date->AdDateFull.' in '.$hLocation[0]);
 				//Determine if artist heading value is too long or doesn't exist
 				if (strlen($this->trimHead($hArtist)) > 30 || strlen($this->trimHead($hArtist)) === 0) {
-					$heading[1] = array($this->trimHead($title), $hDate.' in '.$this->venue[0]);
+					$heading[1] = array($this->trimHead($title).$hGenre, $hDate.' in '.$this->venue[0]);
 				} else {
-					$heading[1] = array($this->trimHead($title), $this->trimHead($hArtist));
+					$heading[1] = array($this->trimHead($title).$hGenre, $this->trimHead($hArtist));
 				}
-				$heading[2] = array($this->trimHead($title), ucfirst($hLocation[2]));
+				$heading[2] = array($this->trimHead($title).$hGenre, ucfirst($hLocation[2]));
 			}
 			
 			//Check if heading 2 is still empty
@@ -368,14 +375,26 @@ class Campaign {
 				"Kom naar ".$title." in ".$venue[1].". Koop tickets voor ".$this->date->AdDate,
 				"Kom naar ".$title." in ".$venue[0].". Bestel nu je tickets voor ".$this->date->AdDate,
 			);
-			$template[2] = array(
-				"Geniet van ".$hArtist.". Koop nu tickets.",
-				"Geniet van ".$title.". Koop nu tickets.",
-			    "Geniet van ".$title.". Koop nu tickets voor ".$this->date->AdDate,
-				"Geniet van ".$title." met ".$artist.". Koop nu tickets voor ".$this->date->AdDate,
-				"Geniet van ".$title." door ".$artist.". Koop tickets voor ".$this->date->AdDate,
-				"Geniet van ".$title." door ".$artist.". Koop nu je tickets voor ".$this->date->AdDate,
-			);
+			if ($this->genre[0] === 'film') {
+				//Custom template for movies
+				$template[2] = array(
+					"Geniet van ".$hArtist.". Koop nu tickets.",
+					"Geniet van ".$title.". Koop nu tickets.",
+					"Geniet van ".$title.". Koop nu tickets voor ".$this->date->AdDate,
+					"Geniet van ".$tLabel[1]." ".$title.". Koop nu tickets voor ".$this->date->AdDate,
+					"Geniet van ".$tLabel[1]." ".$title." in ".$venue[0].". Koop tickets voor ".$this->date->AdDate,
+					"Geniet van ".$tLabel[1]." ".$title." in ".$venue[0].". Koop nu je tickets voor ".$this->date->AdDate,
+				);
+			} else {
+				$template[2] = array(
+					"Geniet van ".$hArtist.". Koop nu tickets.",
+					"Geniet van ".$title.". Koop nu tickets.",
+					"Geniet van ".$title.". Koop nu tickets voor ".$this->date->AdDate,
+					"Geniet van ".$title." met ".$artist.". Koop nu tickets voor ".$this->date->AdDate,
+					"Geniet van ".$title." door ".$artist.". Koop tickets voor ".$this->date->AdDate,
+					"Geniet van ".$title." door ".$artist.". Koop nu je tickets voor ".$this->date->AdDate,
+				);
+			}
 			
 		} 
 		if ($type == 'artist' || $type == 'multiple-artists') {
@@ -412,8 +431,32 @@ class Campaign {
 			}
 			$heading[2] = array($title, ucfirst($hLocation[2]));
 			
-			
-			$template[0] = array(
+			if ($this->genre[0] === 'film') {
+				//Custom template for movies
+				$template[0] = array(
+					"Naar ".$tLabel[2]." met ".$title."? Koop nu je kaarten.",
+					"Naar ".$tLabel[2]." met ".$title."? Kom naar ".$this->location.".",
+					"Naar ".$tLabel[2]." met ".$title."? Koop kaarten voor ".$performance.".",
+					"Naar ".$tLabel[2]." met ".$title."? Koop kaarten voor ".$performance." in ".$this->location.".",
+					"Naar ".$tLabel[2]." met ".$title."? Koop nu kaarten voor ".$performance.".",
+					"Naar ".$tLabel[2]." met ".$title."? Bestel nu je kaarten voor ".$performance." in ".$this->location.".",
+
+				);
+				$template[1] = array(
+					"Kom naar ".$tLabel[2]." met ".$title." in ".$this->location.".",
+					"Kom naar ".$tLabel[2]." met ".$title." in ".$this->location.". Koop tickets voor ".$this->date->AdDate,
+					"Kom naar ".$tLabel[2]." met ".$title." in ".$venue[1].". Koop tickets voor ".$this->date->AdDate,
+					"Kom naar ".$tLabel[2]." met ".$title." in ".$venue[0].". Bestel nu je tickets voor ".$this->date->AdDate,
+				);
+				$template[2] = array(
+					"Geniet van ".$tLabel[2]." met ".$title.". Koop nu je tickets",
+					"Geniet van ".$tLabel[2]." met ".$title.". Koop nu tickets voor ".$this->date->AdDate,
+					"Geniet van ".$tLabel[2]." met ".$title." in ".$performance.". Koop nu tickets.",
+					"Geniet van ".$tLabel[2]." met ".$title." in ".$performance.". Koop tickets voor ".$this->date->AdDate,
+					"Geniet van ".$tLabel[2]." met ".$title." in ".$performance.". Koop nu tickets voor ".$this->date->AdDate,
+				);
+			} else {
+				$template[0] = array(
 				"Naar ".$title."? Koop nu je kaarten.",
 				"Naar ".$title."? Koop kaarten voor ".$tLabel[1]." in ".$this->location.".",
 				"Naar ".$title."? Koop kaarten voor ".$performance.".",
@@ -433,6 +476,7 @@ class Campaign {
 				"Geniet van ".$title." in ".$performance.". Koop tickets voor ".$this->date->AdDate,
 				"Geniet van ".$title." in ".$performance.". Koop nu tickets voor ".$this->date->AdDate,
 			);
+			}
 		}
 			
 			
@@ -464,9 +508,9 @@ class Campaign {
 					} else {
 						$pathTitle = $this->subtitle;
 					}
-					$pathString = strtolower(trim(preg_replace('/( de | een | en | het )/', ' ', trim($pathTitle))));
+					$pathString = strtolower(trim(preg_replace('/( de | een | en | het |:|,)/', ' ', trim($pathTitle))));
 				} else {
-					$pathString = strtolower(trim(preg_replace('/( de | een | en | het )/', ' ', $title)));
+					$pathString = strtolower(trim(preg_replace('/( de | een | en | het |:|,)/', ' ', $title)));
 				}
 				
 				//Check if pathString length <= 15 characters
@@ -490,23 +534,23 @@ class Campaign {
 	
 	private function createKeywords($name, $type) {
 			$placements = new stdClass();
-			$placements->toneel = array('voorstelling', 'toneel', 'tickets', 'theater');
+			$placements->toneel = array('toneel', 'tickets', 'theater');
 			$placements->cabaret = array('cabaret', 'theater', 'tickets');
-			$placements->musical = array('show', 'theater');
+			$placements->musical = array('theater');
 			$placements->college = array('college', 'theater');
 			$placements->familie = array("familie", "theater");
 			$placements->jeugd = array("familie", "theater");
 			$placements->dans = array('dans', 'theater');
-			$placements->serie = array('voorstelling', 'theater');
+			$placements->serie = array('theater');
 		    $placements->concert = array('concert', 'theater');
 			$placements->show = array('concert', 'theater');
 			$placements->muziek = array('concert', 'theater');
 			$placements->klassiek = array('concert', 'theater');
-			$placements->overig = array('voorstelling', 'theater');
+			$placements->overig = array('theater');
 			$placements->opera = array('opera', 'theater');
-			$placements->specials = array('voorstelling', 'theater');
+			$placements->specials = array('theater');
 			$placements->circus = array('circus', 'theater');
-			$placements->entertainment = array('show', 'theater');
+			$placements->entertainment = array('theater');
 			$genre = $this->genre[0];
 		
 			if (count($this->venue) > 1) {
@@ -542,24 +586,24 @@ class Campaign {
 					array_push($keywordList, strtolower($name).' '.strtolower($this->location));
 					array_push($keywordList, strtolower($name).' '.strtolower($venue[0]));
 				}
+				
+				//Loop keyword list
+				foreach($placements as $keyWord => $keyValue) {
+					//Check if genre has keyword array
+					if (stripos($genre, $keyWord) !== false) {
+							foreach($keyValue as $tempKey => $tempVal) {
+								//Add keywords
+									if (stripos($name, $tempVal) === false) {
+										array_push($keywordList, strtolower($name).' '.strtolower($tempVal));
+									}
+
+								}
+
+					}
+
+				}
 			}
 
-		
-			//Loop keyword list
-			/*foreach($placements as $keyWord => $keyValue) {
-				//Check if genre has keyword array
-				if (stripos($genre, $keyWord) !== false) {
-						foreach($keyValue as $tempKey => $tempVal) {
-							//Add keywords
-								if (stripos($name, $tempVal) === false) {
-									array_push($keywordList, strtolower($name).' '.strtolower($tempVal));
-								}
-							
-							}
-							
-				}
-	
-			}*/
 		//Remove single words from keywords list
 		foreach ($keywordList as $key => $word) {
 			if (strpos($word, ' ') === false) {
