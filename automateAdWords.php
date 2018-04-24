@@ -60,6 +60,14 @@ if ($_GET['theater']) {
 					$campaign->createAdgroup();
 					$theater->productions[$key]->campaign = $campaign;
 					$theater->csvOutput = createCSV($theater->name, $month, $result['budget'], $result['targetLocation'], 'paused', $theater->productions[$key]);
+					
+					//Import performance data to database
+					$select = mysqli_query($connect, "SELECT * FROM performances WHERE theaterId=".$result['id']." AND title='".$item->title."' AND performanceDate = '".$item->date->time."'");
+					$selectResult = mysqli_fetch_assoc($select);
+					if (count($selectResult) < 1) {
+						$import = mysqli_query($connect, "INSERT INTO performances (theaterId, title, subtitle, genre, performanceDate, creationDate, link) VALUES (".$result['id'].", '".$item->title."', '".$item->subtitle."', '".implode(';', $item->genre)."', '".$item->date->time."', '".time()."', '".$item->link."')");
+
+					}
 				}
 			}
 			echo json_encode($theater);
