@@ -31,12 +31,45 @@ include('includes/config.inc.php');
 //load method for creating CSV
 include('includes/methods/csv/csv.processor.php');
 error_reporting(E_ALL);
+
+// Parse ads templates from db
+function parseTemplate($template) {
+	$tplString = preg_replace("/\s+/", " ", $template);	
+	// Get template blocks
+	$blocks = preg_split('/(\w* { |\w* = )/', $tplString, -1, PREG_SPLIT_DELIM_CAPTURE);
+	array_push($blocks, '');
+	$blocks = array_chunk(array_slice($blocks, 1, -1, true), 2, false);
 	
+	// Iterate template blocks
+	foreach($blocks as $key => $block) {
+		$block[0] = trim(str_replace(array('{', ' ='), array('',''), $block[0]));
+		$chunk = preg_split('/\[[0-9]\] /', $block[1]);
+		//Iterate ad templates and assign them to types object
+		foreach($chunk as $key => $val) {
+			if (strlen($val) > 1) {
+				$types[$block[0]][$key] = explode(', ', str_replace(array('}', '"'), array('',''), $val));
+			}
+		}
+		// Reset keys of types object
+		$types[$block[0]] = array_values($types[$block[0]]);
+	
+	}
+	
+	// Assign preposition for headings
+	$types['prep'] = $types['prep'][0][0];
+	
+	return $types;
+}
+
 //Check if query string matches database records
 if ($_GET['theater']) {
-	$query = mysqli_query($connect, "SELECT * FROM theaters WHERE alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id WHERE theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+	
 	if (mysqli_num_rows($query) >= 1) {
 		$result = mysqli_fetch_array($query);
+		
+		// Assign template for ads
+		$template = parseTemplate($result['content']);
 
 		//Parse monthly season
 		include('includes/scraper.inc.php');
@@ -56,7 +89,7 @@ if ($_GET['theater']) {
 				$theater->productionsNumber = count($theater->productions);
 			} else {
 				foreach($theater->productions as $key => $item) {
-					$campaign = new Campaign($item);
+					$campaign = new Campaign($item, $template);
 					$campaign->createAdgroup();
 					$theater->productions[$key]->campaign = $campaign;
 					$theater->csvOutput = createCSV($theater->name, $month, $result['budget'], $result['targetLocation'], 'paused', $theater->productions[$key]);
