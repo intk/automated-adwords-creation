@@ -1,7 +1,9 @@
 <?php
 // Include simple_html_dom module to scrape a web page
 header('Content-Type: application/json');
-include('simple_html_dom.php');
+$performersA = array();
+
+include(dirname(__FILE__).'/simple_html_dom.php');
 
 
 //Sort performer array by value length for keyword insertion
@@ -70,6 +72,7 @@ function getPerformers($url, $tag) {
 		
 		//Check if predefined performers tag exists and if it only contains words/names
 		if (count($tag) > 0 && strlen($tag['performers']) > 1) {
+			
 			//Check if multiple selectors are given in performers tag
 			if (count(explode(' + ', $tag['performers'])) > 1) {
 				foreach(explode(' + ', $tag['performers']) as $key => $tagString) {
@@ -81,11 +84,12 @@ function getPerformers($url, $tag) {
 					}	
 				}
 			} else {
-				$credits = preg_split("/(\w*: )/", $dom->find($tag['performers'], -1)->plaintext);
-				$credits .= implode(', ', $credit);
+				//echo $dom->find($tag['performers'], -1)->plaintext;
+				$credits = preg_split("/(\w*: )/", preg_replace("/\s+/", " ", $dom->find($tag['performers'], -1)->plaintext));
+				//$credits .= implode(', ', $credit);
 			}
 			
-			$credits = explode(', ', preg_replace("/\s+/", " ", $credits));
+			//$credits = explode(', ', preg_replace("/\s+/", " ", $credits));
 			
 			//Only remain names
 			foreach ($credits as $ckey => $credit) {
@@ -104,8 +108,9 @@ function getPerformers($url, $tag) {
 						if ($tkey == 1) {
 							$credits[$ckey] .= ' '.$strelem;
 						}
-						if ($tkey == 2 && ($tempstr[1] == 'van' || $tempstr[1] == 'ten' || $tempstr[1] == 'de' || $tempstr[1] == 'den')) {
+						if ($tkey == 2 && ($tempstr[1] == 'van' || $tempstr[1] == 'ten' || $tempstr[1] == 'de' || $tempstr[1] == 'den' || strlen($tempstr[1]) < 10)) {
 							$credits[$ckey] .= ' '.$strelem;
+
 						}
 						if ($tkey == 3 && ($tempstr[1] == 'van' && $tempstr[2] == 'der')) {
 							$credits[$ckey] .= ' '.$strelem;
@@ -123,7 +128,7 @@ function getPerformers($url, $tag) {
 			//Find words with a colon (e.g. regie:) and add it with its delimiter to the array
 			$credits = preg_split("/(\w*: )/", $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 			$credits = array_chunk(array_slice($credits, 1, -1, true), 2, false);
-
+			
 			$performers = array();
 
 			$replace = array('e.a.', 'e.v.a.');
@@ -137,6 +142,10 @@ function getPerformers($url, $tag) {
 				$role[0] = str_replace(':','', $role[0]);
 				if (strlen(trim($role[0])) > 2) {
 					if (stripos($rolePattern, trim($role[0]), 0) !== false && stripos($filteredRoles, trim($role[0]), 0) === false) {
+						$replace = array('e.a.', 'e.a', 'e.v.a.', 'met ',);
+						$replacement = array('', '', '', '');
+						
+						$role[1] = str_ireplace($replace, $replacement, preg_replace("/\([^)]+\)/","",$role[1]));
 						//Add role to 'filteredRoles' string
 						$filteredRoles .=  trim($role[0]).',';
 						//Loop each performer, add them to array
@@ -177,7 +186,7 @@ function getPerformers($url, $tag) {
 											}
 										}
 										
-										array_push($performers, $credits[$ckey]);
+										array_push($performers, trim($credits[$ckey]));
 									}
 
 								}
@@ -185,7 +194,7 @@ function getPerformers($url, $tag) {
 							
 							// If performer roles aren't listed in the performer value, add the full performer value to the performer list
 							if ($noList == true) {
-								array_push($performers, $combined);
+								array_push($performers, trim($combined));
 							}
 							
 							
@@ -210,9 +219,11 @@ function getPerformers($url, $tag) {
 			usort($performers,'sortByLength');
 			$performerObj->success = true;
 			$performerObj->performers = $performers;
+			if (strlen($performers[0]) > 30) {
+				$performerObj->success = false;
+			}
 		}
-			
-		
+				
 	}
 	
 	if ($performerObj->success == true) {
@@ -221,5 +232,5 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
-//print_r(getPerformers("https://www.dedomijnen.nl/podium/film/the-florida-project/?time=201804201600", array("performers"=>"")));
+print_r(getPerformers("https://www.lantarenvenster.nl/programma/gregory-porter-dont-forget-your-music/", array("performers"=>".page-content .wp_theatre_prod .wp_theatre_prod_director")));
 ?>
