@@ -1,9 +1,104 @@
 <?php
 // Include simple_html_dom module to scrape a web page
 header('Content-Type: application/json');
-$performersA = array();
+$performers = array();
 
 include(dirname(__FILE__).'/simple_html_dom.php');
+
+function getCredits($content) {
+	//Find words with a colon (e.g. regie:) and add it with its delimiter to the array
+	$credits = preg_split("/(\w*: )/", $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+	$credits = array_chunk(array_slice($credits, 1, -1, true), 2, false);
+	
+	$tempPerformers = array();
+
+	$replace = array('e.a.', 'e.v.a.');
+	$replacement = array('', '');
+
+	$excludePattern = "muzikale leiding";
+	$rolePattern = "spelers,spel,regie,regisseur,schrijver,schijver,eindregie,tekst,compositie,met,musici,muzikale leiding,muziek,muzikant,muzikanten";
+	$filteredRoles = "";
+	//Loop each role
+	foreach($credits as $role) {
+		$role[0] = str_replace(':','', $role[0]);
+		if (strlen(trim($role[0])) > 2) {
+			if (stripos($rolePattern, trim($role[0]), 0) !== false && stripos($filteredRoles, trim($role[0]), 0) === false) {
+				$replace = array('e.a.', 'e.a', 'e.v.a.', 'met ',);
+				$replacement = array('', '', '', '');
+				
+				$role[1] = str_ireplace($replace, $replacement, preg_replace("/\([^)]+\)/","",$role[1]));
+				//Add role to 'filteredRoles' string
+				$filteredRoles .=  trim($role[0]).',';
+				//Loop each performer, add them to array
+				$performer = preg_split('/(,| en | i.s.m.)+/i', $role[1]);
+				
+				$noList = true;
+				//Check if performer roles exist in splitted values. If so, split new values on their performer role
+				foreach($performer as $key => $combined) {
+					//Loop each word of performer value and check if performer role exists in the value
+					foreach(explode(' ', $combined) as $val) {
+						if (stripos($rolePattern, $val.',') !== false && strlen($val) > 3) {
+							$combined = trim(str_ireplace($val, ', ', $combined));
+							$noList = false;
+						} 
+					}
+					
+					// If performers could be splitted, loop each splitted performer and check if it's a name
+					if ($noList == false && strpos($combined, ',') !== false) {
+						foreach(explode(', ', $combined) as $ckey => $val) {
+							if (strlen($val) > 1) {
+								$tempstr = explode(' ', trim($val));
+								//Empty array element
+								$credits[$ckey] = '';
+
+								//Add relevant string elements as performer name
+								foreach ($tempstr as $tkey => $strelem) {
+									if ($tkey == 0) {
+										$credits[$ckey] .= $strelem;
+									}
+									if ($tkey == 1) {
+										$credits[$ckey] .= ' '.$strelem;
+									}
+									if ($tkey == 2 && ($tempstr[1] == 'van' || $tempstr[1] == 'ten' || $tempstr[1] == 'de' || $tempstr[1] == 'den')) {
+										$credits[$ckey] .= ' '.$strelem;
+									}
+									if ($tkey == 3 && ($tempstr[1] == 'van' && $tempstr[2] == 'der')) {
+										$credits[$ckey] .= ' '.$strelem;
+									}
+								}
+								
+								array_push($tempPerformers, trim($credits[$ckey]));
+							}
+
+						}
+					}
+					
+					// If performer roles aren't listed in the performer value, add the full performer value to the performer list
+					if ($noList == true) {
+						array_push($tempPerformers, trim($combined));
+					}
+					
+					
+				}
+				
+				/*
+				foreach($performer as $val) {
+					//Check if string isn't empty and doesn't include any words or characters that need to be excluded
+					if ((strlen($val)>1 && strlen($val)<1000) && stripos($excludePattern, trim($val)) === false && stripos($val, '#', 0) === false) {
+						array_push($performers, str_replace($replace, $replacement, trim($val)));
+					}
+				}
+				*/
+			}
+		}
+	}
+
+	if (count($tempPerformers) > 0) {
+		return $tempPerformers;
+	} else {
+		return false;
+	}
+}
 
 
 //Sort performer array by value length for keyword insertion
@@ -77,20 +172,34 @@ function getPerformers($url, $tag) {
 			if (count(explode(' + ', $tag['performers'])) > 1) {
 				foreach(explode(' + ', $tag['performers']) as $key => $tagString) {
 					$credit = preg_split("/(\w*: )/", $dom->find($tagString, -1)->plaintext);
-					if ($key > 0) {
-						$credits .= ', '.implode(', ', $credit);
+
+					//Determine if multiple lines or tabs have been used to list the performers
+					if (preg_match("/(\s+ )/", $credit[0], $match)) {
+						$credit = preg_split("/(\s+ )/", $dom->find($tagString, -1)->plaintext);
+						foreach($credit as $ckey => $tempItem) {
+							$credit[$ckey] = substr($tempItem, 0, strpos($tempItem, '&#8211'));
+						}
+						$credits = $credit;
 					} else {
-						$credits .= implode(', ', $credit);
-					}	
+						if ($key > 0) {
+							$credits .= ', '.implode(', ', $credit);
+						} else {
+							$credits .= implode(', ', $credit);
+						}	
+					}
 				}
+
 			} else {
 				//echo $dom->find($tag['performers'], -1)->plaintext;
 				$credits = preg_split("/(\w*: )/", preg_replace("/\s+/", " ", $dom->find($tag['performers'], -1)->plaintext));
 				//$credits .= implode(', ', $credit);
 			}
-			
-			//$credits = explode(', ', preg_replace("/\s+/", " ", $credits));
-			
+
+			// Determine if credits aren't listed in an array, but in a string. Make an array of it
+			if (!is_array($credits)) {
+				$credits = explode(', ', preg_replace("/\s+/", " ", $credits));
+			}
+						
 			//Only remain names
 			foreach ($credits as $ckey => $credit) {
 				if (preg_match('#[0-9]#', $credit)){
@@ -125,92 +234,8 @@ function getPerformers($url, $tag) {
 				$performers = $credits;
 			}
 		} else {
-			//Find words with a colon (e.g. regie:) and add it with its delimiter to the array
-			$credits = preg_split("/(\w*: )/", $content, -1, PREG_SPLIT_DELIM_CAPTURE);
-			$credits = array_chunk(array_slice($credits, 1, -1, true), 2, false);
-			
-			$performers = array();
 
-			$replace = array('e.a.', 'e.v.a.');
-			$replacement = array('', '');
-
-			$excludePattern = "muzikale leiding";
-			$rolePattern = "spelers,spel,regie,regisseur,schrijver,schijver,eindregie,tekst,compositie,met,musici,muzikale leiding,muziek,muzikant,muzikanten";
-			$filteredRoles = "";
-			//Loop each role
-			foreach($credits as $role) {
-				$role[0] = str_replace(':','', $role[0]);
-				if (strlen(trim($role[0])) > 2) {
-					if (stripos($rolePattern, trim($role[0]), 0) !== false && stripos($filteredRoles, trim($role[0]), 0) === false) {
-						$replace = array('e.a.', 'e.a', 'e.v.a.', 'met ',);
-						$replacement = array('', '', '', '');
-						
-						$role[1] = str_ireplace($replace, $replacement, preg_replace("/\([^)]+\)/","",$role[1]));
-						//Add role to 'filteredRoles' string
-						$filteredRoles .=  trim($role[0]).',';
-						//Loop each performer, add them to array
-						$performer = preg_split('/(,| en | i.s.m.)+/i', $role[1]);
-						
-						$noList = true;
-						//Check if performer roles exist in splitted values. If so, split new values on their performer role
-						foreach($performer as $key => $combined) {
-							//Loop each word of performer value and check if performer role exists in the value
-							foreach(explode(' ', $combined) as $val) {
-								if (stripos($rolePattern, $val.',') !== false && strlen($val) > 3) {
-									$combined = trim(str_ireplace($val, ', ', $combined));
-									$noList = false;
-								} 
-							}
-							
-							// If performers could be splitted, loop each splitted performer and check if it's a name
-							if ($noList == false && strpos($combined, ',') !== false) {
-								foreach(explode(', ', $combined) as $ckey => $val) {
-									if (strlen($val) > 1) {
-										$tempstr = explode(' ', trim($val));
-										//Empty array element
-										$credits[$ckey] = '';
-
-										//Add relevant string elements as performer name
-										foreach ($tempstr as $tkey => $strelem) {
-											if ($tkey == 0) {
-												$credits[$ckey] .= $strelem;
-											}
-											if ($tkey == 1) {
-												$credits[$ckey] .= ' '.$strelem;
-											}
-											if ($tkey == 2 && ($tempstr[1] == 'van' || $tempstr[1] == 'ten' || $tempstr[1] == 'de' || $tempstr[1] == 'den')) {
-												$credits[$ckey] .= ' '.$strelem;
-											}
-											if ($tkey == 3 && ($tempstr[1] == 'van' && $tempstr[2] == 'der')) {
-												$credits[$ckey] .= ' '.$strelem;
-											}
-										}
-										
-										array_push($performers, trim($credits[$ckey]));
-									}
-
-								}
-							}
-							
-							// If performer roles aren't listed in the performer value, add the full performer value to the performer list
-							if ($noList == true) {
-								array_push($performers, trim($combined));
-							}
-							
-							
-						}
-						
-						/*
-						foreach($performer as $val) {
-							//Check if string isn't empty and doesn't include any words or characters that need to be excluded
-							if ((strlen($val)>1 && strlen($val)<1000) && stripos($excludePattern, trim($val)) === false && stripos($val, '#', 0) === false) {
-								array_push($performers, str_replace($replace, $replacement, trim($val)));
-							}
-						}
-						*/
-					}
-				}
-			}
+			$performers = getCredits($content);
 		}
 		
 		if (count($performers) >= 1) {
@@ -232,5 +257,5 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
-print_r(getPerformers("https://www.lantarenvenster.nl/programma/gregory-porter-dont-forget-your-music/", array("performers"=>".page-content .wp_theatre_prod .wp_theatre_prod_director")));
+#print_r(getPerformers("https://www.lantarenvenster.nl/programma/aaron-parks-little-big/", array("performers"=>".page-content .wp_theatre_prod .wp_theatre_prod_director + .page-content .user-content h5")));
 ?>
