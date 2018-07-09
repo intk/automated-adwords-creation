@@ -3,6 +3,7 @@
 //Contains name, date, target location, sitelink extentions, AdGroups, Ads, keywords
 class Campaign {
 	private $template;
+	private $price;
 	private $title;
 	private $subtitle;
 	private $venue;
@@ -14,6 +15,7 @@ class Campaign {
 		//Parse campaign info
 		$itemDate = $production->date->time;
 		$this->template = $template;
+		$this->price = $production->price;
 		$this->title = $this->trimStr($production->title);
 		$this->subtitle = $this->trimStr($production->subtitle);
 		// Determine if subtitle exists or not. Depend the campaign name on it
@@ -83,10 +85,10 @@ class Campaign {
 		$replacement = array('', '', '');
 		
 		$performerString = str_replace($replace, $replacement, trim($string));
-		$performers = preg_split('/(,| en | i.s.m. | ism |met | - | + )+/i', $performerString);
+		$performers = preg_split('/(,| en | i.s.m. | ism |met | - | -- | + )+/i', $performerString);
 		// If combined performers have a character length of more than 30
 		if (strlen($performerString) > 30) {
-			$performers = preg_split('/(,| en | i.s.m. | ism |met | - | + | & )+/i', $performerString);
+			$performers = preg_split('/(,| en | i.s.m. | ism |met | - | -- | + | & )+/i', $performerString);
 		}
 		$performers = array_map('trim', array_unique($performers, SORT_STRING));
 		foreach($performers as $key => $performer) {
@@ -110,8 +112,15 @@ class Campaign {
 				$this->performers = $this->getPerformers($this->title);
 				//Check if performers could be divided into two adgroups
 				if (count($this->performers) <= 2) {
-					array_push($tempHeadings, array("value"=>$this->title,"type"=>"artist"));
-					$this->performers = false;
+					if (substr_count($this->title, ' - ') == 1) {
+						$headings = explode(' - ', $this->title);
+						array_push($tempHeadings, array("value"=>$headings[0],"type"=>"title"));
+						array_push($tempHeadings, array("value"=>$headings[1],"type"=>"artist"));
+						$this->performers = false;
+					} else {
+						array_push($tempHeadings, array("value"=>$this->title,"type"=>"artist"));
+						$this->performers = false;
+					}
 				}
 			} else {
 				array_push($tempHeadings, array("value"=>$this->title,"type"=>"title"));
@@ -128,6 +137,10 @@ class Campaign {
 		}
 		if (count($this->performers)>1) { array_push($tempHeadings, array("value"=>$this->performers,"type"=>"multiple-artists")); }
 
+		// If only one adgroup created
+		if (count($tempHeadings) < 2) {
+				array_push($tempHeadings, array("value"=>$this->title.' '.$this->genre[0],"type"=>"title"));
+		}
 		
 		//Split headings array to separate adgroups
 		$i = 0;
@@ -159,6 +172,11 @@ class Campaign {
 			
 				// Create adGroup for single artist / performance
 				foreach($tempAdgroup as $gkey => $gval) {
+					//If adgroup name contains a colon (:), only use the value after the colon
+					if (strpos($gval, ':') !== false) {
+						$gval = substr($gval, strpos($gval, ':')+1);
+					}
+
 					//Remove numbers, special characters (excl. '’&-) and unnecessary mentions between brackets
 					$this->adgroup[$i]->name = ucfirst(preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'‘’&-.:]+/u", " ", $gval))));
 
@@ -205,7 +223,7 @@ class Campaign {
 		else if (strpos($artist, ' - ') !== false) {
 			$tempArtist = explode(' - ', $artist);
 		} else {
-			$tempArtist =  preg_split('/(, | i.s.m. | ism | ft. | feat. |met )+/i', $artist);
+			$tempArtist =  preg_split('/(, | i.s.m. | ism | ft. | feat. | -- |met )+/i', $artist);
 		}
 		return $tempArtist;
 	}
@@ -307,7 +325,7 @@ class Campaign {
 			//Templates Title ad
 			
 			//Determine if the character lenghth of the title is higher than 30 characters and an artist doesn't exist
-			if (strlen($artist) == 0 && strlen($title)>30) {
+			if (strlen($artist) <= 1 || strlen($title)>30) {
 				$artist = $title;
 			}
 			
@@ -347,6 +365,9 @@ class Campaign {
 			
 			if (strlen($hDate.' '.$this->template['prep'].' '.$this->venue[0]) > 30) {
 				$hDateString = $hDate.' '.$this->venue[0];
+				if (strlen($hDateString) > 30) {
+					$hDateString = $hDate.' '.$this->template['prep'].' '.$venue[1];
+				}
 			} else {
 				$hDateString = $hDate.' '.$this->template['prep'].' '.$this->venue[0];
 			}
@@ -355,6 +376,7 @@ class Campaign {
 			//Check if titles length is more than 30 characters. Depend heading values on that
 			if (strlen($title) > 30) {
 				//Divide heading1 and heading2 in 2 elements
+				
 				$heading[0] = array($this->trimHead($hArtist), $this->date->AdDateFull.' '.$this->template['prep'].' '.$hLocation[0]);
 				if (strlen(ucfirst($genre).' - '.$this->trimHead($hArtist)) > 30) {
 					$heading[1] = array($this->trimHead($hArtist), $hDateString);
@@ -374,33 +396,37 @@ class Campaign {
 				}
 				$heading[2] = array($this->trimHead($title).$hGenre, ucfirst($hLocation[2]));
 			}
-			
+
 			//Check if heading 2 is still empty
 			/*if ($performance == null) {
 				$heading[1] = array($title, $hDate.' - '.ucfirst($this->genre).' in '.$this->location);
 			}
 			*/
 			
-			
+		
+			// Assign movietemplate for third ad
+			if ($this->genre[0] === 'film') {
+				$this->template[$type][2] = $this->template['movieTitle'][0];
+			}
+
+			// Assign template for free events
+			else if (strpos($this->price, 'free') !== false) {
+				$this->template[$type] = $this->template['freeTitle'];
+			}
+
 			//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
-			// Loop adgroups
+			// Loop adgroup
 			foreach($this->template[$type] as $groupkey => $adgroups) {
 				foreach ($adgroups as $adkey => $value) {
 					
 					// Replace variables in ad templates
-					$replace = array('[artist]', '[title]', '[genre]', '[venue]', '[venueShort]', '[location]', '[date]');
-					$replacement = array($hArtist, $title, $tLabel[1], $venue[0], $venue[1], $this->location, $this->date->AdDate);
-					$this->template[$type][$groupkey][$adkey] = str_replace($replace, $replacement, $value); 
+					$replace = array('[artist]', '[title]', '[genre]', '[venue]', '[venueShort]', '[location]', '[date]', '[dateFull]');
+					$replacement = array($hArtist, $title, $tLabel[1], $venue[0], $venue[1], $this->location, $this->date->AdDate, $this->date->AdDateFull);
+					$template[$groupkey][$adkey] = str_replace($replace, $replacement, $value); 
 				}
 				
 			}
 			
-			$template = $this->template[$type];
-
-			
-			if ($this->genre[0] === 'film') {
-				$template[2] = $this->template['movieTitle'][0];
-			}
 			
 		} 
 		if ($type == 'artist' || $type == 'multiple-artists') {
@@ -420,22 +446,34 @@ class Campaign {
 			//-10 characers for keyword insertion
 			//+6 characters for additional string 'Naar ?'
 			if (strlen($title)+6 > 30 || ($type == 'multiple-artists' && strlen($title)-4 > 30)) {
-				$heading[0] = array($title, $hDate.' in '.$this->location);
+				$heading[0] = array($title, $hDate.' '.$this->template['prep'].' '.$hLocation[0]);
 			} else {
-				$heading[0] = array('Naar '.$title.'?', $hDate.' '.$this->template['prep'].' '.$this->location);
+				$heading[0] = array('Naar '.$title.'?', $hDate.' '.$this->template['prep'].' '.$hLocation[0]);
 			}
 			
 			//If no title available
 			if (trim($this->title) == null) {
-				$heading[1] = array($title, $hDate.' - '.ucfirst($genre).' '.$this->template['prep'].' '.$this->location);
+				$heading[1] = array($title, $hDate.' - '.ucfirst($genre).' '.$this->template['prep'].' '.$this->venue[0]);
 			} else {
 				if (strlen($performance) > 30) {
-					$heading[1] = array($title, $this->date->AdDateFull.' '.$this->template['prep'].' '.$this->location);
+					if (strlen($this->date->AdDateFull.' '.$this->template['prep'].' '.$this->venue[0]) > 30) {
+						$heading[1] = array($title, $this->date->AdDate.' '.$this->template['prep'].' '.$venue[1]);
+					} else {
+						$heading[1] = array($title, $this->date->AdDateFull.' '.$this->template['prep'].' '.$venue[0]);
+					}
 				} else {
 					$heading[1] = array($title, $performance);
 				}
 			}
 			$heading[2] = array($title, ucfirst($hLocation[2]));
+
+
+			// Assign template for free events
+			if (strpos($this->price, 'free') !== false) {
+				$this->template[$type] = $this->template['freeArtist'];
+			} else {
+				$this->template[$type] = $this->template['artist'];
+			}
 			
 			
 			//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
@@ -444,18 +482,28 @@ class Campaign {
 				foreach ($adgroups as $adkey => $value) {
 
 					// Replace variables in ad templates
-					$replace = array('[artist]', '[performance]', '[genre]', '[venue]', '[venueShort]', '[location]', '[date]', '[movie]');
-					$replacement = array($title, $performance, $tLabel[1], $venue[0], $venue[1], $this->location, $this->date->AdDate, $tLabel[2]);
-					$this->template[$type][$groupkey][$adkey] = str_replace($replace, $replacement, $value); 
+					$replace = array('[artist]', '[performance]', '[genre]', '[venue]', '[venueShort]', '[location]', '[date]', '[dateFull]', '[movie]');
+					$replacement = array($title, $performance, $tLabel[1], $venue[0], $venue[1], $this->location, $this->date->AdDate, $this->date->AdDateFull, $tLabel[2]);
+					$template[$groupkey][$adkey] = str_replace($replace, $replacement, $value); 
 				}
 
 			}
-
-			$template = $this->template[$type];
 			
 			if ($this->genre[0] === 'film') {
 				//Custom template for movies
-				$template = $this->template['movieArtist'];
+				
+				//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
+				// Loop adgroups
+				foreach($this->template['movieArtist'] as $groupkey => $adgroups) {
+					foreach ($adgroups as $adkey => $value) {
+
+						// Replace variables in ad templates
+						$replace = array('[artist]', '[performance]', '[genre]', '[venue]', '[venueShort]', '[location]', '[date]', '[movie]');
+						$replacement = array($title, $performance, $tLabel[1], $venue[0], $venue[1], $this->location, $this->date->AdDate, $tLabel[2]);
+						$template[$groupkey][$adkey] = str_replace($replace, $replacement, $value); 
+					}
+
+				}
 			}
 		}
 			
@@ -481,6 +529,12 @@ class Campaign {
 						$ad[$key]->description = $template[$key][1];
 					}
 				}
+
+				// Determine if both heading 1 and heading 2 have the same value
+				if ($ad[$key]->heading[0] == $ad[$key]->heading[1]) {
+					$ad[$key]->heading[1] = $this->template['placeholder'];
+				}
+
 				
 				if ($type == 'multiple-artists') {
 					if (strlen($this->title)>1) {
@@ -508,6 +562,22 @@ class Campaign {
 					//Check if keyword insertion has been applied. If keyword doesn't fit, choose performance name for display url fields
 						$ad[$key]->path[0] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', trim($this->truncate($pathString, 15)))));
 						$ad[$key]->path[1] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', trim($this->truncate(substr($pathString, strlen($this->truncate($pathString, 15)), 30), 15)))));
+
+					//If both paths still have more than 15 characters, split them by their inner parts
+					if (strlen($ad[$key]->path[0]) > 15) {
+						$wordSplit = json_decode(file_get_contents("https://picturage.nl/intk/theaterads/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$key]->path[0]));
+						if (strlen($wordSplit[0]) <= 15 && strlen($wordSplit[0]) > 1) {
+							$ad[$key]->path[0] = $wordSplit[0];
+							$ad[$key]->path[1] = $wordSplit[1];
+						}
+					}
+					if (strlen($ad[$key]->path[1]) > 15) {
+						$wordSplit = json_decode(file_get_contents("https://picturage.nl/intk/theaterads/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$key]->path[1]));
+						if (strlen($wordSplit[0]) <= 15 && strlen($wordSplit[0]) > 1) {
+							$ad[$key]->path[0] = $wordSplit[0];
+							$ad[$key]->path[1] = $wordSplit[1];
+						}
+					}
 				}
 			}
 			
@@ -525,16 +595,21 @@ class Campaign {
 			$placements->jeugd = array("familie", "theater");
 			$placements->dans = array('dans', 'theater');
 			$placements->serie = array('theater');
-		    $placements->concert = array('concert', 'theater');
+		    $placements->concert = array('concert');
 			$placements->show = array('concert', 'theater');
 			$placements->muziek = array('concert');
+			$placements->festival = array('concert', 'muziek', 'festival');
 			$placements->klassiek = array('concert', 'theater');
 			$placements->overig = array('theater');
 			$placements->opera = array('opera', 'theater');
 			$placements->specials = array('theater');
 			$placements->circus = array('circus', 'theater');
 			$placements->entertainment = array('theater');
-			$genre = $this->genre[0];
+			if (count($this->genre) > 1) {
+				$genre = $this->genre[1];
+			} else {
+				$genre = $this->genre[0];
+			}
 		
 			if (count($this->venue) > 1) {
 				$venue[0] = $this->venue[0];

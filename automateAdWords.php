@@ -28,6 +28,8 @@
 session_start();
 header('Content-Type: application/json');
 include('includes/config.inc.php');
+ header("Access-Control-Allow-Origin: *");
+
 //load method for creating CSV
 include('includes/methods/csv/csv.processor.php');
 error_reporting(E_ALL);
@@ -57,13 +59,22 @@ function parseTemplate($template) {
 	
 	// Assign preposition for headings
 	$types['prep'] = $types['prep'][0][0];
+	if (strlen($types['placeholder'][0][0]) > 1) {
+		$types['placeholder'] = $types['placeholder'][0][0];
+	}
 	
 	return $types;
 }
 
 //Check if query string matches database records
 if ($_GET['theater']) {
+
+	//Get custom templates by theater ID
 	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id WHERE theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+	if (mysqli_num_rows($query) < 1) {
+		// If no custom template is available, use default template
+		$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = 0 WHERE theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+	}
 	
 	if (mysqli_num_rows($query) >= 1) {
 		$result = mysqli_fetch_array($query);
@@ -74,11 +85,18 @@ if ($_GET['theater']) {
 		//Parse monthly season
 		include('includes/scraper.inc.php');
 		if ($_GET['month']) {
-			$month = $_GET['month'];
+			$month = filter_var($_GET['month'], FILTER_SANITIZE_STRING);
 		} else {
 			$month = date('Y-m', strtotime('+1 month', time()));
 		}
-		$theater = new Theater($result['alias'], $month);
+		
+		// Filter on venue
+		if ($_GET['venue']) {
+			$venue = filter_var(str_replace('-', ' ', $_GET['venue']), FILTER_SANITIZE_STRING);
+		} else {
+			$venue = null;
+		}
+		$theater = new Theater($result['alias'], $month, $venue);
 		$_SESSION['INTK-processID'] = base64_encode($theater->name.'_'.time());
 	
 		if ($_SESSION['INTK-processID']) {
@@ -113,3 +131,4 @@ if ($_GET['theater']) {
 /*
 </body>
 </html>
+*/
