@@ -34,6 +34,9 @@ include('includes/config.inc.php');
 include('includes/methods/csv/csv.processor.php');
 error_reporting(E_ALL);
 
+// Determine if performance already exists 
+
+
 // Parse ads templates from db
 function parseTemplate($template) {
 	$tplString = preg_replace("/\s+/", " ", $template);	
@@ -106,7 +109,38 @@ if ($_GET['theater']) {
 			if ($_GET['numberOnly']) {
 				$theater->productionsNumber = count($theater->productions);
 			} else {
+
+				$storedPerformances = array();
+				$performances = $theater->productions;
+
+				//Filter double performances
 				foreach($theater->productions as $key => $item) {
+
+					// Determine if performance exists
+					$found = array_search(trim($item->title), $storedPerformances);
+					if ($found !== false) {
+						//Unset same performance
+						unset($storedPerformances[$found]);
+						unset($theater->productions[$found]);
+					}
+
+					// Add performance to storage
+					$storedPerformances[$key] = trim($item->title);
+				}
+
+
+				// Rebase keys
+				$tempPerformances = $theater->productions;
+				$theater->productions = array();
+				$iTheater = 0;
+				foreach($tempPerformances as $value) {
+					$theater->productions[$iTheater] = $value;
+					$iTheater++;
+				}
+
+
+				foreach($theater->productions as $key => $item) {
+
 					$campaign = new Campaign($item, $template);
 					$campaign->createAdgroup();
 					$theater->productions[$key]->campaign = $campaign;
@@ -119,7 +153,13 @@ if ($_GET['theater']) {
 						$import = mysqli_query($connect, "INSERT INTO performances (theaterId, title, subtitle, genre, performanceDate, creationDate, link) VALUES (".$result['id'].", '".$item->title."', '".$item->subtitle."', '".implode(';', $item->genre)."', '".$item->date->time."', '".time()."', '".$item->link."')");
 
 					}
+
+					// Add performance to storage
+					$storedPerformances[$key] = $item->title;
 				}
+
+
+
 			}
 			echo json_encode($theater);
 
