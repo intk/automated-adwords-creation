@@ -2,7 +2,7 @@
 function createCSV($theatre, $monthYear, $dailybudget, $location, $status, $package) {
 $data = array (
 	"campaign" => $package->campaign->name,
-	"labels" => "",
+	"labels" => "Automation;".implode(';', $package->campaign->genre),
 	"campaignDailyBudget" => str_replace(',', '.', $dailybudget),
 	"campaignType" => "Search Network only",
 	"networks" => "Google search",
@@ -137,7 +137,7 @@ for ($i = 0; $i < count($package->campaign->adgroup); $i++) {
 		$adArr[array_search("path2", array_keys($data))] = $ad->path[1];
 		$adArr[array_search("Description", array_keys($data))] = $ad->description;
 		$list[$i+count($list)] = $adArr;
-		if ($package->campaign->adgroup[$i]->name == "Performers" && $key == 2) {
+		if ($package->campaign->adgroup[$i]->name == "Performers" || $package->campaign->adgroup[$i]->type == "artist" && $key == 2) {
 			$list[$i+count($list)] = $adArr;
 		}
 	}
@@ -151,7 +151,14 @@ if ($location == "Nederland") {
 	$LocArr[array_search("ID", array_keys($data))] = "2528";
 	$LocArr[array_search("Location", array_keys($data))] = $location;
 	$LocArr[array_search("Reach", array_keys($data))] = "20000000";
-} else {
+}
+if (stripos($location, "Belg") !== false) {
+	$LocArr[array_search("ID", array_keys($data))] = "2056";
+	$LocArr[array_search("Location", array_keys($data))] = "België";
+	$LocArr[array_search("Reach", array_keys($data))] = "8540000";
+}
+
+ else {
 	$LocArr[array_search("Location", array_keys($data))] = $location;
 }
 $list[count($list)+1] = $LocArr;
@@ -183,5 +190,5 @@ foreach ($list as $fields) {
     fputcsv($fp, $fields);
 }
 fclose($fp);
-	return '<a href="campaigns/'.$_SESSION['INTK-processID'].'.csv" target="_blank">Open CSV File</a>';
+	return 'campaigns/'.$_SESSION['INTK-processID'].'.csv';
 }
