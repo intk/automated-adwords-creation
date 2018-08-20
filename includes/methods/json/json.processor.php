@@ -145,7 +145,6 @@ $json = preg_replace("/\s+/", " ", file_get_contents($source));
 $sourceArray = json_decode($json);
 foreach ($sourceArray as $production) {
 
-
 	// Get last date of production
 	if (!$tags['defined']) {
 		$lastShow = $production->shows->show[count($production->shows->show)-1];
@@ -254,7 +253,13 @@ foreach ($sourceArray as $production) {
 			$productionObj->venue = $venue;			
 			$productionObj->location = $location['city'];
 
+
 			$productionObj->genre[0] = 'overig';
+
+			if (strlen($tags['genre']) > 1) {
+				$productionObj->genre = listGenres(toPath($production, $tags['genre']));
+			}
+
 			if (strpos($tags['genre'], '/') !== false) {
 				$parts = explode(' ', $tags['genre']);
 				$category = explode('/', $parts[0]);
