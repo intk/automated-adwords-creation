@@ -314,11 +314,17 @@ class Campaign {
 				$venue[1] = $this->location;
 			}
 		
-		if ($this->genre[0] == 'film') {
+			if ($this->genre[0] == 'film') {
 				$hGenre = ' - '.ucfirst($this->genre[0]);
 			} else {
 				$hGenre = '';
 			}
+
+		if ($this->location == $hLocation[0]) {
+			$locPrep = 'in';
+		} else {
+			$locPrep = $this->template['prep'];
+		}
 		
 		if ($type == 'title') {
 			
@@ -377,7 +383,7 @@ class Campaign {
 			if (strlen($title) > 30) {
 				//Divide heading1 and heading2 in 2 elements
 				
-				$heading[0] = array($this->trimHead($hArtist), $this->date->AdDateFull.' '.$this->template['prep'].' '.$hLocation[0]);
+				$heading[0] = array($this->trimHead($hArtist), $this->date->AdDateFull.' '.$locPrep.' '.$hLocation[0]);
 				if (strlen(ucfirst($genre).' - '.$this->trimHead($hArtist)) > 30) {
 					$heading[1] = array($this->trimHead($hArtist), $hDateString);
 					$heading[2] = array($this->trimHead($hArtist), ucfirst($hLocation[2]));
@@ -387,12 +393,18 @@ class Campaign {
 				}
 			} else {
 				//Divide heading1 and heading2 in 2 elements
-				$heading[0] = array($this->trimHead($title).$hGenre, $this->date->AdDateFull.' '.$this->template['prep'].' '.$hLocation[0]);
+				$heading[0] = array($this->trimHead($title).$hGenre, $this->date->AdDateFull.' '.$locPrep.' '.$hLocation[0]);
 				//Determine if artist heading value is too long or doesn't exist
 				if (strlen($this->trimHead($hArtist)) > 30 || strlen($this->trimHead($hArtist)) === 0) {
 					$heading[1] = array($this->trimHead($title).$hGenre, $hDateString);
 				} else {
-					$heading[1] = array($this->trimHead($title).$hGenre, $this->trimHead($hArtist));
+					// Determine if artist has same value as title
+					if ($title == $hArtist) {
+						$h2Val = $hLocation[2].' '.$this->location;
+					} else {
+						$h2Val = $hArtist;
+					}
+					$heading[1] = array($this->trimHead($title).$hGenre, $this->trimHead($h2Val));
 				}
 				$heading[2] = array($this->trimHead($title).$hGenre, ucfirst($hLocation[2]));
 			}
@@ -414,7 +426,7 @@ class Campaign {
 				$this->template[$type] = $this->template['freeTitle'];
 			}
 
-			//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
+			//Sort description length from short to long. Needed to iterate them to fit the 90 characters.
 			// Loop adgroup
 			foreach($this->template[$type] as $groupkey => $adgroups) {
 				foreach ($adgroups as $adkey => $value) {
@@ -446,9 +458,9 @@ class Campaign {
 			//-10 characers for keyword insertion
 			//+6 characters for additional string 'Naar ?'
 			if (strlen($title)+6 > 30 || ($type == 'multiple-artists' && strlen($title)-4 > 30)) {
-				$heading[0] = array($title, $hDate.' '.$this->template['prep'].' '.$hLocation[0]);
+				$heading[0] = array($title, $hDate.' '.$locPrep.' '.$hLocation[0]);
 			} else {
-				$heading[0] = array('Naar '.$title.'?', $hDate.' '.$this->template['prep'].' '.$hLocation[0]);
+				$heading[0] = array('Naar '.$title.'?', $hDate.' '.$locPrep.' '.$hLocation[0]);
 			}
 			
 			//If no title available
@@ -476,7 +488,7 @@ class Campaign {
 			}
 			
 			
-			//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
+			//Sort description length from short to long. Needed to iterate them to fit the 90 characters.
 			// Loop adgroups
 			foreach($this->template[$type] as $groupkey => $adgroups) {
 				foreach ($adgroups as $adkey => $value) {
@@ -492,7 +504,7 @@ class Campaign {
 			if ($this->genre[0] === 'film') {
 				//Custom template for movies
 				
-				//Sort description length from short to long. Needed to iterate them to fit the 80 characters.
+				//Sort description length from short to long. Needed to iterate them to fit the 90 characters.
 				// Loop adgroups
 				foreach($this->template['movieArtist'] as $groupkey => $adgroups) {
 					foreach ($adgroups as $adkey => $value) {
@@ -513,13 +525,13 @@ class Campaign {
 				$ad[$key]->heading[1] = $heading[$key][1];
 				
 				foreach ($template[$key] as $description) {
-					//Check if description length <= 80 characters
-					if (strlen($description) <= 80 || ($type == 'multiple-artists' && strlen($description) <= 90)) {
+					//Check if description length <= 90 characters
+					if (strlen($description) <= 90 || ($type == 'multiple-artists' && strlen($description) <= 90)) {
 						$ad[$key]->description = $description;
 					}
 				}
 				
-				//If the description length is still empty because > 80 characters, use the first (shortest) description
+				//If the description length is still empty because > 90 characters, use the first (shortest) description
 				if ($ad[$key]->description == '') {
 					$ad[$key]->description = $template[$key][0];
 					//If third ad
@@ -598,7 +610,7 @@ class Campaign {
 		    $placements->concert = array('concert');
 			$placements->show = array('concert', 'theater');
 			$placements->muziek = array('concert');
-			$placements->festival = array('concert', 'muziek', 'festival');
+			$placements->festival = array('concert', 'muziek', 'festival', 'live');
 			$placements->klassiek = array('concert', 'theater');
 			$placements->overig = array('theater');
 			$placements->opera = array('opera', 'theater');
