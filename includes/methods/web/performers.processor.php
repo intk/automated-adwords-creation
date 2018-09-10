@@ -172,6 +172,14 @@ function getPerformers($url, $tag) {
 			if (count(explode(' + ', $tag['performers'])) > 1) {
 				foreach(explode(' + ', $tag['performers']) as $key => $tagString) {
 					$credit = preg_split("/(\w*: )/", $dom->find($tagString, -1)->plaintext);
+					// Select property by name and key
+					if (preg_match_all("/\[([^\]]*)\]/", $tagString, $matches)) {
+						//Remove brackets with key from string
+						$tagString = str_replace($matches[0][0], '', $tagString);
+						$credit = $dom->find($tagString, $matches[1][0])->plaintext;
+						$credits .= $credit.', ';
+
+					}
 
 					//Determine if multiple lines or tabs have been used to list the performers
 					if (preg_match("/(\s+ )/", $credit[0], $match)) {
@@ -191,8 +199,30 @@ function getPerformers($url, $tag) {
 
 			} else {
 				//echo $dom->find($tag['performers'], -1)->plaintext;
-				$credits = preg_split("/(\w*: )/", preg_replace("/\s+/", " ", $dom->find($tag['performers'], -1)->plaintext));
-				//$credits .= implode(', ', $credit);
+
+				//Determine if performers are listed in separate html elements
+				if (count($dom->find($tag['performers'])) > 1) {
+					$ckey = 0;
+					foreach($dom->find($tag['performers']) as $tempItem) {
+						$subitems = $tempItem->find('a');
+						// Determine if there are multiple performers given
+						if (count($subitems) > 1) {
+							foreach($subitems as $performerItem) {
+								$credits[$ckey] = $performerItem->plaintext;
+								$ckey++;
+							}
+						} else {
+							$credits[$ckey] = $tempItem->plaintext;
+						}
+						$ckey++;
+
+					}
+				} else {
+
+
+					$credits = preg_split("/(\w*: )/", preg_replace("/\s+/", " ", $dom->find($tag['performers'], -1)->plaintext));
+					//$credits .= implode(', ', $credit);
+				}
 			}
 
 			// Determine if credits aren't listed in an array, but in a string. Make an array of it
@@ -221,7 +251,7 @@ function getPerformers($url, $tag) {
 							$credits[$ckey] .= ' '.$strelem;
 
 						}
-						if ($tkey == 3 && ($tempstr[1] == 'van' && $tempstr[2] == 'der')) {
+						if ($tkey == 3 && ($tempstr[1] == 'van' && ($tempstr[2] == 'den') || $tempstr[2] == 'der' || $tempstr[2] == 'het' || $tempstr[2] == "'t")) {
 							$credits[$ckey] .= ' '.$strelem;
 						}
 					}
@@ -258,4 +288,6 @@ function getPerformers($url, $tag) {
 	}
 }
 #print_r(getPerformers("https://www.lantarenvenster.nl/programma/aaron-parks-little-big/", array("performers"=>".page-content .wp_theatre_prod .wp_theatre_prod_director + .page-content .user-content h5")));
+
+#print_r(getPerformers("https://www.filmfestival.nl/films/tagged-2/", array("performers"=>".credits .wrap .part-two .inner .two")));
 ?>
