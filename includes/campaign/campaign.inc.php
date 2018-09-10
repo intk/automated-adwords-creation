@@ -48,8 +48,15 @@ class Campaign {
 			//Uppercase first character of each word in the string
 			$string = ucwords(strtolower($string));
 		}
+
+		//Remove number and plus sign from string, only when plus sign is present
+		if (preg_match("/\d\+/", $string, $match)) {
+			$output = str_replace('+', '', preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'‘’&,-.:]+/u", " ", str_replace($replace, $replacement, $string)))));
+		} else {
+			$output = str_replace('+', '', preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'‘’&,-.:[0-9]]+/u", " ", str_replace($replace, $replacement, $string)))));
+		}
 		
-		return str_replace('+', '', preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'‘’&,-.:]+/u", " ", str_replace($replace, $replacement, $string)))));
+		return $output;
 	}
 	
 	private function trimHead($string) {
@@ -57,7 +64,11 @@ class Campaign {
 		if (strpos($string, '’') !== false && strpos($string, '‘') === false) {
 			$string = str_replace("’", "'", $string);
 		} 
-		$output = ucfirst(preg_replace('/[\[{\(\].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()&-.:]+/u", " ", $string))));
+		if (preg_match("/\d\+/", $string, $match)) {
+			$output = ucfirst(preg_replace('/[\[{\(\].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()&-.:]+/u", " ", $string))));
+		} else {
+			$output = ucfirst(preg_replace('/[\[{\(\].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()&-.:[0-9]]+/u", " ", $string))));
+		}
 		return $output;
 	}
 	
@@ -178,7 +189,11 @@ class Campaign {
 					}
 
 					//Remove numbers, special characters (excl. '’&-) and unnecessary mentions between brackets
+					if (preg_match("/\d\+/", $gval, $match)) {
 					$this->adgroup[$i]->name = ucfirst(preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'‘’&-.:]+/u", " ", $gval))));
+					} else {
+						$this->adgroup[$i]->name = ucfirst(preg_replace('/[\[{\(].*[\]}\)]/u', '', trim(preg_replace("/[^\p{L}()'‘’&-.:[0-9]]+/u", " ", $gval))));
+					}
 
 					//Check if misplaced dash (-) occurs in campaign name
 					if (strpos($this->adgroup[$i]->name, '-') == (strlen($this->adgroup[$i]->name) -1)) {
