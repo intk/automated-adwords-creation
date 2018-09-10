@@ -409,6 +409,12 @@ class Campaign {
 				$heading[2] = array($this->trimHead($title).$hGenre, ucfirst($hLocation[2]));
 			}
 
+
+			// Determine if display date boolean is set
+			if (strpos($this->template['displayDate'], 'No') !== false) {
+				$heading[0][1] = $this->template['placeholder'];
+			}
+
 			//Check if heading 2 is still empty
 			/*if ($performance == null) {
 				$heading[1] = array($title, $hDate.' - '.ucfirst($this->genre).' in '.$this->location);
@@ -486,6 +492,11 @@ class Campaign {
 			} else {
 				$this->template[$type] = $this->template['artist'];
 			}
+
+			// Assign movie template for artist
+			if ($this->genre[0] === 'film') {
+				$this->template[$type] = $this->template['movieArtist'];
+			}
 			
 			
 			//Sort description length from short to long. Needed to iterate them to fit the 90 characters.
@@ -515,6 +526,15 @@ class Campaign {
 						$template[$groupkey][$adkey] = str_replace($replace, $replacement, $value); 
 					}
 
+				}
+			}
+
+			// Determine if display date boolean is set
+			if ($this->template['displayDate'] == "No") {
+				if (strlen($performance.' - '.$this->template['placeholder']) <= 30) {
+					$heading[$key][1] = $performance.' - '.$this->template['placeholder'];
+				} else {
+					$heading[$key][1] = $this->template['placeholder'];
 				}
 			}
 		}
@@ -617,6 +637,7 @@ class Campaign {
 			$placements->specials = array('theater');
 			$placements->circus = array('circus', 'theater');
 			$placements->entertainment = array('theater');
+			$placements->film = array('film');
 			if (count($this->genre) > 1) {
 				$genre = $this->genre[1];
 			} else {
@@ -657,6 +678,8 @@ class Campaign {
 				} else {
 					array_push($keywordList, strtolower($name).' '.strtolower($this->location));
 					array_push($keywordList, strtolower($name).' '.strtolower($venue[0]));
+					array_push($keywordList, strtolower($name).' '.strtolower($venue[1]));
+
 				}
 				
 				//Loop keyword list
