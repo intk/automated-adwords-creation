@@ -28,7 +28,7 @@ function dateFromString($string) {
 
 
 	// Exclude days of the week and their abbreviations
-	$date = preg_replace("/(maandag| maa |ma |dinsdag|din|di|woensdag|woe|wo|donderdag|don|do|vrijdag|vri|vr|zaterdag|zat|za|zondag|zon|zo|om)/i", "", $date);
+	$date = preg_replace("/(lundi|mardi|mecredi|jeudi|vendredi|samedi|dimanche)/i", "", $date);
 
 	//Determine if wrong date format has been used
 	if (substr_count($date, '.') > 1) {
