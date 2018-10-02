@@ -125,8 +125,8 @@ class Campaign {
 				if (count($this->performers) <= 2) {
 					if (substr_count($this->title, ' - ') == 1) {
 						$headings = explode(' - ', $this->title);
-						array_push($tempHeadings, array("value"=>$headings[0],"type"=>"title"));
-						array_push($tempHeadings, array("value"=>$headings[1],"type"=>"artist"));
+						array_push($tempHeadings, array("value"=>$headings[0],"type"=>"artist"));
+						array_push($tempHeadings, array("value"=>$headings[1],"type"=>"artist")); //artist //TEMPORARY
 						$this->performers = false;
 					} else {
 						array_push($tempHeadings, array("value"=>$this->title,"type"=>"artist"));
@@ -134,10 +134,17 @@ class Campaign {
 					}
 				}
 			} else {
+				/*
 				array_push($tempHeadings, array("value"=>$this->title,"type"=>"title"));
+				*/
+
+				//TEMP
+				$headings = explode(' - ', $this->title);
+				array_push($tempHeadings, array("value"=>$headings[0],"type"=>"artist"));
+				array_push($tempHeadings, array("value"=>$headings[1],"type"=>"artist")); //artist //TEMPORARY
 			}
 		} else {
-			if (strlen($this->title)>1) { array_push($tempHeadings, array("value"=>$this->title,"type"=>"title")); }
+			if (strlen($this->title)>1) { array_push($tempHeadings, array("value"=>$this->title,"type"=>"artist")); }
 		}
 		
 		//Check if subtitle contains listed artists
@@ -167,7 +174,7 @@ class Campaign {
 				// Create adGroup for multiple artists (keyword insertion)
 				foreach($tempAdgroup as $gkey => $gval) {
 					//Remove numbers, special characters (excl. '’&-) and unnecessary mentions between brackets
-					$this->adgroup[$i]->name = 'Performers';
+					$this->adgroup[$i]->name = 'Sounds like';
 
 					//Check if misplaced dash (-) occurs in performance title
 					if (strpos($this->title, '-') == (strlen($this->title) -1)) {
@@ -495,10 +502,16 @@ class Campaign {
 						$heading[1] = array($title, $this->date->AdDateFull.' '.$this->template['prep'].' '.$venue[0]);
 					}
 				} else {
-					$heading[1] = array($title, $performance);
+					$heading[1] = array($title, date('d.m.y', $this->date->time).' '.$this->template['prep'].' '.$venue[0]);
 				}
 			}
 			$heading[2] = array($title, ucfirst($hLocation[2]));
+
+			if ($type == 'multiple-artists') {
+				$heading[0][0] = "Fan van ".$title."?";
+				$heading[1][0] = "Fan van ".$title."?";
+				$heading[2][0] = $title."?";
+			}
 
 
 			// Assign template for free events
@@ -512,7 +525,12 @@ class Campaign {
 			if ($this->genre[0] === 'film') {
 				$this->template[$type] = $this->template['movieArtist'];
 			}
-			
+
+			// Assign template for SoundsLike
+			if ($type == 'multiple-artists') {
+				$this->template[$type] = $this->template['SoundsLike'];
+			}
+
 			
 			//Sort description length from short to long. Needed to iterate them to fit the 90 characters.
 			// Loop adgroups
@@ -543,6 +561,8 @@ class Campaign {
 
 				}
 			}
+
+
 
 			// Determine if display date boolean is set
 			if ($this->template['displayDate'] == "No") {
