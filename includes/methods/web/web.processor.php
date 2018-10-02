@@ -49,7 +49,7 @@ function dateFromString($string) {
 	}
 	
 	// Replace months and their abbreviations
-	$date = str_ireplace(array("januari", "februari", "maart", "mrt", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "okt", "november", "december", "v.a.", " -", "uur", "."), array("jan", "feb", "mar", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "oct", "nov", "dec", "", "", "", ":"), $date);
+	$date = str_ireplace(array("janvier", "février", "mars", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "oct", "novembre", "decembre", "v.a.", " -", "uur", "."), array("jan", "feb", "mar", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "oct", "nov", "dec", "", "", "", ":"), $date);
 
 	//Convert string to date format
 	$dateArray = explode(' ', trim($date));
