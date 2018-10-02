@@ -1,87 +1,94 @@
 <?php
 // Crawl XML feed and parse productions
 $source = $url;
+$tempDate = '';
 
 $productions = array();
 
-function getWebPage($url){
-        $options = array( 
-	    	CURLOPT_RETURNTRANSFER => true, // to return web page
-            CURLOPT_HEADER         => true, // to return headers in addition to content
-            CURLOPT_FOLLOWLOCATION => true, // to follow redirects
-            CURLOPT_ENCODING       => "",   // to handle all encodings
-            CURLOPT_AUTOREFERER    => true, // to set referer on redirect
-            CURLOPT_CONNECTTIMEOUT => 120,  // set a timeout on connect
-            CURLOPT_TIMEOUT        => 120,  // set a timeout on response
-            CURLOPT_MAXREDIRS      => 10,   // to stop after 10 redirects
-            CURLINFO_HEADER_OUT    => true, // no header out
-            CURLOPT_SSL_VERIFYPEER => false,// to disable SSL Cert checks
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-        );
-
-        $handle = curl_init( $url );
-        curl_setopt_array( $handle, $options );
- 
-    	// additional for storing cookie 
-        $tmpfname = dirname(__FILE__).'/cookie.txt';
-        curl_setopt($handle, CURLOPT_COOKIEJAR, $tmpfname);
-        curl_setopt($handle, CURLOPT_COOKIEFILE, $tmpfname);
-
-        $raw_content = curl_exec( $handle );
-        $err = curl_errno( $handle );
-        $errmsg = curl_error( $handle );
-        $header = curl_getinfo( $handle ); 
-        curl_close( $handle );
- 
-        $header_content = substr($raw_content, 0, $header['header_size']);
-        $body_content = trim(str_replace($header_content, '', $raw_content));
-    
-    	// extract cookie from raw content for the viewing purpose         
-        $cookiepattern = "#Set-Cookie:\\s+(?<cookie>[^=]+=[^;]+)#m"; 
-        preg_match_all($cookiepattern, $header_content, $matches); 
-        $cookiesOut = implode("; ", $matches['cookie']);
-
-        $header['errno']   = $err;
-        $header['errmsg']  = $errmsg;
-        $header['headers']  = $header_content;
-        $header['content'] = $body_content;
-        $header['cookies'] = $cookiesOut;
-    	return $header['content'];
-}
-
-
 // Sanitize & trim string
-function trimString($string) {
-	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
-	return str_replace(array("&#39;", "/"),array("'","-"), $string);
+include('includes/methods/filter/filter.inc.php');
+
+function validateDate($date, $format = 'd-m-Y') {
+
+    $d = DateTime::createFromFormat($format, $date);
+    return $d && $d->format($format) == $date;
+
 }
 
 
 //Get date format from string
 function dateFromString($string) {
-	
 	//Convert string to a date string
 	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
-	$splittedDate = preg_split("(t/m|&)", $string);
+	$splittedDate = preg_split("(t/m|&|tm| - )", $string);
 	$date = $splittedDate[count($splittedDate)-1];
-	$date = preg_replace("/(ma|di|wo|do|vr|za|zo)/i", "", $date);
-	$date = str_ireplace(array("mrt","mei","okt", "v.a.", "uur", "."), array("mar","may","oct", "", "", ":"), $date);
-	
-	//Convert string to date format
-	$dateArray = explode(' ', trim($date));
-	
-	//Define the year	
-	if (strtotime((date('d')+1).' '.ucfirst($dateArray[1]).' '.date('Y')) < time()) {
-		$year = date('Y')+1;
-	} else {
-		$year = date('Y');
+	if (strpos($date,'+') !== false) {
+		$date = substr($date, 0, strpos($date,'+'));
+	}
+
+
+	// Exclude days of the week and their abbreviations
+	$date = preg_replace("/(maandag| maa |ma |dinsdag|din|di|woensdag|woe|wo|donderdag|don|do|vrijdag|vri|vr|zaterdag|zat|za|zondag|zon|zo|om)/i", "", $date);
+
+	//Determine if wrong date format has been used
+	if (substr_count($date, '.') > 1) {
+		// Execute preg_match
+		if (preg_match("/\d{2}.\d{2}.\d{2}/", $date, $match)) {
+			$date = trim(str_replace('.','-', $date));
+			$d = DateTime::createFromFormat('d-m-y', $date);
+			$time = strtotime($d->format('Y-m-d'));
+		}
+	}
+	else if (substr_count($date, '-') > 1) {
+		$date =  preg_replace('/[\[{\(].*[\]}\)]/u', '', $date);
+		// Execute preg_match
+		if (preg_match("/\d{2}-\d{2}-\d{4}/", $date, $match)) {
+			$d = DateTime::createFromFormat('d-m-Y', $match[0]);
+			$time = strtotime($d->format('Y-m-d'));
+		}
 	}
 	
-	//Convert date to timestamp
-	if (strpos($date, ':') !== false) {
-		$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year.' '.$dateArray[2]);
-	} else {
-		$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year);
+	// Replace months and their abbreviations
+	$date = str_ireplace(array("januari", "februari", "maart", "mrt", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "okt", "november", "december", "v.a.", " -", "uur", "."), array("jan", "feb", "mar", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "oct", "nov", "dec", "", "", "", ":"), $date);
+
+	//Convert string to date format
+	$dateArray = explode(' ', trim($date));
+	$dateArray[1] = str_ireplace(array('01','02','03','04','05','06','07','08','09','10','11 ','12'), array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov ','dec'), $dateArray[1]);
+
+	
+	//if (intval($dateArray[0]) < 10 && strpos($dateArray[0], '0') !== false) { $dateArray[0] = substr($dateArray[0], 1); }
+    if ($time < time()) {
+		//Determine if date string is already a valid date format
+		if (validateDate($dateArray[0]) || validateDate(date('d-m-Y', strtotime($date))) || validateDate($date)) {
+			if (strpos($date, ':') !== false) {
+				$time = strtotime($dateArray[0].' '.$dateArray[count($dateArray)-1]);
+			} else {
+				$time = strtotime($dateArray[0]);
+			}
+			if (strtotime($time) < time()) {
+				$time = strtotime(trim($date));
+			}
+
+		} else {
+
+			//Define the year
+			if (strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.date('Y')) < time()) {
+				$year = date('Y')+1;
+			} else {
+				$year = date('Y');
+			}
+			if ($dateArray[2] == date('Y') || $dateArray[2] == date('Y')+1) {
+				$year = $dateArray[2];
+			}
+			$year = '00';
+			//Convert date to timestamp
+			if (strpos($date, ':') !== false) {
+				$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year.' '.$dateArray[2]);
+			} else {
+				$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year);
+			}
+			
+		}
 	}
 	
 	return $time;
@@ -99,61 +106,256 @@ function listGenres($genre) {
 
 
 // Include simple_html_dom module to scrape a web page
-include('includes/methods/web/simple_html_dom.php');
+// Parse spreadsheet data and filter on the performance name to derive similar artists
+include(dirname(__FILE__).'/similarPerformers.processor.php');
 
-
-//Scrape performer names from web page
-//include('includes/methods/web/performers.processor.php');
 
 
 // Split tags to array element
 $tags = explode('; ', $tags);
 foreach ($tags as $key => $value) {
 	$temp = explode(',', $value);
+	// Check if multiple selectors are given in tag
+	if (count(explode(' + ', $temp[1])) > 1) {
+		if (strpos($temp[1], '[') == false) {
+			$temp[1] = str_replace(" + ", ", ", $temp[1]);
+		}
+	}
+
 	$tags[$temp[0]] = str_replace('"', '', $temp[1]);
+
+
 	unset($tags[$key]);
 
 }
 
+
 // XML scraper
+//Pagination
+if (strlen($tags['pagination']) > 1) {
+	$pagCount = 31;
+} else {
+	$pagCount = 1;
+}
 
-$dom = new simple_html_dom(getWebPage($source));
 
-foreach ($dom->find($tags['container'].' '.$tags['item']) as $production) {
-	// Get last date of production
-	$time = dateFromString($production->find($tags['date'], 0)->plaintext);	
+//for ($pag = 0; $pag < $pagCount; $pag++) {
+	//print_r(array($source.'&p='.$pag));
+	/*if (strlen($tags['pagination']) > 1) {
+		$dom = new simple_html_dom(getWebPage($source.'&p='.$pag));
+	} else {*/
+		$dom = new simple_html_dom(getWebPage($source));
+	//}
+foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $production) {
+
+	//Check if title, subtitle and date are placed in same tag
+	if ($tags['title'] == $tags['subtitle'] && $tags['date'] == $tags['title']) {
+		$elementsArray = explode('<br>', preg_replace("/\s+/", " ", $production->find($tags['title'], 0)));
+		foreach($elementsArray as $key => $val) {
+			$elementsArray[$key] = $val;
+		}
+		$title = $elementsArray[0];
+		$subtitle = $elementsArray[1];
+		$date = trimString($elementsArray[2]);
+		
+
+		// Determine if a genre has been given for the performance
+		if (strlen($production->find($tags['genre'], 0)->plaintext) > 2) {
+			$genre = array(strtolower($production->find($tags['genre'], 0)->plaintext)); 
+		} else {
+			$genre = "voorstelling";
+		}
+
+	}
+
+	if ($tags['title'] == $tags['subtitle'] && $tags['date'] !== $tags['title']) {
+		if (strpos($production->find($tags['title'], 0), '<br>') > 1) {
+			$elementsArray = explode('<br>', $production->find($tags['title'], 0));
+			$title = filter_var(explode('<br>', $production->find($tags['title'], 0))[count($elementsArray)-1], FILTER_SANITIZE_STRING);
+			$subtitle = '';
+			$date = str_replace("'", '20', preg_replace("/\s+/", " ", $production->find('a .date', 0)->plaintext));
+			//print_r(array($date, dateFromString($date)));
+
+
+		} else {
+			$title = trimString($production->find($tags['title'].' h5', 0)->plaintext);
+			$subtitle = trimString(substr($production->find($tags['subtitle'], 0), strpos($production->find($tags['subtitle'], 0), '</h5>')));
+			$date = explode(' ', trimString($production->find($tags['date'], 0)->plaintext));
+			$date = $date[1].' '.$date[0].' '.$date[2];
+		}
+				
+		
+		// Determine if a genre has been given for the performance
+		if (strlen($production->find($tags['genre'], 0)->plaintext) > 2) {
+			$genre = array(strtolower($production->find($tags['genre'], 0)->plaintext)); 
+		} else {
+			$genre = "voorstelling";
+		}
+
 	
-	// Filter by month
-	if (date('Y-m', $time) == $month) {
-		//Check if genre exist
-			$productionObj = new stdClass();
+	} else {
+		$title = $production->find($tags['title'], 0)->plaintext;
+		$subtitle = $production->find($tags['subtitle'], 0)->plaintext;
+		if (strpos($subtitle, "&nbsp;") !== false || strlen($subtitle) < 2) {
+			$subtitle = trimString($production->find($tags['subtitle'], 1)->plaintext);
+		}
+		if (preg_match("/\d{4}-\d{2}-\d{2}/", $tags['date'], $match)) {
+			$date = trimString($tags['date']);
+		} else {
+			$date = trimString($production->find($tags['date'], 0)->plaintext);
+		$genre = $production->find($tags['genre']);
+	}
+		
+	}
+
+	if (strlen($title) < 1 && strlen($subtitle) > 1) {
+		$title = $subtitle;
+		$subtitle = '';
+	}
+
+	// Determine if a genre has been given for the performance
+
+	//$genre = array(strtolower($dom->find($tags['container'], 0)->find(".agenda_tabs", $keyA)->find(".col-md-3 .tab_cat p", 0)->plaintext));
+	
+	// Get last date of production
+	$time = dateFromString($date);
+
+	// Determine if given date is invalid
+		if (validateDate($date) == false  || validateDate(date('d-m-Y',$time)) == false) {
+			$link = $production->find($tags['link'], 0)->href;
+
+			// Check for a valid date format in the given url
+			if (preg_match("/\d{2}-\d{2}-\d{4}/", $link, $match)) {
+				$time = strtotime($match[0]);
+
+				// Check for valid time format in the given url
+				if (preg_match("/\d{2}-\d{2}-\d{4}-\d{2}-\d{2}/", $link, $match)) {
+					
+					// Replace last '-' with ':' for valid time
+					$search = '-';
+					$subject = $match[0];
+					$pos = strpos_all($subject, $search);
+					
+					// Add time to date string and create a timestamp of it
+					if($pos !== false) {
+						$subject = substr_replace($subject, ':', $pos[count($pos)-1], strlen($search));
+						$subject = substr_replace($subject, ' ', $pos[count($pos)-2], strlen($search));
+						$time = strtotime($subject);
+					}
+
+				}
+
+				// Check for a valid date format in the given url
+				if (preg_match("/\d{4}-\d{2}-\d{2}/", $link, $match)) {
+					$time = strtotime($match[0]);
+				} else {
+					$time = time();
+				}
+			}
 			
+		}
+
+	//Custom added 
+	//print_r(array($title, $tags['subtitle'], $subtitle, $date, $tempDate, $time, date('Y-m-d', $time)));
+	// Filter by month
+	if (date('Y-m', $time) == $month || strtoupper($month) == "ALL") {
+		
+		//Check if genre exist
+			$productionObj = new stdClass();			
 			// Put data to object
-			$productionObj->title = trimString($production->find($tags['title'], 0)->plaintext);
-			$productionObj->subtitle = trimString($production->find($tags['subtitle'], 0)->plaintext);
+			$productionObj->title = trimString($title);
+			$productionObj->subtitle = trimString($subtitle);
 			$productionObj->venue = $location['venue'];
 			$productionObj->location = $location['city'];
-			$productionObj->genre = listGenres($production->find($tags['genre']));
-			if (count($productionObj->genre) <= 1) {
+			
+			
+			$productionObj->genre = listGenres($genre);
+			/*
+			if (count($productionObj->genre) < 1 || strpos($productionObj->genre[0], ' ') !== false) {
 				$productionObj->genre[0] = 'voorstelling';
+
+				if (strpos($tags['genre'], '.') === false) {
+					$productionObj->genre[0] = $tags['genre'];
+				}
+			}
+
+			if (strpos($tags['genre'], '/') !== false) {
+				$parts = explode(' ', $tags['genre']);
+				$needleHaystack = explode('/', $parts[0]);
+				if (stripos($production->find($needleHaystack[0]), $needleHaystack[0]) !== false) {
+					$productionObj->genre[0] = $needleHaystack[0];
+				} else {
+					$productionObj->genre[0] = $parts[1];
+				}
+			} else {
+				$productionObj->genre[0] = 'overig';
+				if (strpos($tags['genre'], ' ') !== false) {
+					$parts = explode(' ', $tags['genre']);
+					$productionObj->genre = $parts;
+				}
+			}
+			*/
+
+			if (!$tags['link'])	{
+				$link = 'a';
+			} else {
+				$link = $tags['link'];
+			}
+			if (strpos($production->find($link, 1)->href, $tags['baseUrl']) !== false) {
+				$productionObj->link = filter_var(trim($production->find($link, 0)->href), FILTER_SANITIZE_URL);
+			} else {
+				// Determine if item is an anchor link
+				if (strlen($production->href) > 1) {
+					$productionObj->link = filter_var(trim($production->href), FILTER_SANITIZE_URL);
+
+					/*if (strpos($production->href, $tags['baseUrl']) !== false) {
+						$productionObj->link = filter_var(trim($production->href), FILTER_SANITIZE_URL);
+					} else {
+						$productionObj->link = filter_var(trim($tags['baseUrl'].$production->href), FILTER_SANITIZE_URL);
+					}
+					*/
+				} else {
+					$productionObj->link = filter_var(trim($tags['baseUrl'].$production->find($link, 0)->href), FILTER_SANITIZE_URL);
+				}
 			}
 		
-			if (strpos($production->find('a', 0)->href, $tags['baseUrl']) !== false) {
-				$productionObj->link = filter_var(trim($production->find('a', 0)->href), FILTER_SANITIZE_URL);
-			} else {
-				$productionObj->link = filter_var(trim($tags['baseUrl'].$production->find('a', 0)->href), FILTER_SANITIZE_URL);
-			}
 			$productionObj->date->time = $time;
 			$productionObj->date->dateString = date('d-m-Y H:i', $productionObj->date->time);
-			//$productionObj->performers = getPerformers($productionObj->link);
-		
-		
+			if (array_key_exists('performers', $tags)) {
+				//$productionObj->performers = getPerformers($productionObj->link, array("performers"=>$tags['performers']));
+				$productionObj->performers = getsimilarPerformers($productionObj->title);
+				if (count($productionObj->performers) == 1 && strlen($productionObj->performers[0]) > 1) {
+					$productionObj->subtitle = $productionObj->performers[0];
+				}
+			}
+
+
+			//$productionObj->link = str_replace("https://stadstheater.nl//stadstheater.nl", "https://stadstheater.nl", $productionObj->link);
+
 			// Push object to productions array
 			// Exclude productions with irrelevant tags, title or sold out
-			if (stripos($exclude, $productionObj->genre[0]) === false && stripos($exclude, $productionObj->genre[1]) === false && stripos($exclude, $productionObj->title) === false && stripos($productionObj->title, 'inleiding') === false && stripos($lastShow->status, "uitverkocht") === false && $lastShow->status !== "Geannuleerd") {
-				array_push($productions, $productionObj);
-			}
+			// Push object to productions array
+			// Exclude productions with irrelevant tags, title or sold out
+
+			
+				$excludeFound = false;
+				foreach (explode(' ', $exclude) as $excl) {
+					if (stripos($productionObj->title, $excl) > -1) {
+						$excludeFound = true;
+					}
+					else if (stripos($excl, $productionObj->genre[0]) > -1) {
+						$excludeFound = true;
+					}
+				}
+				
+				if ($excludeFound == false) {
+					array_push($productions, $productionObj);
+				}
+				
 		}
 
 }
+
+//} //Used for pagination
+
 ?>
