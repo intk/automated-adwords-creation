@@ -39,7 +39,8 @@ error_reporting(E_ALL);
 
 // Parse ads templates from db
 function parseTemplate($template) {
-	$tplString = preg_replace("/\s+/", " ", $template);	
+	//Encode to UTF-8
+	$tplString = utf8_encode(preg_replace("/\s+/", " ", $template));	
 	// Get template blocks
 	$blocks = preg_split('/(\w* { |\w* = )/', $tplString, -1, PREG_SPLIT_DELIM_CAPTURE);
 	array_push($blocks, '');
@@ -64,6 +65,9 @@ function parseTemplate($template) {
 	$types['prep'] = $types['prep'][0][0];
 	if (strlen($types['placeholder'][0][0]) > 1) {
 		$types['placeholder'] = $types['placeholder'][0][0];
+	}
+	if (strlen($types['displayDate'][0][0]) > 1) {
+		$types['displayDate'] = $types['displayDate'][0][0];
 	}
 	
 	return $types;
@@ -153,6 +157,7 @@ if ($_GET['theater']) {
 						$import = mysqli_query($connect, "INSERT INTO performances (theaterId, title, subtitle, genre, performanceDate, creationDate, link) VALUES (".$result['id'].", '".$item->title."', '".$item->subtitle."', '".implode(';', $item->genre)."', '".$item->date->time."', '".time()."', '".$item->link."')");
 
 					}
+
 
 					// Add performance to storage
 					$storedPerformances[$key] = $item->title;
