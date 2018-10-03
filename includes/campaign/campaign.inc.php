@@ -74,14 +74,14 @@ class Campaign {
 	
 	//Format timestamp to different date strings
 	private function formatDate($time) {
-		$monthNL = array('jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec');
-		$monthNLFull = array('januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december');
+		$monthFR = array("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "decembre");
+		$monthFRFull =  array("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "decembre");
 		$monthEN = array('jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec');
 		$day = date('d', $time);
 		if ($day < 10) { $day = substr($day, 1); }
 		$output[0] = date('M d, Y', $time);
-		$output[1] = $day.' '.str_ireplace($monthEN, $monthNL, date('M', $time)).'.';
-		$output[2] = $day.' '.str_ireplace($monthEN, $monthNLFull, date('M', $time));
+		$output[1] = $day.' '.str_ireplace($monthEN, $monthFR, date('M', $time)).'.';
+		$output[2] = $day.' '.str_ireplace($monthEN, $monthFRFull, date('M', $time));
 		$output[3] = date('Y-m-d', $time);
 		return $output;
 	}
@@ -488,7 +488,7 @@ class Campaign {
 			if (strlen($title)+6 > 30 || ($type == 'multiple-artists' && strlen($title)-4 > 30)) {
 				$heading[0] = array($title, $hDate.' '.$locPrep.' '.$hLocation[0]);
 			} else {
-				$heading[0] = array('Naar '.$title.'?', $hDate.' '.$locPrep.' '.$hLocation[0]);
+				$heading[0] = array('Voir '.$title.'?', $hDate.' '.$locPrep.' '.$hLocation[0]);
 			}
 			
 			//If no title available
@@ -508,8 +508,8 @@ class Campaign {
 			$heading[2] = array($title, ucfirst($hLocation[2]));
 
 			if ($type == 'multiple-artists') {
-				$heading[0][0] = "Fan van ".$title."?";
-				$heading[1][0] = "Fan van ".$title."?";
+				$heading[0][0] = "Fan de ".$title."?";
+				$heading[1][0] = "Fan de ".$title."?";
 				$heading[2][0] = $title."?";
 			}
 
