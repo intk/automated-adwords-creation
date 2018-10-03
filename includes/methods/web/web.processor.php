@@ -28,7 +28,7 @@ function dateFromString($string) {
 
 
 	// Exclude days of the week and their abbreviations
-	$date = preg_replace("/(lundi|mardi|mecredi|jeudi|vendredi|samedi|dimanche)/i", "", $date);
+	$date = preg_replace("/(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)/i", "", $date);
 
 	//Determine if wrong date format has been used
 	if (substr_count($date, '.') > 1) {
@@ -328,6 +328,8 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 					$productionObj->subtitle = $productionObj->performers[0];
 				}
 			}
+
+			print_r($productionObj);
 
 
 			//$productionObj->link = str_replace("https://stadstheater.nl//stadstheater.nl", "https://stadstheater.nl", $productionObj->link);
