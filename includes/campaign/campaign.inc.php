@@ -80,7 +80,7 @@ class Campaign {
 		$day = date('d', $time);
 		if ($day < 10) { $day = substr($day, 1); }
 		$output[0] = date('M d, Y', $time);
-		$output[1] = $day.' '.str_ireplace($monthEN, $monthFR, date('M', $time)).'.';
+		$output[1] = $day.' '.str_ireplace($monthEN, $monthFR, date('M', $time)).'';
 		$output[2] = $day.' '.str_ireplace($monthEN, $monthFRFull, date('M', $time));
 		$output[3] = date('Y-m-d', $time);
 		return $output;
