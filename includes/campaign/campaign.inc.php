@@ -281,11 +281,11 @@ class Campaign {
 		$pLabel->jeugd = array("toneel", "toneel");
 		$pLabel->dans = array('dans', 'een danssshow');
 		$pLabel->film = array('film', 'de film', 'een film');
-		$pLabel->concert = array('concert', 'een concert');
-		$pLabel->theaterconcert = array('concert', 'een concert');
+		$pLabel->concert = array('concert', 'un concert');
+		$pLabel->theaterconcert = array('concert', 'un concert');
 		$pLabel->opera = array('opera', 'opera');
-		$pLabel->muziek = array('concert', 'een concert');
-		$pLabel->klassiek = array('concert', 'een concert');
+		$pLabel->muziek = array('concert', 'un concert');
+		$pLabel->klassiek = array('concert', 'un concert');
 		
 		$genre = $this->genre[0];
 	
