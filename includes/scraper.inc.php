@@ -14,12 +14,12 @@ class Theater {
 			$result = mysqli_fetch_array($query);
 			$this->name = $result['name'];
 			$this->method = $result['method'];
-			$this->productions = $this->crawl($result['method'], $result['url'], $result['location'], $month, $result['exclude']);
+			$this->productions = $this->scrape($result['method'], $result['url'], $result['tags'], $result['location'], $month, $result['exclude']);
 		}
     }
 	
 	//Crawl programme
-	private function crawl($method, $url, $location, $month, $exclude) {
+	private function scrape($method, $url, $tags, $location, $month, $exclude) {
 		include('methods/'.$method.'/'.$method.'.processor.php');
 		return $productions;
 	}
