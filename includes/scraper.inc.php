@@ -2,7 +2,7 @@
 
 //Contains name & programme
 class Theater {
-    public function __construct($name, $month) {
+    public function __construct($name, $month, $venue) {
 		include('config.inc.php');
 		//Obtain database records
 		$query = mysqli_query($connect, "SELECT * FROM theaters WHERE alias LIKE '%".$name."%'");
@@ -14,12 +14,21 @@ class Theater {
 			$result = mysqli_fetch_array($query);
 			$this->name = $result['name'];
 			$this->method = $result['method'];
-			$this->productions = $this->scrape($result['method'], $result['url'], $result['tags'], $result['location'], $month, $result['exclude']);
+			
+			//Add different location formats
+			$location['city'] = $result['location'];
+			$location['venue'][0] = $result['name'];
+			if (strlen($result['shortName']) > 1) {
+				$location['venue'][1] = $result['shortName'];
+			}
+			//'exclude' parameter for preventing irrelevant campaign creation
+			$this->productions = $this->scrape($result['method'], $result['url'], $result['tags'], $location, $month, $venue, $result['exclude']);
+
 		}
     }
 	
-	//Crawl programme
-	private function scrape($method, $url, $tags, $location, $month, $exclude) {
+	//Scrape programme
+	private function scrape($method, $url, $tags, $location, $month, $venue, $exclude) {
 		include('methods/'.$method.'/'.$method.'.processor.php');
 		return $productions;
 	}
