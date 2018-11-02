@@ -86,12 +86,13 @@ if ($xlsx = SimpleXLSX::parse($url)) {
 
 
 			$productionObj->title = $production[$tags['title']];
+			$productionObj->genre[0] = $production[$tags['category']];
 			$productionObj->subtitle = $production[$tags['artist']];
 			$productionObj->venue = $location['venue'];
 			$productionObj->location = $location['city'];
 
 			//Add genre
-			$productionObj->genre = listGenres($tags['genre']);
+			/*$productionObj->genre = listGenres($tags['genre']);
 			if (count($productionObj->genre) <= 1) {
 					if (strlen($tags['category']) > 1) {
 						$productionObj->genre[0] = $tags['category'];
@@ -105,6 +106,7 @@ if ($xlsx = SimpleXLSX::parse($url)) {
 				$productionObj->genre[0] = $parts[1];
 				$productionObj->genre[1] = $category[1];
 			}
+			*/
 
 			// Add link to production
 			if (strpos($tags['link'], 'http') !== false) {
