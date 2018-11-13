@@ -27,7 +27,6 @@ function listGenres($genre) {
 	return $genreArr;
 }
 
-
 if ($xlsx = SimpleXLSX::parse($url)) {
 	// Get column names and store them in array
 	foreach ($xlsx->rows()[0] as $column) {
