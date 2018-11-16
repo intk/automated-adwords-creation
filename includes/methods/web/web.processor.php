@@ -20,7 +20,7 @@ function validateDate($date, $format = 'd-m-Y') {
 function dateFromString($string) {
 	//Convert string to a date string
 	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
-	$splittedDate = preg_split("(t/m|&|tm| - )", $string);
+	$splittedDate = preg_split("(t/m|&|tm| -|-)", $string);
 	$date = $splittedDate[count($splittedDate)-1];
 	if (strpos($date,'+') !== false) {
 		$date = substr($date, 0, strpos($date,'+'));
@@ -28,7 +28,7 @@ function dateFromString($string) {
 
 
 	// Exclude days of the week and their abbreviations
-	$date = preg_replace("/(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)/i", "", $date);
+	$date = preg_replace("/(lundi|lu|mardi|ma|mercredi|me|jeudi|je|vendredi|ve|samedi|sa|dimanche|di)/i", "", $date);
 
 	//Determine if wrong date format has been used
 	if (substr_count($date, '.') > 1) {
@@ -202,9 +202,9 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		if (preg_match("/\d{4}-\d{2}-\d{2}/", $tags['date'], $match)) {
 			$date = trimString($tags['date']);
 		} else {
-			$date = trimString($production->find($tags['date'], 0)->plaintext);
-		$genre = $production->find($tags['genre']);
-	}
+			$date = trimString($production->find($tags['date'], -1)->plaintext);
+			$genre = $production->find($tags['genre']);
+		}
 		
 	}
 
@@ -256,7 +256,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		}
 
 	//Custom added 
-	//print_r(array($title, $tags['subtitle'], $subtitle, $date, $tempDate, $time, date('Y-m-d', $time)));
+	print_r(array($title, $tags['subtitle'], $subtitle, $date, $tempDate, $time, date('Y-m-d', $time)));
 	// Filter by month
 	if (date('Y-m', $time) == $month || strtoupper($month) == "ALL") {
 		
