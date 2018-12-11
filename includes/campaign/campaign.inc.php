@@ -474,10 +474,11 @@ class Campaign {
 				$this->template[$type] = $this->template['artist'];
 			}
 
-			// Assign movie template for artist
+			/*// Assign movie template for artist
 			if ($this->genre[0] === 'film') {
 				$this->template[$type] = $this->template['movieArtist'];
 			}
+			*/
 
 			// Assign template for SoundsLike
 			if ($type == 'multiple-artists') {
