@@ -256,7 +256,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		}
 
 	//Custom added 
-	print_r(array($title, $tags['subtitle'], $subtitle, $date, $tempDate, $time, date('Y-m-d', $time)));
+	//print_r(array($title, $tags['subtitle'], $subtitle, $date, $tempDate, $time, date('Y-m-d', $time)));
 	// Filter by month
 	if (date('Y-m', $time) == $month || strtoupper($month) == "ALL") {
 		
@@ -329,7 +329,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				}
 			}
 
-			print_r($productionObj);
+			//print_r($productionObj);
 
 
 			//$productionObj->link = str_replace("https://stadstheater.nl//stadstheater.nl", "https://stadstheater.nl", $productionObj->link);
