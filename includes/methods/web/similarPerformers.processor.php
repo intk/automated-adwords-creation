@@ -61,7 +61,7 @@ function getsimilarPerformers($inputTitle) {
 	$performerObj = new stdClass();
 	$performerObj->success = false;
 
-	$XLSUrl = 'campaigns/uploads/Botanique-similar-artists.xlsx';
+	$XLSUrl = 'campaigns/uploads/Botanique-similar-artists-2019.xlsx';
 
 	if ($xlsx = SimpleXLSX::parse($XLSUrl)) {
 		// Get column names and store them in array
@@ -73,7 +73,7 @@ function getsimilarPerformers($inputTitle) {
 		
 		// Filter array and return element on case insensitive partial match of artist
 		$filter = array_filter($xlsx->rows(), function($el) use ($inputTitle) {
-			return (stripos($el[0], $inputTitle) !== false);
+			return (stripos($inputTitle, $el[0]) !== false);
 		});
 		if (count($filter) > 0) {
 			sort($filter);

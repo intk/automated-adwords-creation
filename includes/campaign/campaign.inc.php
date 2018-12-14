@@ -169,12 +169,30 @@ class Campaign {
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $subtitleObj->adgroup);
 		}
 
+		if (count($keywordsObj->adgroup) < 2) {
+			$addObj = new Keywords($this->title.' '.$this->genre[0], $this->venue[0], $this->city, $placementsList);
+			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $addObj->adgroup);
+		}
+
 
 		foreach ($keywordsObj->adgroup as $key => $adgroup) {
 			$this->adgroup[$key]->name = $adgroup['name'];
 			$this->adgroup[$key]->type = $adgroup['type'];
+			// Determine ad group type
+			if ($adgroup['name'] == $this->title) {
+				$this->adgroup[$key]->type = 'title';
+			}
 			$this->adgroup[$key]->ad = $this->createAds(trim($this->adgroup[$key]->name), $this->adgroup[$key]->type, $this->trimArtist($this->subtitle));
 			$this->adgroup[$key]->keywords = $adgroup['keywords'];
+
+		}
+
+		if (count($this->performers) > 1) {
+			$adGroupCount = count($this->adgroup);
+			$this->adgroup[$adGroupCount]->name = 'Performers';
+			$this->adgroup[$adGroupCount]->type = 'multiple-artists';
+			$this->adgroup[$adGroupCount]->ad = $this->createAds(trim($this->adgroup[$adGroupCount]->name), $this->adgroup[$adGroupCount]->type, $this->trimArtist($this->subtitle));
+			$this->adgroup[$adGroupCount]->keywords = $this->performers;
 		}
 
 		
