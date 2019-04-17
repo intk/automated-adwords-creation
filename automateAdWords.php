@@ -39,8 +39,7 @@ error_reporting(E_ALL);
 
 // Parse ads templates from db
 function parseTemplate($template) {
-	//Encode to UTF-8
-	$tplString = utf8_encode(preg_replace("/\s+/", " ", $template));	
+	$tplString = preg_replace("/\s+/", " ", $template);	
 	// Get template blocks
 	$blocks = preg_split('/(\w* { |\w* = )/', $tplString, -1, PREG_SPLIT_DELIM_CAPTURE);
 	array_push($blocks, '');
@@ -66,9 +65,6 @@ function parseTemplate($template) {
 	if (strlen($types['placeholder'][0][0]) > 1) {
 		$types['placeholder'] = $types['placeholder'][0][0];
 	}
-	if (strlen($types['displayDate'][0][0]) > 1) {
-		$types['displayDate'] = $types['displayDate'][0][0];
-	}
 	
 	return $types;
 }
@@ -87,7 +83,7 @@ if ($_GET['theater']) {
 		$result = mysqli_fetch_array($query);
 		
 		// Assign template for ads
-		$template = parseTemplate($result['content']);
+		$template = $result['content'];
 
 		//Parse monthly season
 		include('includes/scraper.inc.php');
@@ -110,7 +106,7 @@ if ($_GET['theater']) {
 		
 			//Create new campaign object of each production
 			include('includes/campaign/campaign.inc.php');
-			if ($_GET['numberOnly']) {
+			if (isset($_GET['numberOnly'])) {
 				$theater->productionsNumber = count($theater->productions);
 			} else {
 
@@ -157,7 +153,6 @@ if ($_GET['theater']) {
 						$import = mysqli_query($connect, "INSERT INTO performances (theaterId, title, subtitle, genre, performanceDate, creationDate, link) VALUES (".$result['id'].", '".$item->title."', '".$item->subtitle."', '".implode(';', $item->genre)."', '".$item->date->time."', '".time()."', '".$item->link."')");
 
 					}
-
 
 					// Add performance to storage
 					$storedPerformances[$key] = $item->title;

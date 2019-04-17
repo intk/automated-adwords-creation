@@ -2,14 +2,15 @@
 header('Content-Type: application/json');
 
 class Keywords {
-	public function __construct($title, $venue, $city, $placements) {
+	public function __construct($title, $venue, $city, $placements, $type) {
+
+		$this->type = $type;
 		$this->title = $title;
 		$this->venue = $venue;
 		$this->city = $city;
 		$this->placements = $placements;
 		$this->newAdgroup = $this->newAdgroup();
 		$this->adgroup = $this->keywordsParser();
-
 	}
 
 	private function newAdgroup() {
@@ -29,6 +30,13 @@ class Keywords {
 
 		// Derive string 
 		$input = $this->title;
+		if (strpos($this->title, 'met ') !== false) {
+
+			$input = str_replace('met ', '', $input);
+		}
+		if (strpos($this->title, ': ') !== false) {
+			$input = preg_replace("/(\w*: )/", '', $input);
+		}
 
 		// Parse by predifined delimiters
 		if (strpos($input, ',') !== false || (strpos($input, ',') !== false && strpos($input, ',') < strpos($input, ' en '))) {
@@ -52,16 +60,17 @@ class Keywords {
 			$this->newAdgroup = true;
 		} else {
 			$delOutputCount = count($delOutput);
-			$delOutput =  preg_split('/(, | i.s.m. | ism | ft. | feat. | -- | met )+/i', $input);
-			if (count($delOutput) > $delOutputCount) {
+			$delOutput = preg_split('/(, | i.s.m. | ism | ft. | feat. | -- | met )+/i', $input);
+			if (count($delOutput) > 1) {
 				$this->newAdgroup = true;
 			}
 		}
 
 		$outputArray = array();
-		
+
 		// Parse by every second space
 		foreach ($delOutput as $delString) {
+			$delString = trim($delString);
 
 			// Only parse by every second space if string length is more than 20 characters
 			if (strlen($delString) > 20) {
@@ -69,8 +78,8 @@ class Keywords {
 				// Remove words that have less than 4 characters
 				$tempVal = explode(' ', $delString);
 		    	foreach($tempVal as $key => $val) {
-		    		//Exclude words that can be part of a name
-		    		if (!preg_match("/(big|job|jam|joy|max)/", $val, $matches) && strlen($val) < 4) {
+		    		//Exclude words from removal that can be part of a name
+		    		if (!preg_match("/(big|job|jam|joy|max|van|der)/i", $val, $matches) && strlen($val) < 4) {
 		    			unset($tempVal[$key]);
 		    		}
 		    	}
@@ -78,7 +87,6 @@ class Keywords {
 		    	if (substr_count($delString, " ") > 1) {
 		    		$delString = implode(' ', $tempVal);
 		    	}
-
 
 				// Split by second space
 				$deliverPair = array_map(
@@ -93,12 +101,20 @@ class Keywords {
 				);
 
 				$outputArray = array_merge($outputArray, $deliverPair);
+
 			} else {
 				array_push($outputArray, $delString);
 			}
 
 		}
 		$tempOutputArray = $outputArray;
+
+		/*
+		if (strpos($this->title, $this->placements[0]) !== false) {
+			$tempOutputArray = array($this->title);
+		}
+		*/
+
 		foreach ($tempOutputArray as $key => $tempKeyword) {
 
 			// Create keywords for each new adgroup
@@ -112,12 +128,12 @@ class Keywords {
 
 
 				// Make sure there is the same amount of keywords, and placements to combine
-				$DuplicateKeywords = array_fill(0, count($placements), $tempKeyword);
+				$DuplicateKeywords = array_fill(0, count($placements), trim($tempKeyword));
 
 
 
 				// Placements will be placed after the keyword, so it becomes a new keyword
-				$outputArray[$key] = array_merge(array("name"=>$tempKeyword,"type"=>"artist", "keywords"=>array_merge(array(strtolower($tempKeyword)), array_map(
+				$outputArray[$key] = array_merge(array("name"=>$tempKeyword,"type"=>$this->type, "keywords"=>array_merge(array(strtolower($tempKeyword)), array_map(
 					function($placement, $keyword) {
 						return strtolower($keyword .' '.$placement);
 					}, $placements, $DuplicateKeywords
@@ -125,27 +141,30 @@ class Keywords {
 				))));
 
 				// Remove any single word keywords
+				/*
 				foreach ($outputArray[$key]['keywords'] as $keyword => $value) {
 					if (substr_count($value, " ") < 1) {
 						unset($outputArray[$key]['keywords'][$keyword]);
 					}
 				}
+				*/
 
 
 			} else {
 				// Determine if there are any single word keywords
 				if (substr_count($tempKeyword, " ") < 1) {
-					$outputArray[$key] = '+ '.$tempKeyword;
-					$outputArray[count($tempOutputArray)] = $tempKeyword.' '.$this->city;
+					$outputArray[$key]['keywords'][0] = '+ '.$tempKeyword;
+					$outputArray[count($tempOutputArray)]['keywords'][1] = $tempKeyword.' '.$this->city;
 				}
 			}
 		}
 
+
 		// Make adgroup object
 		if ($this->newAdgroup == 'false') {
 			$outputArrayTemp = $outputArray;
-			$outputArray = null;
-			$outputArray[0] = array("name"=>$this->title,"type"=>"title", "keywords"=>$outputArrayTemp);
+			$outputArray = array();
+			$outputArray[0] = array("name"=>$this->title,"type"=>$this->type, "keywords"=>$outputArrayTemp);
 		}
 
 		return $outputArray;
