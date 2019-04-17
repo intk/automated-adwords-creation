@@ -167,7 +167,7 @@ function getPerformers($url, $tag) {
 		
 		//Check if predefined performers tag exists and if it only contains words/names
 		if (count($tag) > 0 && strlen($tag['performers']) > 1) {
-			
+
 			//Check if multiple selectors are given in performers tag
 			if (count(explode(' + ', $tag['performers'])) > 1) {
 				foreach(explode(' + ', $tag['performers']) as $key => $tagString) {
@@ -198,8 +198,6 @@ function getPerformers($url, $tag) {
 				}
 
 			} else {
-				//echo $dom->find($tag['performers'], -1)->plaintext;
-
 				//Determine if performers are listed in separate html elements
 				if (count($dom->find($tag['performers'])) > 1) {
 					$ckey = 0;
@@ -212,16 +210,30 @@ function getPerformers($url, $tag) {
 								$ckey++;
 							}
 						} else {
-							$credits[$ckey] = $tempItem->plaintext;
+							$credits[$ckey] = trim(preg_split("/(,)/", $tempItem->plaintext)[0]);
 						}
 						$ckey++;
 
 					}
 				} else {
 
+					 //$tempProgramme = explode(",", str_replace("\r\n", ",", $dom->find($tag['performers'], -1)->plaintext));
+					 //$credits = $tempProgramme;
 
-					$credits = preg_split("/(\w*: )/", preg_replace("/\s+/", " ", $dom->find($tag['performers'], -1)->plaintext));
-					//$credits .= implode(', ', $credit);
+
+				    /* Added for Brussels Philharmonic */
+				    /*
+				    $tempProgramme = explode("\n", $dom->find($tag['performers'], -1)->plaintext);
+				    foreach($tempProgramme as $key => $val) {
+				    	$tempVal = explode('•', $val)[0];
+				    	$tempProgramme[$key] = trim($tempVal);
+				    }
+				    $credits = $tempProgramme;
+
+				    /* Removed for Brussels Philharmonic */
+
+					$credit = preg_split("/(\w*: )/", preg_replace("/\s+/", " ", $dom->find($tag['performers'], -1)->plaintext));
+					$credits .= implode(', ', $credit);
 				}
 			}
 
@@ -271,7 +283,7 @@ function getPerformers($url, $tag) {
 		if (count($performers) >= 1) {
 			$performers = array_unique($performers, SORT_STRING);
 			//Sort performers by length for keyword insertion
-			usort($performers,'sortByLength');
+			#($performers,'sortByLength');
 			$performerObj->success = true;
 			$performerObj->performers = $performers;
 			if (strlen($performers[0]) > 30) {
@@ -287,6 +299,11 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
+# print_r(getPerformers("https://www.antwerpsymphonyorchestra.be/kidconcert-calamity-jane", array("performers"=>".cluster .main .artists .first .artist h1")));
+
+
+#print_r(getPerformers("https://www.filmhuisalkmaar.nl/films/becoming-astrid", array("performers"=>".film-header .film-header-info .film-actors")));
+
 #print_r(getPerformers("https://www.lantarenvenster.nl/programma/aaron-parks-little-big/", array("performers"=>".page-content .wp_theatre_prod .wp_theatre_prod_director + .page-content .user-content h5")));
 
 #print_r(getPerformers("https://www.filmfestival.nl/films/tagged-2/", array("performers"=>".credits .wrap .part-two .inner .two")));

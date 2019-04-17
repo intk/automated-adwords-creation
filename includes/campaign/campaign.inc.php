@@ -170,7 +170,7 @@ class Campaign {
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $titleObj->adgroup);
 		}
 
-		if (count($this->performers) > 0 && count($this->performers) <= 11 && $manyPerformers == false) {
+		if (count($this->performers) > 0 && count($this->performers) <= 10 && $manyPerformers == false) {
 			foreach ($this->performers as $performer) {
 				$performersObj = new Keywords($performer, $this->venue[0], $this->city, $placementsList, 'performer');
 				$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $performersObj->adgroup);
@@ -327,6 +327,9 @@ class Campaign {
 
 		# Add keyword insertion when performers > 10
 		if (count($this->performers) > 10 && $type == 'performer') {
+			//Sort performers by length for keyword insertion
+			usort($this->performers,'sortByLength');
+			# Placeholder for longest keyword
 			$title = '{KeyWord:'.$this->performers[0].'}';
 		}
 
