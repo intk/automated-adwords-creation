@@ -7,7 +7,7 @@ $data = array (
 	"campaignType" => "Search Network only",
 	"networks" => "Google search",
 	"languages" => "nl",
-	"bidStrategyType" => "Manual CPC",
+	"bidStrategyType" => "Maximize conversions",
 	"bidStrategyName" => "",
 	"enhancedCPC" => "disabled",
 	"CPABid" => "0.00",
@@ -27,6 +27,7 @@ $data = array (
 	"Reach" => "",
 	"FinalURL" => "",
 	
+	/*
 	//SITELINK
 	"DevicePreference" => "",
 	"LinkText" => "",
@@ -34,16 +35,19 @@ $data = array (
 	"DescriptionLine2" => "",
 	"FeedName" => "",
 	"PlatformTargeting" => "",
+	*/
 	
 	//CALL
 	/*"PhoneNumber" => "",
 	"CountryOfPhone" => "",
 	"CallReporting" => "",
 	"ConversionAction" => "",*/
-	
-	"Description" => "",
+
 	"Headline1" => "",
 	"Headline2" => "",
+	"Headline3" => "",
+	"DescriptionLine1" => "",
+	"DescriptionLine2" => "",
 	"path1" => "",
 	"path2" => "",
 	"campaignStatus" => $status
@@ -133,11 +137,36 @@ for ($i = 0; $i < count($package->campaign->adgroup); $i++) {
 		$adArr[array_search("FinalURL", array_keys($data))] = $package->link;
 		$adArr[array_search("Headline1", array_keys($data))] = $ad->heading[0];
 		$adArr[array_search("Headline2", array_keys($data))] = $ad->heading[1];
+		$adArr[array_search("Headline3", array_keys($data))] = $ad->heading[2];
 		$adArr[array_search("path1", array_keys($data))] = $ad->path[0];
 		$adArr[array_search("path2", array_keys($data))] = $ad->path[1];
-		$adArr[array_search("Description", array_keys($data))] = $ad->description;
+
+		// Split description text over 2 lines if first line has more than 90 characters
+		if ((strlen($ad->description[0]) > 90 && strpos($ad->description[0], '{KeyWord:') === false)  || (strpos($ad->description[0], '{KeyWord:') > 1 && strlen($ad->description[0]) > 100)) {
+			$descriptionParts = preg_split( "/(\.|!)/", $ad->description[0], -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			$adArr[array_search("DescriptionLine1", array_keys($data))] = $descriptionParts[0].$descriptionParts[1];
+			$adArr[array_search("DescriptionLine2", array_keys($data))] = $descriptionParts[2].$descriptionParts[3];
+		} else {
+
+			// If first description line has <= characters, use default template for both description lines
+			$adArr[array_search("DescriptionLine1", array_keys($data))] = $ad->description[0];
+			$adArr[array_search("DescriptionLine2", array_keys($data))] = $ad->description[1];
+		}
+
+
+		/*
+		
+		if (strlen($ad->description) > 90) {
+			$descriptionParts = preg_split( "/(\.|!)/", $ad->description, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			$adArr[array_search("DescriptionLine1", array_keys($data))] = $descriptionParts[0].$descriptionParts[1];
+			$adArr[array_search("DescriptionLine2", array_keys($data))] = $descriptionParts[2].$descriptionParts[3];
+		} else {
+			$adArr[array_search("DescriptionLine1", array_keys($data))] = $ad->description;
+		}
+		*/
+		
 		$list[$i+count($list)] = $adArr;
-		if ($package->campaign->adgroup[$i]->name == "Performers" || $package->campaign->adgroup[$i]->type == "artist" && $key == 2) {
+		if ($package->campaign->adgroup[$i]->name == "Performers" || $package->campaign->adgroup[$i]->type == "performer" && $key == 2) {
 			$list[$i+count($list)] = $adArr;
 		}
 	}
