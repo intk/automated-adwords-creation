@@ -336,11 +336,12 @@ class Campaign {
 			$title = '{KeyWord:'.$this->performers[0].'}';
 		}
 
-		if ($type == 'title') {
+		if ($type == 'title' || ($type == 'performer' && count($this->performers) <= $this->maxPerformers)) {
 			$replacement = array($performer, $title, $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		} else {
 			$replacement = array($title, $this->title, $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		}
+
 
 		# Decode ads template in JSON format and iterate
 		foreach (json_decode($this->template) as $template) {
@@ -350,12 +351,15 @@ class Campaign {
 				# Iterate ads template
 				foreach($template->ads as $adkey => $adProperties) {
 
+
+					#### CREATE ADD CONTENT ####
+
 					//Sort first heading length from short to long. Needed to iterate them to fit the 30 characters.
 					foreach ($adProperties->heading1 as $heading1) {
 						$heading = $this->replaceTpl($heading1, $replace, $replacement, 30);
 
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && strlen($heading) <= 41)) {
+						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && strlen($heading) <= 40)) {
 							$ad[$adkey]->heading[0] = $heading;
 						}
 
@@ -370,7 +374,7 @@ class Campaign {
 						$description = $this->replaceTpl($description1, $replace, $replacement, 90);
 
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 101)) {
+						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
 							$ad[$adkey]->description[0] = $description;
 						}
 
@@ -381,13 +385,100 @@ class Campaign {
 						$description = $this->replaceTpl($description2, $replace, $replacement, 90);
 
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 101)) {
+						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
 							$ad[$adkey]->description[1] = $description;
 						}
 
 					}
 
+					#### CREATE DISPLAY URL ####
 
+					// Determine if keyword insertion has been used in the display url
+					$keywordInsertionPath = false;
+
+					
+					if (count($this->performers) > $this->maxPerformers && $type == 'performer') {
+						if (strlen($title) <= 25) {
+							$ad[$adkey]->path[0] = $this->removeChars(strtolower($genre));
+							$ad[$adkey]->path[1] = $title;
+							$keywordInsertionPath = true;
+						}
+					} 
+
+					if ($keywordInsertionPath == false) {
+
+
+						// Replace path title if keyword insertion couldn't be applied
+						if (count($this->performers) > $this->maxPerformers && $type == 'performer') {
+							if (strlen($this->title)>1) {
+								$pathTitle = $this->title;
+							} else {
+								$pathTitle = $this->subtitle;
+							}
+						}
+
+						else if (count($this->performers) <= $this->maxPerformers && $type == 'performer') {
+							$pathTitle = $performer;
+						
+						} else {
+							// If adgroup type is performer or title without keyword insertion being used
+							$pathTitle = $title;
+						}
+
+						$pathString = strtolower(trim(preg_replace('/( de | een | en | het |:|,)/', ' ', trim($pathTitle))));
+
+						// Check if pathString length <= 15 characters
+						if (strlen($pathString) <= 15) {
+							// Only use first genre if there are more
+							if (strpos($genre, '_') > 1)  {
+								$genre = explode('_', $genre)[0];
+							}
+							$ad[$adkey]->path[0] = $this->removeChars(strtolower($genre));
+
+							// Remove unnecessary characters and replace spaces with dashes
+							$ad[$adkey]->path[1] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', $pathString)));
+						}
+
+						// Check if pathstring has more than 15 characters and split the words to the path fields
+						else if (strlen($pathString) > 15) {
+
+							$pathFits = false;
+
+							// Split by space and dash
+							$pathElements = preg_split('/( | - )+/i', trim(preg_replace('/(\d{1,7})/', '', $pathString)));
+
+							// Determine if path string now only consists of one path
+							if (count($pathElements) == 1) {
+								$ad[$adkey]->path[0] = $this->removeChars(strtolower($genre));
+								$ad[$adkey]->path[1] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', $pathElements[0])));
+								$pathFits = true;
+							} else {
+
+								// Devide path string over 2 paths for display url
+								for ($i = 0; $i < 2; $i++) {
+									$ad[$adkey]->path[$i] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', $pathElements[$i])));
+								}
+
+							}
+
+							//If both paths still have more than 15 characters, split them by their inner parts
+							if (strlen($ad[$adkey]->path[0]) > 15) {
+								$wordSplit = json_decode(file_get_contents("https://picturage.nl/intk/theaterads/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$adkey]->path[0]));
+								if (strlen($wordSplit[0]) <= 15 && strlen($wordSplit[0]) > 1) {
+									$ad[$adkey]->path[0] = $wordSplit[0];
+									$ad[$adkey]->path[1] = $wordSplit[1];
+								}
+							}
+							if (strlen($ad[$adkey]->path[1]) > 15) {
+								$wordSplit = json_decode(file_get_contents("https://picturage.nl/intk/theaterads/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$adkey]->path[1]));
+								if (strlen($wordSplit[0]) <= 15 && strlen($wordSplit[0]) > 1) {
+									$ad[$adkey]->path[0] = $wordSplit[0];
+									$ad[$adkey]->path[1] = $wordSplit[1];
+								}
+							}
+
+						}
+					}
 
 
 				}
@@ -395,55 +486,6 @@ class Campaign {
 			}
 
 		}
-
-
-		/*
-
-				
-				if ($type == 'multiple-artists') {
-					if (strlen($this->title)>1) {
-						$pathTitle = $this->title;
-					} else {
-						$pathTitle = $this->subtitle;
-					}
-					$pathString = strtolower(trim(preg_replace('/( de | een | en | het |:|,)/', ' ', trim($pathTitle))));
-				} else {
-					$pathString = strtolower(trim(preg_replace('/( de | een | en | het |:|,)/', ' ', $title)));
-				}
-				
-				//Check if pathString length <= 15 characters
-				
-				if (strlen($pathString) <= 15) {
-					if (strpos($genre, '_') > 1)  {
-						$genre = explode('_', $genre)[0];
-					}
-					$ad[$key]->path[0] = $this->removeChars(strtolower($genre));
-					$ad[$key]->path[1] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', $pathString)));
-				}
-				
-				//Check if pathstring has more than 15 characters and split the words to the path fields
-				else if (strlen($pathString) > 15) {
-					//Check if keyword insertion has been applied. If keyword doesn't fit, choose performance name for display url fields
-						$ad[$key]->path[0] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', trim($this->truncate($pathString, 15)))));
-						$ad[$key]->path[1] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', trim($this->truncate(substr($pathString, strlen($this->truncate($pathString, 15)), 30), 15)))));
-
-					//If both paths still have more than 15 characters, split them by their inner parts
-					if (strlen($ad[$key]->path[0]) > 15) {
-						$wordSplit = json_decode(file_get_contents("https://picturage.nl/intk/theaterads/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$key]->path[0]));
-						if (strlen($wordSplit[0]) <= 15 && strlen($wordSplit[0]) > 1) {
-							$ad[$key]->path[0] = $wordSplit[0];
-							$ad[$key]->path[1] = $wordSplit[1];
-						}
-					}
-					if (strlen($ad[$key]->path[1]) > 15) {
-						$wordSplit = json_decode(file_get_contents("https://picturage.nl/intk/theaterads/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$key]->path[1]));
-						if (strlen($wordSplit[0]) <= 15 && strlen($wordSplit[0]) > 1) {
-							$ad[$key]->path[0] = $wordSplit[0];
-							$ad[$key]->path[1] = $wordSplit[1];
-						}
-					}
-				}
-			}*/
 			
 		
 		return $ad;
