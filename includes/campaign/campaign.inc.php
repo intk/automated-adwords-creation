@@ -13,6 +13,7 @@ class Campaign {
 	private $city;
 	private $performers;
 	private $link;
+	private $maxPerformers;
     public function __construct($production, $template) {
 
 		//Parse campaign info
@@ -40,6 +41,7 @@ class Campaign {
 		$this->date->AdDate = $this->formatDate($itemDate)[1];
 		$this->date->AdDateFull = $this->formatDate($itemDate)[2];
 		$this->link = $production->link;
+		$this->maxPerformers = 10;
 		//$this->date->dateString = $production->date->dateString;
     }
 	
@@ -170,7 +172,7 @@ class Campaign {
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $titleObj->adgroup);
 		}
 
-		if (count($this->performers) > 0 && count($this->performers) <= 10 && $manyPerformers == false) {
+		if (count($this->performers) > 0 && count($this->performers) <= $this->maxPerformers && $manyPerformers == false) {
 			foreach ($this->performers as $performer) {
 				$performersObj = new Keywords($performer, $this->venue[0], $this->city, $placementsList, 'performer');
 				$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $performersObj->adgroup);
@@ -206,7 +208,7 @@ class Campaign {
 		}
 
 		// Create keywords and adgroups of performers list
-		if (count($this->performers) > 10 && $manyPerformers == false) {
+		if (count($this->performers) > $this->maxPerformers && $manyPerformers == false) {
 			$adGroupCount = count($this->adgroup);
 			$this->adgroup[$adGroupCount]->name = 'Performers';
 			$this->adgroup[$adGroupCount]->type = 'performer';
@@ -260,7 +262,8 @@ class Campaign {
 	# Replace variables in template text
 	private function replaceTpl($property, $replace, $replacement, $Maxcharacters) {
 
-		$tempString = str_replace($replace, $replacement, $property); 
+		# Replace string with replacements and bring first character to capital
+		$tempString = ucfirst(str_replace($replace, $replacement, $property)); 
 		#$tempString = $property;
 
 		/*
@@ -323,10 +326,10 @@ class Campaign {
 
 
 		# Template replacements
-		$replace = array('[performer]', '[title]', '[genre]', '[venue]', '[location]', '[date]', '[dateFull]');
+		$replace = array('[performer]', '[title]', '[genre]', '[genreTerm]', '[venue]', '[location]', '[date]', '[dateFull]');
 
-		# Add keyword insertion when performers > 10
-		if (count($this->performers) > 10 && $type == 'performer') {
+		# Add keyword insertion when performers amount > maxPerformers
+		if (count($this->performers) > $this->maxPerformers && $type == 'performer') {
 			//Sort performers by length for keyword insertion
 			usort($this->performers,'sortByLength');
 			# Placeholder for longest keyword
@@ -334,9 +337,9 @@ class Campaign {
 		}
 
 		if ($type == 'title') {
-			$replacement = array($performer, $title, $tLabel[1], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
+			$replacement = array($performer, $title, $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		} else {
-			$replacement = array($title, $this->title, $tLabel[1], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
+			$replacement = array($title, $this->title, $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		}
 
 		# Decode ads template in JSON format and iterate
@@ -346,9 +349,47 @@ class Campaign {
 
 				# Iterate ads template
 				foreach($template->ads as $adkey => $adProperties) {
-					$ad[$adkey]->heading[0] = $this->replaceTpl($adProperties->heading1, $replace, $replacement, 30);
+
+					//Sort first heading length from short to long. Needed to iterate them to fit the 30 characters.
+					foreach ($adProperties->heading1 as $heading1) {
+						$heading = $this->replaceTpl($heading1, $replace, $replacement, 30);
+
+						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
+						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && strlen($heading) <= 41)) {
+							$ad[$adkey]->heading[0] = $heading;
+						}
+
+					}
+
 					$ad[$adkey]->heading[1] = $this->replaceTpl($adProperties->heading2, $replace, $replacement, 30);
 					$ad[$adkey]->heading[2] = $this->replaceTpl($adProperties->heading3, $replace, $replacement, 30);
+
+
+					//Sort first description length from short to long. Needed to iterate them to fit the 90 characters.
+					foreach ($adProperties->description1 as $description1) {
+						$description = $this->replaceTpl($description1, $replace, $replacement, 90);
+
+						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
+						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 101)) {
+							$ad[$adkey]->description[0] = $description;
+						}
+
+					}
+
+					//Sort second description length from short to long. Needed to iterate them to fit the 90 characters.
+					foreach ($adProperties->description2 as $description2) {
+						$description = $this->replaceTpl($description2, $replace, $replacement, 90);
+
+						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
+						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 101)) {
+							$ad[$adkey]->description[1] = $description;
+						}
+
+					}
+
+
+
+
 				}
 
 			}
@@ -357,43 +398,6 @@ class Campaign {
 
 
 		/*
-
-			//Sort description length from short to long. Needed to iterate them to fit the 90 characters.
-			// Loop adgroup
-			foreach($this->template[$type] as $groupkey => $adgroups) {
-				foreach ($adgroups as $adkey => $value) {
-					
-					// Replace variables in ad templates
-					$replace = array('[artist]', '[title]', '[genre]', '[venue]', '[venueShort]', '[location]', '[date]', '[dateFull]');
-					$replacement = array($hArtist, $title, $tLabel[1], $venue[0], $venue[1], $this->city, $this->date->AdDate, $this->date->AdDateFull);
-					$template[$groupkey][$adkey] = str_replace($replace, $replacement, $value); 
-				}
-				
-			}
-
-			/*
-		
-					//Check if description length <= 90 characters
-					if (strlen($description) <= 90 || ($type == 'multiple-artists' && strlen($description) <= 90)) {
-						$ad[$key]->description = $description;
-					}
-				}
-				
-				//If the description length is still empty because > 90 characters, use the first (shortest) description
-				if ($ad[$key]->description == '') {
-					$ad[$key]->description = $template[$key][0];
-					//If third ad
-					if ($key == 2) {
-						$ad[$key]->heading[0] = $heading[0][0];
-						$ad[$key]->heading[1] = $heading[0][1];
-						$ad[$key]->description = $template[$key][1];
-					}
-				}
-
-				// Determine if both heading 1 and heading 2 have the same value
-				if ($ad[$key]->heading[0] == $ad[$key]->heading[1]) {
-					$ad[$key]->heading[1] = $this->template['placeholder'];
-				}
 
 				
 				if ($type == 'multiple-artists') {
