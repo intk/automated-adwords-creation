@@ -199,6 +199,8 @@ class Campaign {
 			if (strlen(trim($this->subtitle)) > 1) {
 				$subtitle = $this->trimArtist($this->subtitle);
 			} 
+
+			// If subtitle is empty use first performer as subtitle
 			else if (strlen(trim($this->subtitle)) < 1 && count($this->performers) > 0) {
 				$subtitle = $this->performers[0];
 			}
@@ -368,6 +370,14 @@ class Campaign {
 					$ad[$adkey]->heading[1] = $this->replaceTpl($adProperties->heading2, $replace, $replacement, 30);
 					$ad[$adkey]->heading[2] = $this->replaceTpl($adProperties->heading3, $replace, $replacement, 30);
 
+					// If performer doesn't exist, remove ad description with performer variable
+					if (strlen($performer) <= 0) {
+						foreach($adProperties->description1 as $key => $value) {
+							if (strpos($value, '[performer]') !== false) {
+								unset($adProperties->description1[$key]);
+							}
+						}
+					}
 
 					//Sort first description length from short to long. Needed to iterate them to fit the 90 characters.
 					foreach ($adProperties->description1 as $description1) {
