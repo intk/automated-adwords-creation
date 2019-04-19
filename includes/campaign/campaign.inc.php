@@ -403,7 +403,17 @@ class Campaign {
 					}
 
 					$ad[$adkey]->heading[1] = $this->replaceTpl($adProperties->heading2, $replace, $replacement, 30);
-					$ad[$adkey]->heading[2] = $this->replaceTpl($adProperties->heading3, $replace, $replacement, 30);
+					
+					//Sort third heading length from short to long. Needed to iterate them to fit the 30 characters.
+					foreach ($adProperties->heading3 as $heading3) {
+						$heading = $this->replaceTpl($heading3, $replace, $replacement, 30);
+
+						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
+						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && strlen($heading) <= 40)) {
+							$ad[$adkey]->heading[2] = $heading;
+						}
+
+					}
 
 					// Remove ad description with performer variable if performer doesn't exist
 					if (strlen($performer) <= 0) {
