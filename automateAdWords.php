@@ -144,7 +144,7 @@ if ($_GET['theater']) {
 					$campaign = new Campaign($item, $template);
 					$campaign->createAdgroup();
 					$theater->productions[$key]->campaign = $campaign;
-					$theater->csvOutput = createCSV($theater->name, $month, $result['budget'], $result['targetLocation'], 'paused', $theater->productions[$key]);
+					$theater->csvOutput = createCSV($theater->name, $month, $result['budget'], $result['targetLocation'], 'enabled', $theater->productions[$key]);
 					
 					//Import performance data to database
 					$select = mysqli_query($connect, "SELECT * FROM performances WHERE theaterId=".$result['id']." AND title='".$item->title."' AND performanceDate = '".$item->date->time."'");
