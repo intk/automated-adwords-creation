@@ -19,7 +19,7 @@ class Keywords {
 		$input = $this->title;
 
 		// Determine if a new adgroup should be created for each keyword or not
-		if (strlen($input) > 30) {
+		if (strlen($input) > 20) {
 			return 'true';
 		} else {
 			return 'false';
@@ -88,17 +88,22 @@ class Keywords {
 		    		$delString = implode(' ', $tempVal);
 		    	}
 
-				// Split by second space
-				$deliverPair = array_map(
-				    function($value) {
-				    	
-				        return implode(' ', $value);
-				    },
-				    array_chunk(
-				        explode(' ', $delString),
-				        2
-				    )
-				);
+		    	$deliverPair = array();
+
+				// Split by every 30 characters
+				$i = 0;
+				$tempString = '';
+				foreach(explode(' ', $delString) as $delElement) {
+					$tempString .= $delElement.' ';
+
+					if (strlen(trim($tempString)) < 30) {
+						$deliverPair[$i] = trim($tempString);
+					} else {
+						$tempString = $delElement.' ';
+						$i++;
+						$deliverPair[$i] = trim($tempString);
+					}
+				}
 
 				$outputArray = array_merge($outputArray, $deliverPair);
 
@@ -153,7 +158,7 @@ class Keywords {
 			} else {
 				// Determine if there are any single word keywords
 				if (substr_count($tempKeyword, " ") < 1) {
-					$outputArray[$key]['keywords'][0] = '+ '.$tempKeyword;
+					$outputArray[count($tempOutputArray)]['keywords'][0] = '+ '.$tempKeyword;
 					$outputArray[count($tempOutputArray)]['keywords'][1] = $tempKeyword.' '.$this->city;
 				}
 			}

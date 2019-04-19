@@ -164,6 +164,12 @@ class Campaign {
 		$keywordsObj = new stdClass();
 		$keywordsObj->adgroup = array();
 		$manyPerformers = false;
+		$performersList = false;
+
+		// If this is true, don't make another ad group from the title
+		if (count($this->performers) > 0 && $this->performers !== false) {
+			$performersList = true;
+		}
 
 		// Create keywords and adgroup of title
 		if (strlen($this->title) > 1) {
@@ -172,7 +178,7 @@ class Campaign {
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $titleObj->adgroup);
 		}
 
-		if (count($this->performers) > 0 && count($this->performers) <= $this->maxPerformers && $manyPerformers == false) {
+		if (count($this->performers) > 0 && $this->performers !== false && count($this->performers) <= $this->maxPerformers && $manyPerformers == false) {
 			foreach ($this->performers as $performer) {
 				$performersObj = new Keywords($performer, $this->venue[0], $this->city, $placementsList, 'performer');
 				$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $performersObj->adgroup);
@@ -180,10 +186,29 @@ class Campaign {
 			$manyPerformers = true;
 		}
 
-		// Create keywords and adgroups of title + genre
-		if (count($keywordsObj->adgroup) < 2 && count($this->performers) < 1) {
-			$addObj = new Keywords($this->title.' '.$this->genre[0], $this->venue[0], $this->city, $placementsList, 'title');
-			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $addObj->adgroup);
+
+		// Create keywords and adgroups of title + genre if < 2 adgroups created
+		if (count($keywordsObj->adgroup) < 2 && $performersList == false) {
+
+			/*
+			// Insert placement text
+			$newElement = $this->title.' '.$this->genre[0];
+			*/
+
+			// Remove word that contains placement text
+			$splittedPair = explode(' ', $this->title);
+			$found = array_filter($splittedPair, function($value) {return strpos($value,  $this->genre[0]) !== false;});
+			if ($found !== false) {
+				unset($splittedPair[key($found)]);
+			}
+
+			// Add genre name to filtered element
+			$newElement = implode(' ', $splittedPair).' '. $this->genre[0];
+
+
+			$titleObj = new Keywords($newElement, $this->venue[0], $this->city, $placementsList, 'title');
+			# Merge ad groups from keyword object
+			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $titleObj->adgroup);
 		}
 
 		foreach ($keywordsObj->adgroup as $key => $adgroup) {
@@ -285,10 +310,20 @@ class Campaign {
 
 		return $tempString;
 	}
+
+	# Shorten string when characters > 30
+	private function shortstring($string) {
+
+		$stringArr = preg_split('/( - )/', $string);
+		while (strlen($string) > 30) {
+			array_pop($stringArr);
+			$string = implode(' ', $stringArr);
+		}
+		return $string;
+	}
 	
 	private function createAds($title, $type, $performer) {
 		//Get first artist in the list
-		$artist = $artist[0];
 		$ad = array();
 		$pLabel = new stdClass();
 		$pLabel->toneel = array('toneel', 'toneel');
@@ -339,9 +374,9 @@ class Campaign {
 		}
 
 		if ($type == 'title' || ($type == 'performer' && count($this->performers) <= $this->maxPerformers)) {
-			$replacement = array($performer, $title, $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
+			$replacement = array($performer, $this->shortstring($title), $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		} else {
-			$replacement = array($title, $this->title, $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
+			$replacement = array($title, $this->shortstring($this->title), $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		}
 
 
@@ -370,7 +405,7 @@ class Campaign {
 					$ad[$adkey]->heading[1] = $this->replaceTpl($adProperties->heading2, $replace, $replacement, 30);
 					$ad[$adkey]->heading[2] = $this->replaceTpl($adProperties->heading3, $replace, $replacement, 30);
 
-					// If performer doesn't exist, remove ad description with performer variable
+					// Remove ad description with performer variable if performer doesn't exist
 					if (strlen($performer) <= 0) {
 						foreach($adProperties->description1 as $key => $value) {
 							if (strpos($value, '[performer]') !== false) {
@@ -479,6 +514,7 @@ class Campaign {
 									$ad[$adkey]->path[1] = $wordSplit[1];
 								}
 							}
+
 							if (strlen($ad[$adkey]->path[1]) > 15) {
 								$wordSplit = json_decode(file_get_contents("https://picturage.nl/intk/theaterads/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$adkey]->path[1]));
 								if (strlen($wordSplit[0]) <= 15 && strlen($wordSplit[0]) > 1) {
