@@ -178,7 +178,6 @@ function getPerformers($url, $tag) {
 						$tagString = str_replace($matches[0][0], '', $tagString);
 						$credit = $dom->find($tagString, $matches[1][0])->plaintext;
 						$credits .= $credit.', ';
-
 					}
 
 					//Determine if multiple lines or tabs have been used to list the performers
@@ -202,17 +201,29 @@ function getPerformers($url, $tag) {
 				if (count($dom->find($tag['performers'])) > 1) {
 					$ckey = 0;
 					foreach($dom->find($tag['performers']) as $tempItem) {
-						$subitems = $tempItem->find('a');
-						// Determine if there are multiple performers given
-						if (count($subitems) > 1) {
-							foreach($subitems as $performerItem) {
-								$credits[$ckey] = $performerItem->plaintext;
+
+						if (count($tempItem->find('a')) > 1) {
+							$subitems = $tempItem->find('a');
+							// Determine if there are multiple performers given
+							if (count($subitems) > 1) {
+								foreach($subitems as $performerItem) {
+									$credits[$ckey] = $performerItem->plaintext;
+									$ckey++;
+								}
+							} else {
+								$credits[$ckey] = trim(preg_split("/(,)/", $tempItem->plaintext)[0]);
+							}
+							$ckey++;
+						} else {
+							// Split performers line by line. Remove unnecessary tags from string
+							$newItem = preg_replace('#<em[^>]*>.*?</em>#si', '', html_entity_decode($tempItem));
+
+							$newItemArray = preg_split("/(<p>|<\/p>|<br \/>|,)/", str_replace('&nbsp;', '', $newItem));
+							foreach ($newItemArray as $item) {
+								$credits[$ckey] = trim($item);
 								$ckey++;
 							}
-						} else {
-							$credits[$ckey] = trim(preg_split("/(,)/", $tempItem->plaintext)[0]);
 						}
-						$ckey++;
 
 					}
 				} else {
@@ -299,7 +310,7 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
-# print_r(getPerformers("https://www.antwerpsymphonyorchestra.be/kidconcert-calamity-jane", array("performers"=>".cluster .main .artists .first .artist h1")));
+ # print_r(getPerformers("https://www.festivalclassique.nl/nl/agenda-en-kaarten/265/afstudeerconcert-beniamino-paganini/", array("performers"=>".content-wrapper .artists p")));
 
 
 #print_r(getPerformers("https://www.filmhuisalkmaar.nl/films/becoming-astrid", array("performers"=>".film-header .film-header-info .film-actors")));
