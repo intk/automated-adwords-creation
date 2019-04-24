@@ -300,8 +300,9 @@ class Campaign {
 		$tempString = ucfirst(str_replace($replace, $replacement, $property)); 
 		#$tempString = $property;
 
+		
+
 		/*
-		# Limit string to characters
 		for ($i = 0; $i < count($replace); $i++) {
 			if (strpos($property, $replace[$i]) > 1 && strlen($tempString) > $characters) {
 				# Split replacement by spaces
@@ -321,11 +322,21 @@ class Campaign {
 	# Shorten string when characters > 30
 	private function shortstring($string) {
 
-		$stringArr = preg_split('/( - )/', $string);
-		while (strlen($string) > 30) {
-			array_pop($stringArr);
-			$string = implode(' ', $stringArr);
+		if (strpos($string, ' - ') !== false) {
+			$stringArr = preg_split('/( - )/', $string);
+			while (strlen($string) > 30) {
+				array_pop($stringArr);
+				$string = implode(' ', $stringArr);
+			}
 		}
+		if (strpos($string, ' - ') == false && strlen($string) > 30) {
+			$stringArr = explode(' ', $string);
+			while (strlen($string) > 30) {
+				array_pop($stringArr);
+				$string = implode(' ', $stringArr);
+			}
+		}
+
 		return $string;
 	}
 	
@@ -383,7 +394,7 @@ class Campaign {
 		if ($type == 'title' || ($type == 'performer' && count($this->performers) <= $this->maxPerformers)) {
 			$replacement = array($performer, $this->shortstring($title), $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		} else {
-			$replacement = array($title, $this->shortstring($this->title), $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
+			$replacement = array($performer,  $this->shortstring($this->title), $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		}
 
 
@@ -496,7 +507,7 @@ class Campaign {
 							$pathTitle = $title;
 						}
 
-						$pathString = strtolower(trim(preg_replace('/( de | een | en | het |:|,)/', ' ', trim($pathTitle))));
+						$pathString = strtolower(trim(preg_replace('/( de | een | en | het |:|, | & )/', ' ', trim($pathTitle))));
 
 						// Check if pathString length <= 15 characters
 						if (strlen($pathString) <= 15) {
@@ -550,6 +561,10 @@ class Campaign {
 							}
 
 						}
+					}
+
+					if (strlen($ad[$adkey]->path[0]) < 1) {
+						$ad[$adkey]->path[0] = $tLabel[0];
 					}
 
 
