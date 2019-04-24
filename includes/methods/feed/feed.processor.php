@@ -73,9 +73,8 @@ include('includes/methods/web/performers.processor.php');
 
 // XML scraper
 $xml = simplexml_load_file($source, 'SimpleXMLElement', LIBXML_NOCDATA);
-
 foreach (toPath($xml, $tags['item']) as $production) {
-	
+
 	// Get last date of production
 	if (!$tags['defined']) {
 		$lastShow = $production->shows->show[count($production->shows->show)-1];
@@ -117,7 +116,8 @@ foreach (toPath($xml, $tags['item']) as $production) {
 	}
 	
 	// Filter by month
-	if (date('Y-m', $time) == $month) {
+	if (date('Y-m', $time) == $month || strtoupper($month) == "ALL") {
+		
 			$productionObj = new stdClass();
 			
 			//Check if venue of production matches value stored in db
@@ -134,6 +134,7 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			$productionObj->subtitle = trimString(toPath($production, $tags['subtitle']));
 			$productionObj->venue = $venue;
 			$productionObj->location = $location['city'];
+			/*
 			if (count(toPath($production, $tags['genre'])) > 1) {
 				$productionObj->genre = listGenres(toPath($production, $tags['genre']));
 			} else {
@@ -143,6 +144,9 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			if (count($productionObj->genre) < 1) {
 				$productionObj->genre[0] = 'overig';
 			}
+			*/
+			$productionObj->genre[0] = 'concert';
+			$productionObj->genre[1] = 'muziek';
 			$productionObj->link = filter_var(trim(toPath($production, $tags['link'])), FILTER_SANITIZE_URL);
 			$productionObj->date->time = $time;
 			$productionObj->date->dateString = date('d-m-Y H:i', $productionObj->date->time);
