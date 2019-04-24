@@ -178,6 +178,13 @@ class Campaign {
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $titleObj->adgroup);
 		}
 
+		// Create keywords and adgroup of subtitle
+		if (strlen($this->subtitle) > 1) {
+			$subtitleObj = new Keywords($this->subtitle, $this->venue[0], $this->city, $placementsList, 'performer');
+			# Merge ad groups from keyword object
+			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $subtitleObj->adgroup);
+		}
+
 		if (count($this->performers) > 0 && $this->performers !== false && count($this->performers) <= $this->maxPerformers && $manyPerformers == false) {
 			foreach ($this->performers as $performer) {
 				$performersObj = new Keywords($performer, $this->venue[0], $this->city, $placementsList, 'performer');
@@ -415,11 +422,20 @@ class Campaign {
 
 					}
 
-					// Remove ad description with performer variable if performer doesn't exist
+					// Remove first ad description with performer variable if performer doesn't exist
 					if (strlen($performer) <= 0) {
 						foreach($adProperties->description1 as $key => $value) {
 							if (strpos($value, '[performer]') !== false) {
 								unset($adProperties->description1[$key]);
+							}
+						}
+					}
+
+					// Remove second ad description with performer variable if performer doesn't exist
+					if (strlen($performer) <= 0) {
+						foreach($adProperties->description2 as $key => $value) {
+							if (strpos($value, '[performer]') !== false) {
+								unset($adProperties->description2[$key]);
 							}
 						}
 					}
