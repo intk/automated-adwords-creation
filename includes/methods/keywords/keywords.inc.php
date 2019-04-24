@@ -47,6 +47,10 @@ class Keywords {
 			$delOutput = preg_split('(,| & )', $input);
 			$this->newAdgroup = true;
 		}
+		else if ($this->newAdgroup == true && strpos($input, ' en ') !== false) {
+			$delOutput = preg_split('/(,| en )/', $input);
+			$this->newAdgroup = true;
+		}
 		else if (strpos($input, ' en ') === false && strpos($input, ' & ') !== false && strlen($input) > 30) {
 			$delOutput = explode(' & ', $input);
 			$this->newAdgroup = true;
