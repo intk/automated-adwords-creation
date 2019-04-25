@@ -109,6 +109,7 @@ function sortByLength($a,$b) {
 // Open web page like a client and store cookies
 function getWebPage($url){
         $options = array( 
+        	CURLOPT_USERAGENT	   => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36", // spoof user agent
 	    	CURLOPT_RETURNTRANSFER => true, // to return web page
             CURLOPT_HEADER         => true, // to return headers in addition to content
             CURLOPT_FOLLOWLOCATION => true, // to follow redirects
@@ -216,9 +217,9 @@ function getPerformers($url, $tag) {
 							$ckey++;
 						} else {
 							// Split performers line by line. Remove unnecessary tags from string
-							$newItem = preg_replace('#<em[^>]*>.*?</em>#si', '', html_entity_decode($tempItem));
+							$newItem = preg_replace('#<em[^>]*>.*?</em>#si', '', html_entity_decode(str_replace('&nbsp;', '', $tempItem)));
+							$newItemArray = preg_split("/(<p>|<\/p>|<span>|<\/span>|<br \/>|,)/", $newItem);
 
-							$newItemArray = preg_split("/(<p>|<\/p>|<br \/>|,)/", str_replace('&nbsp;', '', $newItem));
 							foreach ($newItemArray as $item) {
 								$credits[$ckey] = trim($item);
 								$ckey++;
@@ -243,7 +244,8 @@ function getPerformers($url, $tag) {
 
 				    /* Removed for Brussels Philharmonic */
 
-					$credit = preg_split("/(\w*: )/", preg_replace("/\s+/", " ", $dom->find($tag['performers'], -1)->plaintext));
+				    $performers = strip_tags(preg_replace('#<em[^>]*>.*?</em>#si', '', $dom->find($tag['performers'], -1)));
+					$credit = preg_split("/(\w*: )/", preg_replace("/\s+/", " ", $performers));
 					$credits .= implode(', ', $credit);
 				}
 			}
@@ -310,8 +312,7 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
- # print_r(getPerformers("https://www.festivalclassique.nl/nl/agenda-en-kaarten/265/afstudeerconcert-beniamino-paganini/", array("performers"=>".content-wrapper .artists p")));
-
+ print_r(getPerformers("https://musichall.be/shows/hans-en-grietje-home/", array("performers"=>".x-container.cs-ta-center.no-pm.max.width.marginless-columns .x-column.x-sm h5 span")));
 
 #print_r(getPerformers("https://www.filmhuisalkmaar.nl/films/becoming-astrid", array("performers"=>".film-header .film-header-info .film-actors")));
 
