@@ -1,5 +1,7 @@
 <?php
 // Crawl XML feed and parse productions
+#ini_set('display_errors', 1);
+
 $source = $url;
 $tempDate = '';
 $productions = array();
@@ -20,7 +22,7 @@ function dateFromString($string) {
 	//Convert string to a date string
 	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
 	$string = str_replace('| ' , ' - ', $string);
-	$splittedDate = preg_split("(t/m|&|tm| -| - | to | /| and )", $string);
+	$splittedDate = preg_split("(t/m|&|tm| -| - | to | /| and | tot )", $string);
 	$date = $splittedDate[count($splittedDate)-1];
 	if (strpos($date,'+') !== false) {
 		$date = substr($date, 0, strpos($date,'+'));
@@ -163,7 +165,7 @@ function listGenres($genre) {
 
 // Include simple_html_dom module to scrape a web page
 // Parse spreadsheet data and filter on the performance name to derive similar artists
-include(dirname(__FILE__).'/performers.processor.php');
+include('includes/methods/web/performers.processor.php');
 
 
 
@@ -200,9 +202,11 @@ if (strlen($tags['pagination']) > 1) {
 	/*if (strlen($tags['pagination']) > 1) {
 		$dom = new simple_html_dom(getWebPage($source.'&p='.$pag));
 	} else {*/
-		$dom = new simple_html_dom(getWebPage($source));
+
+		$dom = new simple_html_dom(getWebPage($source)); 
 	//}
 foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $production) {
+
 
 	//Check if title, subtitle and date are placed in same tag
 	if ($tags['title'] == $tags['subtitle'] && $tags['date'] == $tags['title']) {
@@ -329,8 +333,10 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 	// Get last date of production
 	$time = dateFromString($date); 
 
+
 	//Custom added 
-	//print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time)));
+	#print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time)));
+
 	// Filter by month
 	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {
 
@@ -381,6 +387,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			}
 
 
+
 			if (strpos($production->find($link, 1)->href, $tags['baseUrl']) !== false) {
 				$productionObj->link = filter_var(trim($production->find($link, 0)->href), FILTER_SANITIZE_URL);
 			} else {
@@ -399,20 +406,34 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				}
 			}
 
+			// Remove domainname from url when its added twice
+			if (substr_count($productionObj->link, $tags['baseUrl']) > 1) {
+				$productionObj->link = substr($productionObj->link, strpos($productionObj->link, $tags['baseUrl'])+strlen($tags['baseUrl']));
+			}
+
+
 			$productionObj->date->time = $time;
 			$productionObj->date->dateString = date('d-m-Y H:i', $productionObj->date->time);
+
 			if (array_key_exists('performers', $tags)) {
 				if (strlen($productionObj->link) > 1) {
 					$productionObj->performers = getPerformers($productionObj->link, array("performers"=>$tags['performers']));
 				}
-				$productionObj->performers = getsimilarPerformers($productionObj->title);
+				//$productionObj->performers = getsimilarPerformers($productionObj->title);
 				if (count($productionObj->performers) == 1 && strlen($productionObj->performers[0]) > 1) {
 					$productionObj->subtitle = $productionObj->performers[0];
 				}
 			}
+
+			// If subtitle does not exist in agenda item, try to find performer on the the performance page itself
 			if (strlen($productionObj->subtitle) <= 1) {
-				$productionObj->subtitle = getPerformers($productionObj->link, array("performers"=>$tags['subtitle']))[0];
+
+				# Suppress warning when function can't be executed
+				$productionObj->subtitle = getPerformers($productionObj->link, array("performers"=>$tags['subtitle']));
+				
+
 			}
+
 			//$productionObj->subtitle = implode(', ', getPerformers($productionObj->link, array("performers"=>$tags['subtitle'])));
 			if (array_key_exists('location', $tags)) {
 				$venueArr = explode('|', $production->find($tags['location'], 0)->plaintext);
@@ -421,6 +442,8 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				//$productionObj->venue[0] = trim($locationArr[0]).' '.$productionObj->location;
 
 			}
+
+			#print_r($productionObj);
 
 			//$productionObj->link = str_replace("https://stadstheater.nl//stadstheater.nl", "https://stadstheater.nl", $productionObj->link);
 
@@ -443,6 +466,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				if ($excludeFound == false) {
 					array_push($productions, $productionObj);
 				}
+
 				
 		}
 
