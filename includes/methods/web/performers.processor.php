@@ -1,5 +1,6 @@
 <?php
 // Include simple_html_dom module to scrape a web page
+#ini_set('display_errors', 1);
 header('Content-Type: application/json');
 $performers = array();
 
@@ -9,7 +10,7 @@ function getCredits($content) {
 	//Find words with a colon (e.g. regie:) and add it with its delimiter to the array
 	$credits = preg_split("/(\w*: )/", $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 	$credits = array_chunk(array_slice($credits, 1, -1, true), 2, false);
-	
+
 	$tempPerformers = array();
 
 	$replace = array('e.a.', 'e.v.a.');
@@ -160,19 +161,25 @@ function getPerformers($url, $tag) {
 	
 	//Convert content on page to plain text
 	$dom = new simple_html_dom(getWebPage($url));
+	
 	//Sanitize and remove unnecessary characters like tabs and html tags from string. Convert string to utf-8 format.
+
 	$content = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $dom->plaintext)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
+
 	$content = str_replace(array(' |', '-'), array(':', '_'), $content);
 
 	if (strlen($content)>1) {
-		
+
 		//Check if predefined performers tag exists and if it only contains words/names
 		if (count($tag) > 0 && strlen($tag['performers']) > 1) {
 
 			//Check if multiple selectors are given in performers tag
 			if (count(explode(' + ', $tag['performers'])) > 1) {
 				foreach(explode(' + ', $tag['performers']) as $key => $tagString) {
-					$credit = preg_split("/(\w*: )/", $dom->find($tagString, -1)->plaintext);
+
+					// Throw exception if performers cannot be found
+					$credit = preg_split("/(\w*: )/", $dom->find($tagString, -1)->plaintext);			
+
 					// Select property by name and key
 					if (preg_match_all("/\[([^\]]*)\]/", $tagString, $matches)) {
 						//Remove brackets with key from string
@@ -221,12 +228,15 @@ function getPerformers($url, $tag) {
 							$newItemArray = preg_split("/(<p>|<\/p>|<span>|<\/span>|<br \/>|,)/", $newItem);
 
 							foreach ($newItemArray as $item) {
-								$credits[$ckey] = trim($item);
+								$credits[$ckey] = strip_tags(trim($item));
 								$ckey++;
 							}
+
+
 						}
 
 					}
+
 				} else {
 
 					 //$tempProgramme = explode(",", str_replace("\r\n", ",", $dom->find($tag['performers'], -1)->plaintext));
@@ -253,6 +263,22 @@ function getPerformers($url, $tag) {
 			// Determine if credits aren't listed in an array, but in a string. Make an array of it
 			if (!is_array($credits)) {
 				$credits = explode(', ', preg_replace("/\s+/", " ", $credits));
+			}
+
+			// Check if performer is enclosed within paragraph and exclude paragraph content
+			if (strpos(implode(', ', $credits), ':') > 1) {
+				foreach ($credits as $key => $value) {
+					if (strpos($value, ':') === false) {
+						unset($credits[$key]);
+					}
+					else if (strpos($value, ':') > 1 && strpos($value, 'Door') < -1) {
+						unset($credits[$key]);
+					} else {
+						$tempVal = trim(substr($value, strpos($value, ':')+1));
+						$credits[$key] = $tempVal;
+					}
+				}
+
 			}
 						
 			//Only remain names
@@ -285,11 +311,11 @@ function getPerformers($url, $tag) {
 					}
 				}
 			}
+
 			if (count($credits)>0) {
 				$performers = $credits;
 			}
 		} else {
-
 			$performers = getCredits($content);
 		}
 		
@@ -312,7 +338,7 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
- print_r(getPerformers("https://musichall.be/shows/hans-en-grietje-home/", array("performers"=>".x-container.cs-ta-center.no-pm.max.width.marginless-columns .x-column.x-sm h5 span")));
+#print_r(getPerformers("https://www.zwolleunlimited.nl/herken-de-kansen-in-jouw-verhaal-plotting/", array("performers"=>".et_pb_text_inner p")));
 
 #print_r(getPerformers("https://www.filmhuisalkmaar.nl/films/becoming-astrid", array("performers"=>".film-header .film-header-info .film-actors")));
 
