@@ -4,6 +4,9 @@ $source = $url;
 $parVenue = $venue;
 $productions = array();
 
+#ini_set('display_errors', 1);
+
+
 //Get date format from string
 function dateFromString($string) {
 	
@@ -100,9 +103,15 @@ function listGenresP($genre) {
 function listGenres($genre) {
 	$genreArr = array();
 
-	// Determine if genre has to be filtered out from content
-	foreach ($genre as $genreItem) {
-		array_push($genreArr, trimString(strtolower(filter_var(trim($genreItem), FILTER_SANITIZE_STRING))));
+	if (is_array($genre)) {
+
+		// Determine if genre has to be filtered out from content
+		foreach ($genre as $genreItem) {
+			array_push($genreArr, trimString(strtolower(filter_var(trim($genreItem), FILTER_SANITIZE_STRING))));
+		}
+
+	} else {
+		$genreArr[0] = $genre;
 	}
 	return $genreArr;
 }
@@ -157,6 +166,16 @@ foreach ($sourceArray as $production) {
 			$time = strtotime(toPath($production, $tags['date']));
 		}
 
+		// Check if date is not given
+		if (strlen($tags['date']) < 1) {
+			$time = strtotime("+1 week");
+		}
+
+	// Determine if date string is already a timestamp
+	if (preg_match('~^[1-9][0-9]*$~', trimString(toPath($production, $tags['date']))) == 1) {
+		$time = trimString(toPath($production, $tags['date']));
+	}
+
 
 
 		// Determine if given date is invalid
@@ -196,17 +215,6 @@ foreach ($sourceArray as $production) {
 			$productionObj = new stdClass();
 			$otherHall = false;
 
-
-			//Check if venue of production matches value stored in db
-			if ((strlen($tags['venue']) > 1 && (stripos($location['venue'][0], trimString(toPath($production, $tags['venue']))) === false))) {
-				$venue = array();
-				$venue[0] = trimString(toPath($production, $tags['venue']));
-				$otherHall = true;
-			} else {
-				$venue = $location['venue'];
-			}
-
-
 		
 			//Check if other venue hall matches value stored in db
 			if (strlen($tags['hall']) > 1) {
@@ -239,45 +247,48 @@ foreach ($sourceArray as $production) {
 				$venue = $location['venue'];
 			}
 
+			//Check if venue of production matches value stored in db
+			if ((strlen($tags['venue']) > 1 && (stripos($location['venue'][0], trimString(toPath($production, $tags['venue']))) === false))) {
+				$venue = array();
+				$venue[0] = trimString(toPath($production, $tags['venue']));
+				$otherHall = true;
+			} else {
+				$venue = $location['venue'];
+			}
+
+			if (strlen($venue[0]) < 1) {
+				$venue = $location['venue'];
+			}
+
 			
 			// Put data to object
 			$productionObj->title = trimString(toPath($production, $tags['title']));
 			if (strpos($productionObj->title, ' - ') !== false) {
 				$productionObj->title = trimString(explode(' - ', $productionObj->title)[1]);
 			}
-			if (strlen($tags['subtitle']) < 1) {
-				$productionObj->subtitle = '';
-			}	else {
-				$productionObj->subtitle = trimString(toPath($production, $tags['subtitle']));
+
+			$productionObj->subtitle = trimString(toPath($production, $tags['subtitle']));
+			if (strpos($productionObj->subtitle, ' - ') !== false) {
+				$productionObj->subtitle = trimString(explode(' - ', $productionObj->subtitle)[1]);
 			}
+			
 			$productionObj->venue = $venue;			
 			$productionObj->location = $location['city'];
 
 
 			$productionObj->genre[0] = 'overig';
-
 			if (strlen($tags['genre']) > 1) {
 				$productionObj->genre = listGenres(toPath($production, $tags['genre']));
 			}
 
-			if (strpos($tags['genre'], '/') !== false) {
+			if (strpos($tags['genre'], '/') !== false && strpos($tags['genre'], ' ') !== false) {
 				$parts = explode(' ', $tags['genre']);
 				$category = explode('/', $parts[0]);
 				$productionObj->genre[0] = $parts[1];
 				$productionObj->genre[1] = $category[1];
 			}
 
-			if (strlen($tags['price']) > 1) {
-				$priceString = trimString(toPath($production, $tags['price']));
-				if (strpos($priceString, '0,00') !== false) {
-					$productionObj->price = 'free';
-				} else {
-					$productionObj->price = trimString(toPath($production, $tags['price']));
-				}
-			} else {
-				$productionObj->price = false;
-			}
-			
+			$productionObj->genre[0] = strtolower($productionObj->genre[0]);
 
 			if (strpos($tags['link'], 'http') !== false) {
 				$productionObj->link = filter_var(trim($tags['link']), FILTER_SANITIZE_URL);
@@ -295,11 +306,11 @@ foreach ($sourceArray as $production) {
 				if (count($productionObj->performers) == 1 && strlen($productionObj->performers[0]) > 1) {
 					$productionObj->subtitle = $productionObj->performers[0];
 				}
-			}			
+			}	
 						
 			// Push object to productions array
 			// Exclude productions with irrelevant tags, title or sold out
-			if (stripos($lastShow->status, "uitverkocht") === false && $lastShow->status !== "Geannuleerd") {
+			/*if (stripos($lastShow->status, "uitverkocht") === false && $lastShow->status !== "Geannuleerd") {
 				$excludeFound = false;
 
 				foreach (explode(' ', $exclude) as $excl) {
@@ -316,9 +327,10 @@ foreach ($sourceArray as $production) {
 				}
 				
 				if ($excludeFound == false) {
+					*/
 					array_push($productions, $productionObj);
-				}
-			}
+				//}
+			//}
 
 		}
 
