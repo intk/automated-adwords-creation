@@ -359,11 +359,15 @@ class Campaign {
 		$pLabel->klassiek = array('concert', 'een concert');
 		
 		$genre = $this->genre[0];
-	
-		if ($pLabel->$genre != null) {
-			$tLabel = $pLabel->$genre;
-		} else {
-			$tLabel = array('voorstelling', 'een voorstelling');
+
+		// Determine if genre of performance has close match with predefined genres
+		foreach ($pLabel as $tempGenre => $value) {
+			if (strpos($genre, $tempGenre) > 1) {
+				$tLabel = $pLabel->$tempGenre;
+				$genre = $tempGenre;
+			} else {
+				$tLabel = array('voorstelling', 'een voorstelling');
+			}
 		}
 		
 		//If performance month is equal to May, don't use a dot in the heading.
@@ -396,7 +400,6 @@ class Campaign {
 		} else {
 			$replacement = array($performer,  $this->shortstring($this->title), $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		}
-
 
 		# Decode ads template in JSON format and iterate
 		foreach (json_decode($this->template) as $template) {
@@ -571,6 +574,12 @@ class Campaign {
 
 						}
 					}
+
+
+					if (strlen($ad[$adkey]->path[0]) > 15) {
+						$ad[$adkey]->path[0] = $tLabel[0];
+					}
+
 
 					if (strlen($ad[$adkey]->path[0]) < 1) {
 						$ad[$adkey]->path[0] = $tLabel[0];
