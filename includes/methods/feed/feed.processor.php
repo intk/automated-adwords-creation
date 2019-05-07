@@ -20,6 +20,7 @@ if (count($tags) > 1) {
 	$tags['defined'] = true;
 } else {
 	// Predefined XML elements
+	$tags['venue'] = 'location/venue';
 	$tags['item'] = 'production';
 	$tags['title'] = 'title';
 	$tags['subtitle'] = 'subtitle';
@@ -121,10 +122,15 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			$productionObj = new stdClass();
 			
 			//Check if venue of production matches value stored in db
-			if (strlen($tags['venue']) > 1 && (stripos($location['venue'][0], trimString(toPath($production, $tags['venue']))) === false)) {
+			if ((strlen($tags['venue']) > 1 && (stripos($location['venue'][0], trimString(toPath($production, $tags['venue']))) === false))) {
 				$venue = array();
-				$venue[0] = trimString($production->location->venue);
+				$venue[0] = trimString(toPath($production, $tags['venue']));
+				$otherHall = true;
 			} else {
+				$venue = $location['venue'];
+			}
+
+			if (strlen($venue[0]) < 1) {
 				$venue = $location['venue'];
 			}
 				
@@ -134,19 +140,17 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			$productionObj->subtitle = trimString(toPath($production, $tags['subtitle']));
 			$productionObj->venue = $venue;
 			$productionObj->location = $location['city'];
-			/*
 			if (count(toPath($production, $tags['genre'])) > 1) {
 				$productionObj->genre = listGenres(toPath($production, $tags['genre']));
 			} else {
-				$productionObj->genre = toPath($production, $tags['genre']);
+				$productionObj->genre = listGenres(toPath($production, $tags['genre']));
 			}
 			//Check if genre exist
 			if (count($productionObj->genre) < 1) {
 				$productionObj->genre[0] = 'overig';
 			}
-			*/
-			$productionObj->genre[0] = 'concert';
-			$productionObj->genre[1] = 'muziek';
+			#$productionObj->genre[0] = 'concert';
+			#$productionObj->genre[1] = 'muziek';
 			$productionObj->link = filter_var(trim(toPath($production, $tags['link'])), FILTER_SANITIZE_URL);
 			$productionObj->date->time = $time;
 			$productionObj->date->dateString = date('d-m-Y H:i', $productionObj->date->time);
@@ -155,7 +159,7 @@ foreach (toPath($xml, $tags['item']) as $production) {
 
 			// Push object to productions array
 			// Exclude productions with irrelevant tags, title or sold out
-			if (stripos($exclude, $productionObj->genre[0]) === false && stripos($exclude, $productionObj->genre[1]) === false && stripos($exclude, $productionObj->title) === false && stripos($productionObj->title, 'inleiding') === false && stripos($lastShow->status, "uitverkocht") === false && $lastShow->status !== "Geannuleerd") {
+			if (stripos($exclude, $productionObj->genre[0]) === false && stripos($exclude, $productionObj->genre[1]) === false && stripos($exclude, $productionObj->title) === false && stripos($productionObj->title, 'inleiding') === false && stripos($lastShow->status, "uitverkocht") === false && stripos($lastShow->status, "geannuleerd") === false) {
 				$excludeFound = false;
 				foreach (explode(' ', $exclude) as $excl) {
 					if (stripos($productionObj->title, $excl) > -1) {
