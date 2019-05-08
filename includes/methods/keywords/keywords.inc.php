@@ -83,7 +83,7 @@ class Keywords {
 				$tempVal = explode(' ', $delString);
 		    	foreach($tempVal as $key => $val) {
 		    		//Exclude words from removal that can be part of a name
-		    		if (!preg_match("/(big|job|jam|joy|max|van|der)/i", $val, $matches) && strlen($val) < 4) {
+		    		if (!preg_match("/(big|job|jam|joy|max|van|der|tot|een|mol|op|)/i", $val, $matches) && strlen($val) < 4) {
 		    			unset($tempVal[$key]);
 		    		}
 		    	}
@@ -144,10 +144,18 @@ class Keywords {
 				// Placements will be placed after the keyword, so it becomes a new keyword
 				$outputArray[$key] = array_merge(array("name"=>$tempKeyword,"type"=>$this->type, "keywords"=>array_merge(array(strtolower($tempKeyword)), array_map(
 					function($placement, $keyword) {
-						return strtolower($keyword .' '.$placement);
+						// Determine if placement doesn't partly match the keyword
+						if (stripos($keyword, $placement) === false) {
+							return strtolower($keyword .' '.$placement);
+						} else {
+							return strtolower($keyword);
+						}
 					}, $placements, $DuplicateKeywords
 				
 				))));
+
+				// Remove duplicate keywords
+				$outputArray[$key]['keywords'] = array_unique($outputArray[$key]['keywords']);
 
 				// Remove any single word keywords
 				/*

@@ -30,7 +30,7 @@ class Campaign {
 		//Campaign name format [[YYYY-MM-DD]] [performance] - [performer]
 		$this->name = trim('['.$this->formatDate($itemDate)[3].'] '.$this->title.$subtitlePlacement);
 		if (strlen($this->name) > 120) {
-			$this->name = substr($this->name, 0, strpos($this->name, ' - '));
+			$this->name = trim(substr($this->name, 0, strpos($this->name, ' - ')));
 		}
 		$this->venue = $production->venue;
 		$this->city = $production->location;
@@ -158,6 +158,7 @@ class Campaign {
 			//Check if genre has keyword array
 			if (stripos($genre, $keyWord) !== false) {
 				$placementsList = $keyValue;
+
 			}
 		}
 
@@ -173,7 +174,20 @@ class Campaign {
 
 		// Create keywords and adgroup of title
 		if (strlen($this->title) > 1) {
-			$titleObj = new Keywords($this->title, $this->venue[0], $this->city, $placementsList, 'title');
+
+			// Add performer name to keywords placementList of title ad group
+			$titlePlacementList = $placementsList;
+			if (strlen(trim($this->subtitle)) > 1) {
+				foreach($this->getPerformers(trim($this->subtitle)) as $string) {
+					array_push($titlePlacementList, $string);
+				}
+			}
+
+			if (count($this->performers) > 1) {
+				array_push($titlePlacementList, $this->performers[0]);
+			}
+
+			$titleObj = new Keywords($this->title, $this->venue[0], $this->city, $titlePlacementList, 'title');
 			# Merge ad groups from keyword object
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $titleObj->adgroup);
 		}
