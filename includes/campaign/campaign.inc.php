@@ -46,9 +46,9 @@ class Campaign {
     }
 	
 	private function trimStr($string) {
-		//Replacements for unnecessary abbreviations
-		$replace = array('e.a.', 'e.a', 'e.v.a.', '|', '/', ' + ');
-		$replacement = array('', '', '', ' - ', ' - ', ' - ');
+		//Replacements for unnecessary abbreviations and characters
+		$replace = array('e.a.', 'e.a', 'e.v.a.', '|', '/', ' + ', '?', '!', '...', '..');
+		$replacement = array('', '', '', ' - ', ' - ', ' - ', '', '', '', '');
 		
 		// Determine if string is written in capitals
 		if (strtoupper($string) == $string) {
