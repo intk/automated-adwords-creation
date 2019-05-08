@@ -76,6 +76,12 @@ class Keywords {
 		foreach ($delOutput as $delString) {
 			$delString = trim($delString);
 
+			// Determine if string is written in capitals or in lowercase
+			if (strtoupper($delString) == $delString || strtolower($delString) == $delString) {
+				// Change capitalization to title case
+				$delString = ucwords(strtolower($delString));
+			}
+
 			// Only parse by every second space if string length is more than 20 characters
 			if (strlen($delString) > 20) {
 
