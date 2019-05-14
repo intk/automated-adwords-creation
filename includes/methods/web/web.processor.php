@@ -19,11 +19,18 @@ function validateDate($date, $format = 'd-m-Y') {
 
 //Get date format from string
 function dateFromString($string) {
+
 	//Convert string to a date string
 	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
 	$string = str_replace('| ' , ' - ', $string);
 	$splittedDate = preg_split("(t/m|&|tm| -| - | to | /| and | tot )", $string);
-	$date = $splittedDate[count($splittedDate)-1];
+
+	// Determine if date and time is separated, choose part with date format
+	if (strpos($splittedDate[count($splittedDate)-1], 'u') > 1) {
+		$date = $splittedDate[0];
+	} else {
+		$date = $splittedDate[count($splittedDate)-1];
+	}
 	if (strpos($date,'+') !== false) {
 		$date = substr($date, 0, strpos($date,'+'));
 	}
@@ -145,7 +152,7 @@ function dateFromString($string) {
 			}
 			
 		}
-	}	
+	}
 	return $time;
 
 }
@@ -207,7 +214,6 @@ if (strlen($tags['pagination']) > 1) {
 	//}
 foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $production) {
 
-
 	//Check if title, subtitle and date are placed in same tag
 	if ($tags['title'] == $tags['subtitle'] && $tags['date'] == $tags['title']) {
 		$elementsArray = explode('<br>', preg_replace("/\s+/", " ", $production->find($tags['title'], 0)));
@@ -264,6 +270,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		}
 		if (preg_match("/\d{4}-\d{2}-\d{2}/", $tags['date'], $match)) {
 			$date = trimString($tags['date']);
+			echo $date;
 		} else {
 			$genre = $production->find($tags['genre'], 0)->plaintext;
 			if (count($production->find($tags['date'])) > 3) {
@@ -272,7 +279,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				$date = explode(' - ', trimString($production->find($tags['date'], 0)->plaintext))[0];
 			}
 			
-		}		
+		}	
 	}
 
 	// Check if date is not given
@@ -335,7 +342,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 
 	//Custom added 
-	#print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time)));
+	//print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time)));
 
 	// Filter by month
 	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {
