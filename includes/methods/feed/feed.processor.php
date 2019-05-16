@@ -9,14 +9,19 @@ function validateDate($date, $format = 'd-m-Y')
     return $d && $d->format($format) == $date;
 }
 
-// Split tags to array element
-$tags = explode('; ', $tags);
-if (count($tags) > 1) {
+function splitTags($tags) {
+	$tags = explode('; ', $tags);
 	foreach ($tags as $key => $value) {
 		$temp = explode(',', $value);
 		$tags[$temp[0]] = str_replace('"', '', $temp[1]);
 		unset($tags[$key]);
 	}
+	return $tags;
+}
+
+// Split tags to array element
+$tags = splitTags($tags);
+if (count($tags) > 1) {
 	$tags['defined'] = true;
 } else {
 	// Predefined XML elements
@@ -128,10 +133,20 @@ foreach (toPath($xml, $tags['item']) as $production) {
 				$otherHall = true;
 			} else {
 				$venue = $location['venue'];
+
 			}
 
 			if (strlen($venue[0]) < 1) {
 				$venue = $location['venue'];
+
+				// Replace venue with hall if hall values exist in db
+				if (array_key_exists('hall', $tags) && !$tags['defined']) {
+					foreach(explode("+", $tags['hall']) as $hall) {
+						if (stripos($production->location->hall, trim($hall)) !== false) {
+							$venue[0] = trim($hall);
+						}
+					}
+				}
 			}
 				
 
