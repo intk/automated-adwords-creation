@@ -49,12 +49,6 @@ class Campaign {
 		//Replacements for unnecessary abbreviations and characters
 		$replace = array('e.a.', 'e.a', 'e.v.a.', '|', '/', ' + ', '?', '!', '...', '..');
 		$replacement = array('', '', '', ' - ', ' - ', ' - ', '', '', '', '');
-		
-		// Determine if string is written in capitals
-		if (strtoupper($string) == $string) {
-			//Uppercase first character of each word in the string
-			$string = ucwords(strtolower($string));
-		}
 
 		//Remove number and plus sign from string, only when plus sign is present
 		if (preg_match("/\d\+/", $string, $match)) {
@@ -207,7 +201,6 @@ class Campaign {
 			$manyPerformers = true;
 		}
 
-
 		// Create keywords and adgroups of title + genre if < 2 adgroups created
 		if (count($keywordsObj->adgroup) < 2 && $performersList == false) {
 
@@ -243,7 +236,7 @@ class Campaign {
 			}
 
 			if (strlen(trim($this->subtitle)) > 1) {
-				$subtitle = $this->trimArtist($this->subtitle);
+				$subtitle = $this->trimArtist($this->subtitle)[0];
 			} 
 
 			// If subtitle is empty use first performer as subtitle
@@ -267,6 +260,7 @@ class Campaign {
 	}
 	
 	private function trimArtist($artist) {
+
 		// Check whether artist value consits of multiple performers that have to be splitted into their own adgroup
 		if (strpos($artist, ',') !== false || (strpos($artist, ',') < strpos($artist, ' en '))) {
 			$tempArtist = preg_split('(,| en )', $artist);
@@ -358,19 +352,22 @@ class Campaign {
 		//Get first artist in the list
 		$ad = array();
 		$pLabel = new stdClass();
-		$pLabel->toneel = array('toneel', 'toneel');
-		$pLabel->cabaret = array('cabaret', 'cabaret');
-		$pLabel->musical = array('musical', 'een musical');
-		$pLabel->familievoorstelling = array("voorstelling", "een voorstelling");
-		$pLabel->jeugd = array("toneel", "toneel");
-		$pLabel->dans = array('dans', 'een danssshow');
-		$pLabel->film = array('film', 'de film', 'een film');
-		$pLabel->concert = array('concert', 'een concert');
-		$placements->expo = array('expo', 'de expo');
-		$pLabel->theaterconcert = array('concert', 'een concert');
-		$pLabel->opera = array('opera', 'opera');
-		$pLabel->muziek = array('concert', 'een concert');
-		$pLabel->klassiek = array('concert', 'een concert');
+		
+		//Genre placements
+		$pLabel->toneel = array('toneel', 'toneel', 'toneel');
+		$pLabel->cabaret = array('cabaret', 'cabaret', 'cabaret');
+		$pLabel->musical = array('musical', 'een musical', 'de musical');
+		$pLabel->familievoorstelling = array("voorstelling", "een voorstelling", 'de voorstelling');
+		$pLabel->jeugd = array("toneel", "toneel", 'het toneelstuk');
+		$pLabel->dans = array('dans', 'een danssshow', 'de danssshow');
+		$pLabel->film = array('film', 'de film', 'de film',);
+		$pLabel->concert = array('concert', 'een concert', 'het concert');
+		$placements->expo = array('expo', 'de expo', 'de expo');
+		$pLabel->theaterconcert = array('concert', 'een concert', 'het concert');
+		$pLabel->opera = array('opera', 'opera', 'de opera');
+		$pLabel->muziek = array('concert', 'een concert', 'het concert');
+		$pLabel->klassiek = array('concert', 'een concert', 'het concert');
+		$pLabel->overig = array('voorstelling', 'een voorstelling', 'de voorstelling');
 		
 		$genre = $this->genre[0];
 
@@ -380,7 +377,7 @@ class Campaign {
 				$tLabel = $pLabel->$tempGenre;
 				$genre = $tempGenre;
 			} else {
-				$tLabel = array('voorstelling', 'een voorstelling');
+				$tLabel = $pLabel->overig;
 			}
 		}
 		
@@ -399,7 +396,7 @@ class Campaign {
 
 
 		# Template replacements
-		$replace = array('[performer]', '[title]', '[genre]', '[genreTerm]', '[venue]', '[location]', '[date]', '[dateFull]');
+		$replace = array('[performer]', '[title]', '[genre]', '[genreSentence]', '[genreTerm]', '[venue]', '[location]', '[date]', '[dateFull]');
 
 		# Add keyword insertion when performers amount > maxPerformers
 		if (count($this->performers) > $this->maxPerformers && $type == 'performer') {
@@ -410,9 +407,9 @@ class Campaign {
 		}
 
 		if ($type == 'title' || ($type == 'performer' && count($this->performers) <= $this->maxPerformers)) {
-			$replacement = array($performer, $this->shortstring($title), $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
+			$replacement = array($performer, $this->shortstring($title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		} else {
-			$replacement = array($performer,  $this->shortstring($this->title), $tLabel[1], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
+			$replacement = array($performer,  $this->shortstring($this->title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		}
 
 		# Decode ads template in JSON format and iterate
