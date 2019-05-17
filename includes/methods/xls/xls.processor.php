@@ -27,6 +27,7 @@ function listGenres($genre) {
 	return $genreArr;
 }
 
+
 if ($xlsx = SimpleXLSX::parse($url)) {
 	// Get column names and store them in array
 	foreach ($xlsx->rows()[0] as $column) {
@@ -60,7 +61,6 @@ if ($xlsx = SimpleXLSX::parse($url)) {
 			$production[$key] = filter_var(trim($data), FILTER_SANITIZE_STRING);
 			$data = filter_var(trim($data), FILTER_SANITIZE_STRING);
 
-
 			//Split link from production data
 			if (filter_var($data, FILTER_VALIDATE_URL) == true) {
 				$link = $data;
@@ -73,12 +73,14 @@ if ($xlsx = SimpleXLSX::parse($url)) {
 				} else {
 					$time = $data;
 				}
+
 			} else {
 
 			}
 
 
 		}
+
 		// Filter by month
 		if (date('Y-m', strtotime($time)) == $month || strtoupper($month) == "ALL") {
 			$productionObj = new stdClass();
@@ -89,6 +91,15 @@ if ($xlsx = SimpleXLSX::parse($url)) {
 			$productionObj->subtitle = $production[$tags['artist']];
 			$productionObj->venue = $location['venue'];
 			$productionObj->location = $location['city'];
+
+			if (count($productionObj->genre) < 1 || $productionObj->genre[0] !== '') {
+				//$productionObj->genre[0] = 'voorstelling';
+				//$productionObj->genre[0] = strtolower(trimString($genre));
+
+				if (strpos($tags['genre'], '.') === false) {
+					$productionObj->genre[0] = $tags['genre'];
+				}
+			}
 
 			//Add genre
 			/*$productionObj->genre = listGenres($tags['genre']);
@@ -122,6 +133,11 @@ if ($xlsx = SimpleXLSX::parse($url)) {
 			if (array_key_exists('performers', $tags)) {
 				$productionObj->performers = getPerformers($productionObj->link, $tags);
 			}
+			if (array_key_exists('cast', $tags) && strlen($production[$tags['cast']]) > 1) {
+				$productionObj->performers = preg_split('/(, | i.s.m. )+/i', str_replace(array('/', 'e.a.'), array(',', ''), $production[$tags['cast']]));
+			}
+
+			//print_r($productionObj);
 
 			// Push object to productions array
 			// Exclude productions with irrelevant tags, title or sold out
