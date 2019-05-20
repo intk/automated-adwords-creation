@@ -25,8 +25,8 @@ function dateFromString($string) {
 	$string = str_replace('| ' , ' - ', $string);
 	$splittedDate = preg_split("(t/m|&|tm| -| - | to | /| and | tot )", $string);
 
-	// Determine if date and time is separated, choose part with date format
-	if (strpos($splittedDate[count($splittedDate)-1], 'u') > 1) {
+	// Determine if date and time are separated, choose part with date format
+	if (strpos($splittedDate[count($splittedDate)-1], 'u') > 1 || strpos($string, ':') > 1) {
 		$date = $splittedDate[0];
 	} else {
 		$date = $splittedDate[count($splittedDate)-1];
@@ -276,7 +276,20 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			if (count($production->find($tags['date'])) > 3) {
 				$date = trimString($production->find($tags['date'], -1)->plaintext);
 			} else {
-				$date = explode(' - ', trimString($production->find($tags['date'], 0)->plaintext))[0];
+
+				// Use last date if multiple dates are given
+				$dateRaw = $production->find($tags['date'], 0);
+				// Find blank rows as seperator of the dates and its offset
+				if (preg_match_all('/(<br\/>|<br>)/', $dateRaw, $matches, PREG_OFFSET_CAPTURE)) {
+					// Return the portion of dates string specified by the seperator offset as start parameter
+					$date = trimString(substr($dateRaw, $matches[0][count($matches[0])-1][1]));
+					if (strlen($date) <= 1) {
+						$date = trimString(substr($dateRaw, $matches[0][count($matches[0])-2][1]));
+					}
+				} else {
+
+					$date = explode(' - ', trimString($production->find($tags['date'], 0)->plaintext))[0];
+				}
 			}
 			
 		}	
@@ -342,7 +355,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 
 	//Custom added 
-	//print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time)));
+	#print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $link));
 
 	// Filter by month
 	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {

@@ -403,7 +403,7 @@ class Campaign {
 			//Sort performers by length for keyword insertion
 			usort($this->performers,'sortByLength');
 			# Placeholder for longest keyword
-			$title = '{KeyWord:'.$this->performers[0].'}';
+			$performer = '{KeyWord:'.$this->performers[0].'}';
 		}
 
 		if ($type == 'title' || ($type == 'performer' && count($this->performers) <= $this->maxPerformers)) {
