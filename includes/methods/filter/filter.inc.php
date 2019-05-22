@@ -21,7 +21,7 @@ function trimString($string) {
 	//Remove curly single and double quotes from string
 	
 	//Replace UTF-8 special characters
-	$string = str_replace(array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6", "\xc3\xa0", "\xc3\xa4", "\xc3\xa9", "\xc3\xab", "\xc3\xbc", "&#39;"), array("'", "'", '"', '"', '-', '--','...', "à", "ä", "é", "ë", "ü", "'"), $string);
+	$string = str_replace(array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6", "\xc3\xa0", "\xc3\xa4", "\xc3\xa9", "\xc3\xab", "\xc3\xbc", "&#39;", '&#039;'), array("'", "'", '"', '"', '-', '--','...', "à", "ä", "é", "ë", "ü", "'", "'"), $string);
 	
 	/*
 	//Replace Windows special characters
