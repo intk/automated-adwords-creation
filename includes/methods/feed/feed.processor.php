@@ -51,15 +51,17 @@ function listGenres($genre) {
 function toPath($xml, $string) {
 	$parts = explode('/', $string);
 	$path = $xml;
-	
 	foreach ($parts as $property) {
-		// Determine if the path has a defined key
-		/*if (preg_match('/\[([^\]]*)\]/', $property, $key) == 1) {
-    		$path = $path->$property[$key[1]];
-		} else {*/
+		// Determine if the path string has a defined key and use it
+		if (preg_match_all("/\[([^\]]*)\]/", $property, $matches)) {
+			//Remove brackets with key from string
+			$property = str_replace($matches[0][0], '', $property);
+
+			// Select property by name and key
+			$path = $path->{$property}[intval($matches[1][0])];
+		} else {
 			$path = $path->$property;
-		//}
-		
+		}
 	}
 	return $path;
 }
@@ -120,7 +122,7 @@ foreach (toPath($xml, $tags['item']) as $production) {
 		}
 
 	}
-	
+
 	// Filter by month
 	if (date('Y-m', $time) == $month || strtoupper($month) == "ALL") {
 		
