@@ -280,7 +280,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				// Use last date if multiple dates are given
 				$dateRaw = $production->find($tags['date'], 0);
 				// Find blank rows as seperator of the dates and its offset
-				if (preg_match_all('/(<br\/>|<br>)/', $dateRaw, $matches, PREG_OFFSET_CAPTURE)) {
+				if (preg_match_all('/(<br\/>|<br>)/', $dateRaw, $matches, PREG_OFFSET_CAPTURE) && preg_match("/\<br\>\d{2}<br\>\d{2}/", $dateRaw, $match) == false) {
 					// Return the portion of dates string specified by the seperator offset as start parameter
 					$date = trimString(substr($dateRaw, $matches[0][count($matches[0])-1][1]));
 					if (strlen($date) <= 1) {
@@ -366,6 +366,13 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			// Put data to object
 			$productionObj->title = trimString($title);
 			$productionObj->subtitle = trimString($subtitle);
+
+			// Determine if title element contains subtitle
+			if (strlen($productionObj->subtitle) < 1 && strpos($productionObj->title, ' - ') > 1) {
+				$titleParts = explode(' - ', $productionObj->title);
+				$productionObj->title = $titleParts[0];
+				$productionObj->subtitle = $titleParts[1];
+			}
 			$productionObj->venue = $location['venue'];
 			$productionObj->location = $location['city'];			
 			
@@ -405,7 +412,6 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			 else {
 				$link = $tags['link'];
 			}
-
 
 
 			if (strpos($production->find($link, 1)->href, $tags['baseUrl']) !== false) {
@@ -462,8 +468,6 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				//$productionObj->venue[0] = trim($locationArr[0]).' '.$productionObj->location;
 
 			}
-
-			#print_r($productionObj);
 
 			//$productionObj->link = str_replace("https://stadstheater.nl//stadstheater.nl", "https://stadstheater.nl", $productionObj->link);
 
