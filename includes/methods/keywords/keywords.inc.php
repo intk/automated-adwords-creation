@@ -6,7 +6,13 @@ class Keywords {
 
 		$this->type = $type;
 		$this->title = $title;
-		$this->venue = $venue;
+
+		// Use short venue name when character length of venue name is > 20
+		if (strlen($venue[0]) > 20 && array_key_exists(1, $venue)) {
+			$this->venue = $venue[1];
+		} else {
+			$this->venue = $venue[0];
+		}
 		$this->city = $city;
 		$this->placements = $placements;
 		$this->newAdgroup = $this->newAdgroup();
@@ -34,25 +40,27 @@ class Keywords {
 
 			$input = str_replace('met ', '', $input);
 		}
+		/*
 		if (strpos($this->title, ': ') !== false) {
 			$input = preg_replace("/(\w*: )/", '', $input);
 		}
+		*/
 
 		// Parse by predifined delimiters
 		if (strpos($input, ',') !== false || (strpos($input, ',') !== false && strpos($input, ',') < strpos($input, ' en '))) {
-			$delOutput = preg_split('(,| en )', $input);
+			$delOutput = preg_split('/(,| en| - )/', $input);
 			$this->newAdgroup = true;
 		}
 		else if (strpos($input, ' en ') !== false && strpos($input, '&') !== false) {
-			$delOutput = preg_split('(,| & )', $input);
+			$delOutput = preg_split('/(,| & )/', $input);
 			$this->newAdgroup = true;
 		}
 		else if (strlen($input) > 20 && strpos($input, ' en ') !== false) {
-			$delOutput = preg_split('/(,| en )/', $input);
+			$delOutput = preg_split('/(,| en)/', $input);
 			$this->newAdgroup = true;
 		}
-		else if (strpos($input, ' en ') === false && strpos($input, ' & ') !== false && strlen($input) > 30) {
-			$delOutput = explode(' & ', $input);
+		else if (strpos($input, ' en ') === false && strpos($input, ' & ') !== false && strlen($input) > 20) {
+			$delOutput = preg_split('/( - | & )/', $input);
 			$this->newAdgroup = true;
 		}
 		else if (strpos($input, ' and ') !== false && strlen($input) > 30) {
@@ -64,12 +72,12 @@ class Keywords {
 			$this->newAdgroup = true;
 		} else {
 			$delOutputCount = count($delOutput);
-			$delOutput = preg_split('/(, | i.s.m. | ism | ft. | feat. | -- | met )+/i', $input);
+			$delOutput = preg_split('/(, | i.s.m. | ism | ft. | feat. | -- | met |:)+/i', $input);
 			if (count($delOutput) > 1) {
 				$this->newAdgroup = true;
 			}
 		}
-
+		
 		$outputArray = array();
 
 		// Parse by every second space
@@ -145,7 +153,20 @@ class Keywords {
 				// Make sure there is the same amount of keywords, and placements to combine
 				$DuplicateKeywords = array_fill(0, count($placements), trim($tempKeyword));
 
-
+				// Split keyword by space
+				if ($_GET['splitKeywords'] == 'true') {
+					$placementsList = $placements;
+					$splittedKeyword = explode(' ', $tempKeyword);
+					foreach($splittedKeyword as $splitted) {
+						if (is_numeric($splitted) == false && strlen($splitted) > 4 && strpos($tempKeyword, $this->placements[0]) == false) {
+							$DuplicateKeywords = array_merge($DuplicateKeywords, array_fill(0, count($placements), trim($splitted)));
+							$placementsList = array_merge($placementsList, $placements);
+						}
+					}
+					if (count($placementsList) > 1) {
+						$placements = $placementsList;
+					}
+				}
 
 				// Placements will be placed after the keyword, so it becomes a new keyword
 				$outputArray[$key] = array_merge(array("name"=>$tempKeyword,"type"=>$this->type, "keywords"=>array_merge(array(strtolower($tempKeyword)), array_map(
