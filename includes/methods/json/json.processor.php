@@ -149,9 +149,31 @@ function strpos_all($haystack, $needle) {
 //Scrape performer names from web page
 include('includes/methods/web/performers.processor.php');
 
-// XML scraper
-$json = preg_replace("/\s+/", " ", file_get_contents($source));
+// If pagination is given, iterate all pages
+if (array_key_exists('pagination', $tags)) {
+	$paginationString = $tags['pagination'];
+	$number = $tags['pagecount'];
+} else {
+	$pagination = '';
+	$number = 1;
+}
+
+for($i=1;$i<=$number;$i++) {
+
+	if (array_key_exists('pagination', $tags)) {
+		$pagination = $paginationString.$i;
+	}
+
+
+// JSON scraper
+$json = preg_replace("/\s+/", " ", file_get_contents($source.$pagination));
 $sourceArray = json_decode($json);
+
+
+// If productions are subitems of parent element
+if (strlen($tags['item']) > 1) {
+	$sourceArray = toPath($sourceArray, $tags['item']);
+}
 foreach ($sourceArray as $production) {
 
 	// Get last date of production
@@ -294,6 +316,9 @@ foreach ($sourceArray as $production) {
 				$productionObj->link = filter_var(trim($tags['link']), FILTER_SANITIZE_URL);
 			} else {
 				$productionObj->link = filter_var(trim(toPath($production, $tags['link'])), FILTER_SANITIZE_URL);
+				if (strpos($productionObj->link, $tags['baseUrl']) === false) {
+					$productionObj->link = $tags['baseUrl'].$productionObj->link;
+				}
 			}
 
 			$productionObj->date->time = $time;
@@ -335,4 +360,6 @@ foreach ($sourceArray as $production) {
 		}
 
 }
+
+} // Iteration of pages
 ?>

@@ -176,7 +176,6 @@ function listGenres($genre) {
 include('includes/methods/web/performers.processor.php');
 
 
-
 // Split tags to array element
 $tags = explode('; ', $tags);
 foreach ($tags as $key => $value) {
@@ -196,12 +195,13 @@ foreach ($tags as $key => $value) {
 }
 
 
-// XML scraper
-//Pagination
-if (array_key_exists('pagination', $tags) && strlen($tags['pagination']) > 1) {
-	$pagCount = 31;
+// If pagination is given, iterate all pages
+if (array_key_exists('pagination', $tags)) {
+	$paginationString = $tags['pagination'];
+	$number = $tags['pagecount'];
 } else {
-	$pagCount = 1;
+	$pagination = '';
+	$number = 1;
 }
 
 
@@ -211,7 +211,14 @@ if (array_key_exists('pagination', $tags) && strlen($tags['pagination']) > 1) {
 		$dom = new simple_html_dom(getWebPage($source.'&p='.$pag));
 	} else {*/
 
-		$dom = new simple_html_dom(getWebPage($source)); 
+for($i=1;$i<=$number;$i++) {
+
+	if (array_key_exists('pagination', $tags)) {
+		$pagination = $paginationString.$i;
+	}
+
+
+		$dom = new simple_html_dom(getWebPage($source.$pagination)); 
 	//}
 foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $production) {
 
@@ -356,7 +363,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 
 	//Custom added 
-	print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $link));
+	#print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $link));
 
 	// Filter by month
 	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {
@@ -497,6 +504,6 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 }
 
-//} //Used for pagination
+} //Used for pagination
 
 ?>
