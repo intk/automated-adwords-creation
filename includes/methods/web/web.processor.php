@@ -23,7 +23,7 @@ function dateFromString($string) {
 	//Convert string to a date string
 	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
 	$string = str_replace('| ' , ' - ', $string);
-	$splittedDate = preg_split("(t/m|&|tm| -| - | to | /| and | tot )", $string);
+	$splittedDate = preg_split('/(t\/m|&|tm| -| - | to| and | tot )+/i', $string);
 
 	// Determine if date and time are separated, choose part with date format
 	if (strpos($splittedDate[count($splittedDate)-1], 'u') > 1 || strpos($string, ':') > 1) {
@@ -41,6 +41,7 @@ function dateFromString($string) {
 	//Determine if wrong date format has been used
 	if (substr_count($date, '.') > 1) {
 		// Execute preg_match
+		$date = explode('-',$date)[count(explode('-',$date))-1];
 		if (preg_match("/\d{2}.\d{2}.\d{2}/", $date, $match) && !preg_match("/\d{2}.\d{2}.\d{4}/", $date, $match)) {
 			$dateTemp = trim(str_replace('.','-', $date));
 			$d = DateTime::createFromFormat('d-m-y', $dateTemp);
@@ -197,7 +198,7 @@ foreach ($tags as $key => $value) {
 
 // XML scraper
 //Pagination
-if (strlen($tags['pagination']) > 1) {
+if (array_key_exists('pagination', $tags) && strlen($tags['pagination']) > 1) {
 	$pagCount = 31;
 } else {
 	$pagCount = 1;
@@ -288,7 +289,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 					}
 				} else {
 
-					$date = explode(' - ', trimString($production->find($tags['date'], 0)->plaintext))[0];
+					$date = trimString($production->find($tags['date'], -1)->plaintext);
 				}
 			}
 			
@@ -355,7 +356,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 
 	//Custom added 
-	#print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $link));
+	print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $link));
 
 	// Filter by month
 	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {
