@@ -1,11 +1,16 @@
 <?php
 #error_reporting(E_ALL);
 #ini_set('display_errors', 1);
+
+// Include lexicon
+include('includes/lexicon/'.$lang.'/campaign.inc.php');
+
 include('includes/methods/keywords/keywords.inc.php');
 
 //Contains name, date, target location, sitelink extentions, AdGroups, Ads, keywords
 class Campaign {
 	private $template;
+	private $lexicon;
 	private $price;
 	private $title;
 	private $subtitle;
@@ -14,11 +19,12 @@ class Campaign {
 	private $performers;
 	private $link;
 	private $maxPerformers;
-    public function __construct($production, $template) {
+    public function __construct($production, $template, $lang) {
 
 		//Parse campaign info
 		$itemDate = $production->date->time;
 		$this->template = $template;
+		$this->lexicon = new Lexicon();
 		$this->title = $this->trimStr($production->title);
 		$this->subtitle = $this->trimStr($production->subtitle);
 		// Determine if subtitle exists or not. Depend the campaign name on it
@@ -32,7 +38,11 @@ class Campaign {
 		if (strlen($this->name) > 120) {
 			$this->name = trim(substr($this->name, 0, strpos($this->name, ' - ')));
 		}
+		$this->language = $lang;
 		$this->venue = $production->venue;
+		if (array_key_exists(1, $this->venue) == false) {
+			$this->venue[1] = $this->venue[0];
+		} 
 		$this->city = $production->location;
 		$this->genre = $production->genre;
 		$this->performers = $production->performers;
@@ -81,14 +91,14 @@ class Campaign {
 	
 	//Format timestamp to different date strings
 	private function formatDate($time) {
-		$monthNL = array('jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec');
-		$monthNLFull = array('januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december');
+		$monthAbbr = $this->lexicon->monthAbbr;
+		$monthFull = $this->lexicon->monthFull;
 		$monthEN = array('jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec');
 		$day = date('d', $time);
 		if ($day < 10) { $day = substr($day, 1); }
 		$output[0] = date('M d, Y', $time);
-		$output[1] = $day.' '.str_ireplace($monthEN, $monthNL, date('M', $time)).'.';
-		$output[2] = $day.' '.str_ireplace($monthEN, $monthNLFull, date('M', $time));
+		$output[1] = $day.' '.str_ireplace($monthEN, $monthAbbr, date('M', $time)).'.';
+		$output[2] = $day.' '.str_ireplace($monthEN, $monthFull, date('M', $time));
 		$output[3] = date('Y-m-d', $time);
 		return $output;
 	}
@@ -124,27 +134,24 @@ class Campaign {
 		$adGroups = array();
 
 		$placements = new stdClass();
-		$placements->toneel = array('toneel', 'tickets', 'theater');
-		$placements->cabaret = array('cabaret', 'theater', 'tickets');
-		$placements->musical = array('theater');
-		$placements->college = array('college', 'theater');
-		$placements->familie = array("familie", "theater");
-		$placements->jeugd = array("familie", "theater");
-		$placements->dans = array('dans', 'theater');
-		$placements->serie = array('theater');
-	    $placements->concert = array('concert', 'muziek', 'live');
-	    $placements->expo = array('expo', 'tentoonstelling');
-		$placements->show = array('concert', 'theater');
-		$placements->muziek = array('concert');
-		$placements->festival = array('concert', 'muziek', 'festival', 'live');
-		$placements->klassiek = array('concert', 'theater');
-		$placements->overig = array('theater');
-		$placements->kunst = array('collectie', 'kunst');
-		$placements->opera = array('opera', 'theater');
-		$placements->specials = array('theater');
-		$placements->circus = array('circus', 'theater');
-		$placements->entertainment = array('theater');
-		$placements->film = array('film');
+		$placements->theater = array($this->lexicon->keyword['theater'], $this->lexicon->keyword['tickets']);
+		$placements->theatre = array($this->lexicon->keyword['theatre'], $this->lexicon->keyword['tickets'], $this->lexicon->keyword['theater']);
+		$placements->cabaret = array($this->lexicon->keyword['cabaret'], $this->lexicon->keyword['theater'], $this->lexicon->keyword['tickets']);
+		$placements->musical = array($this->lexicon->keyword['theater']);
+		$placements->lecture = array($this->lexicon->keyword['lecture'], $this->lexicon->keyword['theater']);
+		$placements->family = array($this->lexicon->keyword['family'], $this->lexicon->keyword['theater']);
+		$placements->dance = array($this->lexicon->keyword['dance'], $this->lexicon->keyword['theater']);
+	    $placements->concert = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['music'], $this->lexicon->keyword['live']);
+	    $placements->expo = array($this->lexicon->keyword['expo'], $this->lexicon->keyword['exhibition']);
+		$placements->show = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['theater']);
+		$placements->music = array($this->lexicon->keyword['music'], $this->lexicon->keyword['concert']);
+		$placements->festival = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['music'], $this->lexicon->keyword['festival'], $this->lexicon->keyword['live']);
+		$placements->classic = array($this->lexicon->keyword['classic'], $this->lexicon->keyword['concert'], $this->lexicon->keyword['theater']);
+		$placements->art = array($this->lexicon->keyword['collection'], $this->lexicon->keyword['art']);
+		$placements->opera = array($this->lexicon->keyword['opera'], $this->lexicon->keyword['theater']);
+		$placements->circus = array($this->lexicon->keyword['circus'], $this->lexicon->keyword['theater']);
+		$placements->movie = array($this->lexicon->keyword['movie']);
+
 		if (count($this->genre) > 1) {
 			$genre = $this->genre[1];
 		} else {
@@ -158,8 +165,12 @@ class Campaign {
 			//Check if genre has keyword array
 			if (stripos($genre, $keyWord) !== false) {
 				$placementsList = $keyValue;
-
 			}
+		}
+
+		# Add default placements if placement list is still empty
+		if (count($placementsList) == 0) {
+			$placementsList = $placements->theater;
 		}
 
 		$keywordsObj = new stdClass();
@@ -187,21 +198,21 @@ class Campaign {
 				array_push($titlePlacementList, $this->performers[0]);
 			}
 
-			$titleObj = new Keywords($this->title, $this->venue[0], $this->city, $titlePlacementList, 'title');
+			$titleObj = new Keywords($this->title, $this->venue, $this->city, $titlePlacementList, 'title');
 			# Merge ad groups from keyword object
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $titleObj->adgroup);
 		}
 
 		// Create keywords and adgroup of subtitle
 		if (strlen($this->subtitle) > 1) {
-			$subtitleObj = new Keywords($this->subtitle, $this->venue[0], $this->city, $placementsList, 'performer');
+			$subtitleObj = new Keywords($this->subtitle, $this->venue, $this->city, $placementsList, 'performer');
 			# Merge ad groups from keyword object
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $subtitleObj->adgroup);
 		}
 
 		if (count($this->performers) > 0 && $this->performers !== false && count($this->performers) <= $this->maxPerformers && $manyPerformers == false) {
 			foreach ($this->performers as $performer) {
-				$performersObj = new Keywords($performer, $this->venue[0], $this->city, $placementsList, 'performer');
+				$performersObj = new Keywords($performer, $this->venue, $this->city, $placementsList, 'performer');
 				$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $performersObj->adgroup);
 			}
 			$manyPerformers = true;
@@ -226,7 +237,7 @@ class Campaign {
 			$newElement = implode(' ', $splittedPair).' '. $this->genre[0];
 
 
-			$titleObj = new Keywords($newElement, $this->venue[0], $this->city, $placementsList, 'title');
+			$titleObj = new Keywords($newElement, $this->venue, $this->city, $placementsList, 'title');
 			# Merge ad groups from keyword object
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $titleObj->adgroup);
 		}
@@ -360,35 +371,32 @@ class Campaign {
 		$pLabel = new stdClass();
 		
 		//Genre placements
-		$pLabel->toneel = array('toneel', 'toneel', 'toneel');
-		$pLabel->cabaret = array('cabaret', 'cabaret', 'cabaret');
-		$pLabel->musical = array('musical', 'een musical', 'de musical');
-		$pLabel->familievoorstelling = array("voorstelling", "een voorstelling", 'de voorstelling');
-		$pLabel->jeugd = array("toneel", "toneel", 'het toneelstuk');
-		$pLabel->dans = array('dans', 'een danssshow', 'de danssshow');
-		$pLabel->film = array('film', 'de film', 'de film',);
-		$pLabel->concert = array('concert', 'een concert', 'het concert');
-		$placements->expo = array('expo', 'de expo', 'de expo');
-		$pLabel->theaterconcert = array('concert', 'een concert', 'het concert');
-		$pLabel->opera = array('opera', 'opera', 'de opera');
-		$pLabel->muziek = array('concert', 'een concert', 'het concert');
-		$pLabel->klassiek = array('concert', 'een concert', 'het concert');
-		$pLabel->overig = array('voorstelling', 'een voorstelling', 'de voorstelling');
+		$pLabel->theatre = $this->lexicon->adPlacement['theatre'];
+		$pLabel->cabaret = $this->lexicon->adPlacement['cabaret'];
+		$pLabel->musical = $this->lexicon->adPlacement['musical'];
+		$pLabel->dance = $this->lexicon->adPlacement['dance'];
+		$pLabel->movie = $this->lexicon->adPlacement['movie'];
+		$pLabel->concert = $this->lexicon->adPlacement['concert'];
+		$pLabel->expo = $this->lexicon->adPlacement['expo'];
+		$pLabel->opera = $this->lexicon->adPlacement['opera'];
+		$pLabel->music = $this->lexicon->adPlacement['music'];
+		$pLabel->classic = $this->lexicon->adPlacement['classic'];
+		$pLabel->performance = $this->lexicon->adPlacement['performance'];
 		
 		$genre = $this->genre[0];
 
 		// Determine if genre of performance has close match with predefined genres
-		foreach ($pLabel as $tempGenre => $value) {
-			if (strpos($genre, $tempGenre) > 1) {
+		foreach ($pLabel as $tempGenre) {
+			if (strpos($genre, $tempGenre[0]) > 1) {
 				$tLabel = $pLabel->$tempGenre;
 				$genre = $tempGenre;
 			} else {
-				$tLabel = $pLabel->overig;
+				$tLabel = $pLabel->performance;
 			}
 		}
 		
 		//If performance month is equal to May, don't use a dot in the heading.
-		if (strpos($this->date->AdDate, 'mei') !== false) {
+		if (strpos($this->date->AdDate, $this->lexicon->monthAbbr[4]) !== false) {
 			$hDate = substr($this->date->AdDate, 0, -1);
 		} else {
 			$hDate = $this->date->AdDate;
@@ -402,7 +410,7 @@ class Campaign {
 
 
 		# Template replacements
-		$replace = array('[performer]', '[title]', '[genre]', '[genreSentence]', '[genreTerm]', '[venue]', '[location]', '[date]', '[dateFull]');
+		$replace = array('[performer]', '[title]', '[genre]', '[genreSentence]', '[genreTerm]', '[venue]', '[venueShort]', '[location]', '[date]', '[dateFull]');
 
 		# Add keyword insertion when performers amount > maxPerformers
 		if (count($this->performers) > $this->maxPerformers && $type == 'performer') {
@@ -413,9 +421,9 @@ class Campaign {
 		}
 
 		if ($type == 'title' || ($type == 'performer' && count($this->performers) <= $this->maxPerformers)) {
-			$replacement = array($performer, $this->shortstring($title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
+			$replacement = array($performer, $this->shortstring($title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->venue[1], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		} else {
-			$replacement = array($performer,  $this->shortstring($this->title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->city, $this->date->AdDate, $this->date->AdDateFull);
+			$replacement = array($performer,  $this->shortstring($this->title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->venue[1], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		}
 
 		# Decode ads template in JSON format and iterate

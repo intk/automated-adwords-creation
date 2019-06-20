@@ -69,11 +69,18 @@ function parseTemplate($template) {
 	return $types;
 }
 
+// Set language
+if (isset($_GET['lang'])) {
+	$lang = filter_var($_GET['lang'], FILTER_SANITIZE_STRING);
+} else {
+	$lang = 'nl';
+}
+
 //Check if query string matches database records
 if ($_GET['theater']) {
 
 	//Get custom templates by theater ID
-	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id WHERE theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
 	if (mysqli_num_rows($query) < 1) {
 		// If no custom template is available, use default template
 		$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = 0 WHERE theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
@@ -141,7 +148,7 @@ if ($_GET['theater']) {
 
 				foreach($theater->productions as $key => $item) {
 
-					$campaign = new Campaign($item, $template);
+					$campaign = new Campaign($item, $template, $result['language']);
 					$campaign->createAdgroup();
 					$theater->productions[$key]->campaign = $campaign;
 					$theater->csvOutput = createCSV($theater->name, $month, $result['budget'], $result['targetLocation'], 'enabled', $theater->productions[$key]);
