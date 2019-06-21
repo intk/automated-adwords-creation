@@ -26,7 +26,7 @@ function dateFromString($string) {
 	$splittedDate = preg_split('/(t\/m|&|tm| -| - | to| and | tot )+/i', $string);
 
 	// Determine if date and time are separated, choose part with date format
-	if (strpos($splittedDate[count($splittedDate)-1], 'u') > 1 || strpos($string, ':') > 1) {
+	if (strpos($splittedDate[count($splittedDate)-1], 'uur') > 1 || strpos($string, ':') > 1) {
 		$date = $splittedDate[0];
 	} else {
 		$date = $splittedDate[count($splittedDate)-1];
@@ -35,7 +35,8 @@ function dateFromString($string) {
 		$date = substr($date, 0, strpos($date,'+'));
 	}
 	// Exclude days of the week and their abbreviations
-	$date = trim(preg_replace("/(maandag| maa |mon|ma |dinsdag|din|tue|di|woensdag|woe|wed|wo|donderdag|don|thu|do|vrijdag|vri|fri|vr|zaterdag|zat|sat|za|zondag|zon|sun|zo|om)/i", "", $date));
+	$date = trim(preg_replace("/(from|maandag| maa |mon|ma |dinsdag|din|tue|di|woensdag|woe|wed|wo|donderdag|don|thu|do|vrijdag|vri|fri|vr|zaterdag|zat|sat|za|zondag|zon|sun|zo|om)/i", "", $date));
+
 	//$date = str_replace('.', '', $date);
 
 	//Determine if wrong date format has been used
@@ -164,8 +165,10 @@ function listGenres($genre) {
 	if (strpos($genre, ',') > 1) {
 		$genre = explode(',', $genre);
 	}
-	foreach ($genre as $genreItem) {
-		array_push($genreArr, trim(filter_var(trim(strtolower($genreItem)), FILTER_SANITIZE_STRING)));
+	if (count($genre) > 1) {
+		foreach ($genre as $genreItem) {
+			array_push($genreArr, trim(filter_var(trim(strtolower($genreItem)), FILTER_SANITIZE_STRING)));
+		}
 	}
 	return $genreArr;
 }
@@ -221,6 +224,8 @@ for($i=1;$i<=$number;$i++) {
 		$dom = new simple_html_dom(getWebPage($source.$pagination)); 
 	//}
 foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $production) {
+
+	echo $production->plaintext."\n\n";
 
 	//Check if title, subtitle and date are placed in same tag
 	if ($tags['title'] == $tags['subtitle'] && $tags['date'] == $tags['title']) {
@@ -278,7 +283,6 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		}
 		if (preg_match("/\d{4}-\d{2}-\d{2}/", $tags['date'], $match)) {
 			$date = trimString($tags['date']);
-			echo $date;
 		} else {
 			$genre = $production->find($tags['genre'], 0)->plaintext;
 			if (count($production->find($tags['date'])) > 3) {
@@ -300,6 +304,10 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				}
 			}
 			
+		}
+		// Determine if date is an attribute of a dom element
+		if (array_key_exists('date', $tags) && strpos($tags['date'], 'itemprop') > 1) {
+			$date = trimString($production->find($tags['date'], -1)->content);
 		}	
 	}
 
@@ -312,10 +320,18 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 	if (strlen($tags['title']) < 1) {
 		$titleparts = explode('/', $production->href);
 		$title = str_replace('-', ' ', $titleparts[count($titleparts)-1]);
+		// If title is placed directly within event item, use it. Remove additional divs
+		if (strlen($title) < 1) {
+			$title = str_replace($production->find('div',0)->plaintext, '', trimString($production->plaintext));
+		}
 	}
 
 	if (strlen($title) < 1 && strlen($subtitle) > 1) {
 		$title = $subtitle;
+		$subtitle = '';
+	}
+	if (strlen($title) < 1 && strlen($subtitle) < 1) {
+		$title = $genre;
 		$subtitle = '';
 	}
 
@@ -359,11 +375,12 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			
 		}	
 	// Get last date of production
+
 	$time = dateFromString($date); 
 
 
 	//Custom added 
-	#print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $link));
+	print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
 
 	// Filter by month
 	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {
@@ -421,7 +438,6 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				$link = $tags['link'];
 			}
 
-
 			if (strpos($production->find($link, 1)->href, $tags['baseUrl']) !== false) {
 				$productionObj->link = filter_var(trim($production->find($link, 0)->href), FILTER_SANITIZE_URL);
 			} else {
@@ -429,21 +445,28 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				if (strlen($production->href) > 1) {
 					$productionObj->link = filter_var(trim($production->href), FILTER_SANITIZE_URL);
 
-					/*if (strpos($production->href, $tags['baseUrl']) !== false) {
-						$productionObj->link = filter_var(trim($production->href), FILTER_SANITIZE_URL);
-					} else {
-						$productionObj->link = filter_var(trim($tags['baseUrl'].$production->href), FILTER_SANITIZE_URL);
-					}
-					*/
+					//if (strpos($production->href, $tags['baseUrl']) !== false) {
+					//	$productionObj->link = filter_var(trim($production->href), FILTER_SANITIZE_URL);
+					//} else {
+					//	$productionObj->link = filter_var(trim($tags['baseUrl'].$production->href), FILTER_SANITIZE_URL);
+					//}
 				} else {
 					$productionObj->link = filter_var(trim($tags['baseUrl'].$production->find($link, 0)->href), FILTER_SANITIZE_URL);
 				}
+
+				if (strpos($productionObj->link, '//') > -1 && strpos($productionObj->link, 'http') < 0) {
+					$productionObj->link = str_replace('//', 'https://', $productionObj->link);
+				}
 			}
+
+
 
 			// Remove domainname from url when its added twice
 			if (substr_count($productionObj->link, $tags['baseUrl']) > 1) {
 				$productionObj->link = substr($productionObj->link, strpos($productionObj->link, $tags['baseUrl'])+strlen($tags['baseUrl']));
 			}
+
+			echo $productionObj->link;
 
 
 			$productionObj->date->time = $time;
@@ -460,13 +483,14 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			}
 
 			// If subtitle does not exist in agenda item, try to find performer on the the performance page itself
-			if (strlen($productionObj->subtitle) <= 1) {
+			if (strlen($productionObj->subtitle) <= 1 && strlen($tags['subtitle']) > 1) {
 
 				# Suppress warning when function can't be executed
 				$productionObj->subtitle = getPerformers($productionObj->link, array("performers"=>$tags['subtitle']));
 				
 
 			}
+
 
 			//$productionObj->subtitle = implode(', ', getPerformers($productionObj->link, array("performers"=>$tags['subtitle'])));
 			if (array_key_exists('location', $tags)) {
@@ -477,13 +501,14 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 			}
 
+
+
 			//$productionObj->link = str_replace("https://stadstheater.nl//stadstheater.nl", "https://stadstheater.nl", $productionObj->link);
 
 			// Push object to productions array
 			// Exclude productions with irrelevant tags, title or sold out
 			// Push object to productions array
 			// Exclude productions with irrelevant tags, title or sold out
-
 			
 				$excludeFound = false;
 				foreach (explode(' ', $exclude) as $excl) {
@@ -494,12 +519,12 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 						$excludeFound = true;
 					}
 				}
+
 				
 				if ($excludeFound == false) {
 					array_push($productions, $productionObj);
 				}
 
-				
 		}
 
 }
