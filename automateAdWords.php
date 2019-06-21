@@ -70,7 +70,7 @@ function parseTemplate($template) {
 }
 
 // Set language
-if (isset($_GET['lang'])) {
+if (isset($_GET['lang']) && file_exists('includes/lexicon/'.filter_var($_GET['lang'], FILTER_SANITIZE_STRING))) {
 	$lang = filter_var($_GET['lang'], FILTER_SANITIZE_STRING);
 } else {
 	$lang = 'nl';
