@@ -2,13 +2,15 @@
 header('Content-Type: application/json');
 
 class Keywords {
+	private $charLimit;
 	public function __construct($title, $venue, $city, $placements, $type) {
 
 		$this->type = $type;
 		$this->title = $title;
+		$this->charLimit = 30;
 
-		// Use short venue name when character length of venue name is > 20
-		if (strlen($venue[0]) > 20 && array_key_exists(1, $venue)) {
+		// Use short venue name when character length of venue name is >= Character Limit
+		if (strlen($venue[0]) > $this->charLimit && array_key_exists(1, $venue)) {
 			$this->venue = $venue[1];
 		} else {
 			$this->venue = $venue[0];
@@ -25,7 +27,7 @@ class Keywords {
 		$input = $this->title;
 
 		// Determine if a new adgroup should be created for each keyword or not
-		if (strlen($input) > 20) {
+		if (strlen($input) >= $this->charLimit) {
 			return 'true';
 		} else {
 			return 'false';
@@ -46,7 +48,78 @@ class Keywords {
 		}
 		*/
 
-		// Parse by predifined delimiters
+		// Split by predifined delimiters.
+
+		if (preg_match_all('/(, | en | and |&| - | i.s.m. | ism | ft. | feat. | -- | met |:)/', $input, $matches, PREG_OFFSET_CAPTURE) && strlen($input) > $this->charLimit) {
+
+			// Loop delimiters and split string
+			echo $input."\n";
+
+			$delOutputArray = array();
+			for($key = 0; $key <= count($matches[0]); $key++) {
+				if ($key == 0) {
+					$start = 0;
+					$length = $matches[0][$key][1];
+					$delimiter = $matches[0][$key][0];
+				}
+
+				else if ($key == count($matches[0])) {
+					$start = $matches[0][$key-1][1]+1;
+					$length = strlen($input);
+					$delimiter = $matches[0][$key-1][0];
+				}
+
+				else {
+					$start = $matches[0][$key-1][1]+1;
+					$length = $matches[0][$key][1]-$start;
+					$delimiter = $matches[0][$key-1][0];
+				}
+
+				// Output string parts and its start position, length and delimiters
+				array_push($delOutputArray, array(
+					"delimiter"=>$delimiter,
+					"startPos"=>$start, 
+					"endPos"=>$length,
+					"string"=>trim(substr($input, $start, $length)),
+					"length"=>strlen(trim(substr($input, $start, $length))),
+				));
+			}
+
+			// Merge string parts if they fit the max character limit
+			foreach($delOutputArray as $key => $delElement) {
+				print_r($delElement);
+				$outputString = $delElement['string'];
+				if ($key < count($delOutputArray)-1) {
+					$merged = trim(substr($input, $delElement['startPos'], $delOutputArray[$key+1]['endPos']+$delOutputArray[$key+1]['startPos']));
+
+					if (strlen($merged) <= $this->charLimit && strpos($merged, ',') === false) {
+						$outputString = $merged;
+						$delOutputArray[$key+1]['merged'] = true;
+
+					}
+
+
+				}
+
+				$delElement = $delOutputArray[$key];
+				if ($delElement['merged'] == false) {
+					$delOutput[$key] = $outputString;
+				}
+
+
+
+			}
+
+			print_r($delOutput);
+
+
+			$this->newAdgroup = true;
+		} else {
+
+			$delOutput[0] = $input;
+		}
+
+		/*
 		if (strpos($input, ',') !== false || (strpos($input, ',') !== false && strpos($input, ',') < strpos($input, ' en '))) {
 			$delOutput = preg_split('/(,| en| - )/', $input);
 			$this->newAdgroup = true;
@@ -77,6 +150,7 @@ class Keywords {
 				$this->newAdgroup = true;
 			}
 		}
+		*/
 		
 		$outputArray = array();
 
@@ -91,7 +165,7 @@ class Keywords {
 			}
 
 			// Only parse by every second space if string length is more than 20 characters
-			if (strlen($delString) > 20) {
+			if (strlen($delString) > $this->charLimit) {
 
 				// Remove words that have less than 4 characters
 				$tempVal = explode(' ', $delString);
@@ -114,7 +188,7 @@ class Keywords {
 				foreach(explode(' ', $delString) as $delElement) {
 					$tempString .= $delElement.' ';
 
-					if (strlen(trim($tempString)) < 30) {
+					if (strlen(trim($tempString)) < $this->charLimit) {
 						$deliverPair[$i] = trim($tempString);
 					} else {
 						$tempString = $delElement.' ';
@@ -216,9 +290,8 @@ class Keywords {
 
 	}
 }
-/*
-$keywordsObj = new Keywords("Peter Bla - Blasr", "Botanique", "Brussel", array("concert", "muziek", "live"));
+
+$keywordsObj = new Keywords("De Waanzinnige Boomhut van 13 Verdiepingen", array("Stadsgehoorzaal"), "Leiden", array("concert", "muziek", "live"), "title");
 print_r($keywordsObj);
 echo json_encode($keywordsObj);
-*/
 ?>
