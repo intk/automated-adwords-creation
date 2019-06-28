@@ -34,6 +34,41 @@ class Keywords {
 		}
 	}
 
+	private function stringParts($matches, $input) {
+
+		// Loop delimiters and split string
+		$delOutputArray = array();
+		for($key = 0; $key <= count($matches[0]); $key++) {
+			if ($key == 0) {
+				$start = 0;
+				$length = $matches[0][$key][1];
+				$delimiter = $matches[0][$key][0];
+			}
+
+			else if ($key == count($matches[0])) {
+				$start = $matches[0][$key-1][1]+1;
+				$length = strlen($input);
+				$delimiter = $matches[0][$key-1][0];
+			}
+
+			else {
+				$start = $matches[0][$key-1][1]+1;
+				$length = $matches[0][$key][1]-$start;
+				$delimiter = $matches[0][$key-1][0];
+			}
+
+			// Output string parts and its start position, length and delimiters
+			array_push($delOutputArray, array(
+				"delimiter"=>$delimiter,
+				"startPos"=>$start, 
+				"endPos"=>$length,
+				"string"=>trim(substr($input, $start, $length)),
+				"length"=>strlen(trim(substr($input, $start, $length)))
+			));
+		}
+		return $delOutputArray;
+	}
+
 	private function keywordsParser() {
 
 		// Derive string 
@@ -50,40 +85,11 @@ class Keywords {
 
 		// Split by predifined delimiters.
 
-		if (preg_match_all('/(, | en | and |&| - | i.s.m. | ism | ft. | feat. | -- | met |:)/', $input, $matches, PREG_OFFSET_CAPTURE) && strlen($input) > $this->charLimit) {
+		if (preg_match_all('/(, | en | and |&|-| i.s.m. | ism | ft. | feat. | -- | met |: |\/)/', $input, $matches, PREG_OFFSET_CAPTURE) && strlen($input) > $this->charLimit) {
 
-			// Loop delimiters and split string
 			echo $input."\n";
 
-			$delOutputArray = array();
-			for($key = 0; $key <= count($matches[0]); $key++) {
-				if ($key == 0) {
-					$start = 0;
-					$length = $matches[0][$key][1];
-					$delimiter = $matches[0][$key][0];
-				}
-
-				else if ($key == count($matches[0])) {
-					$start = $matches[0][$key-1][1]+1;
-					$length = strlen($input);
-					$delimiter = $matches[0][$key-1][0];
-				}
-
-				else {
-					$start = $matches[0][$key-1][1]+1;
-					$length = $matches[0][$key][1]-$start;
-					$delimiter = $matches[0][$key-1][0];
-				}
-
-				// Output string parts and its start position, length and delimiters
-				array_push($delOutputArray, array(
-					"delimiter"=>$delimiter,
-					"startPos"=>$start, 
-					"endPos"=>$length,
-					"string"=>trim(substr($input, $start, $length)),
-					"length"=>strlen(trim(substr($input, $start, $length))),
-				));
-			}
+			$delOutputArray = $this->stringParts($matches, $input);
 
 			// Merge string parts if they fit the max character limit
 			foreach($delOutputArray as $key => $delElement) {
@@ -164,11 +170,67 @@ class Keywords {
 				$delString = ucwords(strtolower($delString));
 			}
 
-			// Only parse by every second space if string length is more than 20 characters
-			if (strlen($delString) > $this->charLimit) {
+			// Split by predifined delimiters if string length is more than character limit
+			if (preg_match_all('/( )/', $delString, $matches, PREG_OFFSET_CAPTURE) && strlen($delString) > $this->charLimit) {
+
+				echo $delString."\n";
+				$delOutputArray = $this->stringParts($matches, $delString);
+
+				$outputArrayTemp = array();
+				$outputArrayTempKey = 0;
+				$outputArrayTemp[$outputArrayTempKey]['string'] = '';
+
+				foreach($delOutputArray as $key => $delElement) {
+					$merged = $outputArrayTemp[$outputArrayTempKey]['string'].$delElement['string'].' ';
+
+					//Only merge string when character length <= character limit
+					if (strlen(trim($merged)) <= $this->charLimit) {
+						$outputArrayTemp[$outputArrayTempKey]['string'] = $merged;
+						$outputArrayTemp[$outputArrayTempKey]['startPos'] = $delElement['startPos'];
+
+					} else {
+						// If first string part ends with an unnecessary <= 3 characters word, remove that word
+						$valSplit = explode(' ', $outputArrayTemp[$outputArrayTempKey]['string']);
+
+						// Loop splitted string values in descending order until string end doesn't unnecessary contain words with <=3 character length
+						$rightEndFound = false;
+						for ($i = count($valSplit); $i >= 0; $i--) {
+							if (!preg_match("/(big|bad|job|jam|joy|max|mol)/i", $valSplit[$i], $matches) && strlen($valSplit[$i]) <= 3 && !$rightEndFound) {
+								unset($valSplit[$i]);
+							} else {
+								$rightEndFound = true;
+							}
+						}
+						$outputArrayTemp[$outputArrayTempKey]['string'] = implode(' ', $valSplit);
+
+						/*
+						// Split string to second element and remove string with <= 3 characters from first element
+						$outputArrayTempKey++;
+						$outputArrayTemp[$outputArrayTempKey]['string'] = $delElement['string'];
+						*/
+					}
+
+					/*
+					if (strlen(trim($merged)) <= $this->charLimit) {
+						$outputArrayTemp[$outputArrayTempKey]['string'] .= $merged;
+					}
+					*/
+
+				}
+				print_r($outputArrayTemp);
+
+				
+
+
+
+
+				/*
 
 				// Remove words that have less than 4 characters
 				$tempVal = explode(' ', $delString);
+				print_r($tempVal);
+
+
 		    	foreach($tempVal as $key => $val) {
 		    		//Exclude words from removal that can be part of a name
 		    		if (!preg_match("/(big|job|jam|joy|max|van|der|tot|een|mol|op|)/i", $val, $matches) && strlen($val) < 4) {
@@ -198,6 +260,8 @@ class Keywords {
 				}
 
 				$outputArray = array_merge($outputArray, $deliverPair);
+
+				*/
 
 			} else {
 				array_push($outputArray, $delString);
