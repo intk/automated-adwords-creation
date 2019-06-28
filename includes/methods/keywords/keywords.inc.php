@@ -46,15 +46,15 @@ class Keywords {
 			}
 
 			else if ($key == count($matches[0])) {
-				$start = $matches[0][$key-1][1]+1;
-				$length = strlen($input);
 				$delimiter = $matches[0][$key-1][0];
+				$start = $matches[0][$key-1][1]+strlen($delimiter);
+				$length = strlen($input);
 			}
 
 			else {
-				$start = $matches[0][$key-1][1]+1;
-				$length = $matches[0][$key][1]-$start;
 				$delimiter = $matches[0][$key-1][0];
+				$start = $matches[0][$key-1][1]+strlen($delimiter);
+				$length = $matches[0][$key][1]-$start;
 			}
 
 			// Output string parts and its start position, length and delimiters
@@ -68,6 +68,58 @@ class Keywords {
 		}
 		return $delOutputArray;
 	}
+
+	private function splitString($fullString, $stringParts, $maxLength) {
+		$partsAmount = count($stringParts);
+		$key = 0;
+		$output = array();
+		$outputKey = 0;
+		$merge = '';
+
+		while ($partsAmount >= 0) {
+			$partsAmount--;
+
+			//Only merge string when character length <= character limit
+			$merge .= $stringParts[$key]['string'].' ';
+			if (strlen(trim($merge)) <= $maxLength) {
+
+				$output[$outputKey] = $merge;
+
+			} else {
+				// If first string part ends with an unnecessary <= 3 characters word, remove that word
+				$valSplit = explode(' ', $output[$outputKey]);
+
+				// Loop splitted string values in descending order until string end doesn't unnecessary contain words with <=3 character length
+				$rightEndFound = false;
+				$uWordCount = 0;
+				for ($i = count($valSplit); $i >= 0; $i--) {
+					if (!preg_match("/(big|bad|job|jam|joy|max|mol)/i", $valSplit[$i], $matches) && strlen($valSplit[$i]) <= 3 && !$rightEndFound) {
+						$uWordCount++;
+						unset($valSplit[$i]);
+					} else {
+						$rightEndFound = true;
+					}
+				}
+				// Assign revised string
+				$output[$outputKey] = implode(' ', $valSplit);
+
+				// Set key to string part before last removed word
+				$key -= $uWordCount;
+				// Extend while loop with amount of unnecessary words at the end of string part 1
+				$partsAmount .= $uWordCount;
+
+
+
+
+				$merge = '';
+				$outputKey++;
+			}
+			$key++;
+		} 
+		return $output;
+	}
+
+
 
 	private function keywordsParser() {
 
@@ -116,10 +168,8 @@ class Keywords {
 
 			}
 
-			print_r($delOutput);
-
-
 			$this->newAdgroup = true;
+
 		} else {
 
 			$delOutput[0] = $input;
@@ -160,7 +210,7 @@ class Keywords {
 		
 		$outputArray = array();
 
-		// Parse by every second space
+		// Split title into ad group names
 		foreach ($delOutput as $delString) {
 			$delString = trim($delString);
 
@@ -171,97 +221,9 @@ class Keywords {
 			}
 
 			// Split by predifined delimiters if string length is more than character limit
-			if (preg_match_all('/( )/', $delString, $matches, PREG_OFFSET_CAPTURE) && strlen($delString) > $this->charLimit) {
+			if (preg_match_all('/( )/', $delString, $matches, PREG_OFFSET_CAPTURE) && strlen($delString) > $this->charLimit && count($delOutput) <= 1) {
 
-				echo $delString."\n";
-				$delOutputArray = $this->stringParts($matches, $delString);
-
-				$outputArrayTemp = array();
-				$outputArrayTempKey = 0;
-				$outputArrayTemp[$outputArrayTempKey]['string'] = '';
-
-				foreach($delOutputArray as $key => $delElement) {
-					$merged = $outputArrayTemp[$outputArrayTempKey]['string'].$delElement['string'].' ';
-
-					//Only merge string when character length <= character limit
-					if (strlen(trim($merged)) <= $this->charLimit) {
-						$outputArrayTemp[$outputArrayTempKey]['string'] = $merged;
-						$outputArrayTemp[$outputArrayTempKey]['startPos'] = $delElement['startPos'];
-
-					} else {
-						// If first string part ends with an unnecessary <= 3 characters word, remove that word
-						$valSplit = explode(' ', $outputArrayTemp[$outputArrayTempKey]['string']);
-
-						// Loop splitted string values in descending order until string end doesn't unnecessary contain words with <=3 character length
-						$rightEndFound = false;
-						for ($i = count($valSplit); $i >= 0; $i--) {
-							if (!preg_match("/(big|bad|job|jam|joy|max|mol)/i", $valSplit[$i], $matches) && strlen($valSplit[$i]) <= 3 && !$rightEndFound) {
-								unset($valSplit[$i]);
-							} else {
-								$rightEndFound = true;
-							}
-						}
-						$outputArrayTemp[$outputArrayTempKey]['string'] = implode(' ', $valSplit);
-
-						/*
-						// Split string to second element and remove string with <= 3 characters from first element
-						$outputArrayTempKey++;
-						$outputArrayTemp[$outputArrayTempKey]['string'] = $delElement['string'];
-						*/
-					}
-
-					/*
-					if (strlen(trim($merged)) <= $this->charLimit) {
-						$outputArrayTemp[$outputArrayTempKey]['string'] .= $merged;
-					}
-					*/
-
-				}
-				print_r($outputArrayTemp);
-
-				
-
-
-
-
-				/*
-
-				// Remove words that have less than 4 characters
-				$tempVal = explode(' ', $delString);
-				print_r($tempVal);
-
-
-		    	foreach($tempVal as $key => $val) {
-		    		//Exclude words from removal that can be part of a name
-		    		if (!preg_match("/(big|job|jam|joy|max|van|der|tot|een|mol|op|)/i", $val, $matches) && strlen($val) < 4) {
-		    			unset($tempVal[$key]);
-		    		}
-		    	}
-		    	// Only implode space when more than 1 space occurs in string
-		    	if (substr_count($delString, " ") > 1) {
-		    		$delString = implode(' ', $tempVal);
-		    	}
-
-		    	$deliverPair = array();
-
-				// Split by every 30 characters
-				$i = 0;
-				$tempString = '';
-				foreach(explode(' ', $delString) as $delElement) {
-					$tempString .= $delElement.' ';
-
-					if (strlen(trim($tempString)) < $this->charLimit) {
-						$deliverPair[$i] = trim($tempString);
-					} else {
-						$tempString = $delElement.' ';
-						$i++;
-						$deliverPair[$i] = trim($tempString);
-					}
-				}
-
-				$outputArray = array_merge($outputArray, $deliverPair);
-
-				*/
+				$outputArray = array_merge($outputArray, $this->splitString($delString, $this->stringParts($matches, $delString), $this->charLimit));
 
 			} else {
 				array_push($outputArray, $delString);
@@ -355,7 +317,7 @@ class Keywords {
 	}
 }
 
-$keywordsObj = new Keywords("De Waanzinnige Boomhut van 13 Verdiepingen", array("Stadsgehoorzaal"), "Leiden", array("concert", "muziek", "live"), "title");
-print_r($keywordsObj);
-echo json_encode($keywordsObj);
+#$keywordsObj = new Keywords("Club Guy & Roni / Slagwerk Den Haag / Göteborgsoperans Danskompani", array("Stadsgehoorzaal"), "Leiden", array("concert", "muziek", "live"), "title");
+#print_r($keywordsObj);
+#echo json_encode($keywordsObj);
 ?>
