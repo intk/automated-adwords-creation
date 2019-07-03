@@ -93,7 +93,7 @@ class Keywords {
 				$rightEndFound = false;
 				$uWordCount = 0;
 				for ($i = count($valSplit); $i >= 0; $i--) {
-					if (!preg_match("/(big|bad|job|jam|joy|max|mol)/i", $valSplit[$i], $matches) && strlen($valSplit[$i]) <= 3 && !$rightEndFound) {
+					if (preg_match("/(big|bad|job|jam|joy|max|mol)/i", $valSplit[$i], $matches) < 0 && strlen($valSplit[$i]) <= 3 && !$rightEndFound) {
 						$uWordCount++;
 						unset($valSplit[$i]);
 					} else {
@@ -137,15 +137,15 @@ class Keywords {
 
 		// Split by predifined delimiters.
 
-		if (preg_match_all('/(, | en | and |&|-| i.s.m. | ism | ft. | feat. | -- | met |: |\/)/', $input, $matches, PREG_OFFSET_CAPTURE) && strlen($input) > $this->charLimit) {
+		if (preg_match_all('/(, | en | and |&| - | i.s.m. | ism | ft. | feat. | -- | met |: |\/)/', $input, $matches, PREG_OFFSET_CAPTURE) && strlen($input) > $this->charLimit) {
 
-			echo $input."\n";
+			//echo $input."\n";
 
 			$delOutputArray = $this->stringParts($matches, $input);
 
 			// Merge string parts if they fit the max character limit
 			foreach($delOutputArray as $key => $delElement) {
-				print_r($delElement);
+				//print_r($delElement);
 				$outputString = $delElement['string'];
 				if ($key < count($delOutputArray)-1) {
 					$merged = trim(substr($input, $delElement['startPos'], $delOutputArray[$key+1]['endPos']+$delOutputArray[$key+1]['startPos']));
@@ -221,7 +221,7 @@ class Keywords {
 			}
 
 			// Split by predifined delimiters if string length is more than character limit
-			if (preg_match_all('/( )/', $delString, $matches, PREG_OFFSET_CAPTURE) && strlen($delString) > $this->charLimit && count($delOutput) <= 1) {
+			if (preg_match_all('/( )/', $delString, $matches, PREG_OFFSET_CAPTURE) && strlen($delString) > $this->charLimit /*&& count($delOutput) <= 1*/) {
 
 				$outputArray = array_merge($outputArray, $this->splitString($delString, $this->stringParts($matches, $delString), $this->charLimit));
 
@@ -254,7 +254,7 @@ class Keywords {
 				$DuplicateKeywords = array_fill(0, count($placements), trim($tempKeyword));
 
 				// Split keyword by space
-				if ($_GET['splitKeywords'] == 'true') {
+				if (isset($_GET['splitKeywords']) && $_GET['splitKeywords'] == 'true') {
 					$placementsList = $placements;
 					$splittedKeyword = explode(' ', $tempKeyword);
 					foreach($splittedKeyword as $splitted) {
@@ -317,7 +317,7 @@ class Keywords {
 	}
 }
 
-#$keywordsObj = new Keywords("Club Guy & Roni / Slagwerk Den Haag / Göteborgsoperans Danskompani", array("Stadsgehoorzaal"), "Leiden", array("concert", "muziek", "live"), "title");
+#$keywordsObj = new Keywords("Boris de Leeuw - masterclass klassiek ballet op het toneel", array("Stadsgehoorzaal"), "Leiden", array("concert", "muziek", "live"), "title");
 #print_r($keywordsObj);
 #echo json_encode($keywordsObj);
 ?>
