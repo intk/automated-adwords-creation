@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+ini_set('display_errors', 1);
 
 class Keywords {
 	private $charLimit;
@@ -80,7 +81,9 @@ class Keywords {
 			$partsAmount--;
 
 			//Only merge string when character length <= character limit
-			$merge .= $stringParts[$key]['string'].' ';
+			if (isset($stringParts[$key]['string'])) {
+				$merge .= $stringParts[$key]['string'].' ';
+			}
 			if (strlen(trim($merge)) <= $maxLength) {
 
 				$output[$outputKey] = $merge;
@@ -92,8 +95,9 @@ class Keywords {
 				// Loop splitted string values in descending order until string end doesn't unnecessary contain words with <=3 character length
 				$rightEndFound = false;
 				$uWordCount = 0;
+				print_r($valSplit);
 				for ($i = count($valSplit); $i >= 0; $i--) {
-					if (preg_match("/(big|bad|job|jam|joy|max|mol)/i", $valSplit[$i], $matches) < 0 && strlen($valSplit[$i]) <= 3 && !$rightEndFound) {
+					if (array_key_exists($i, $valSplit) == false || (array_key_exists($i, $valSplit) && !preg_match("/(big|bad|job|jam|joy|max|mol)/i", $valSplit[$i], $matches) && strlen($valSplit[$i]) <= 3) && $rightEndFound == false) {
 						$uWordCount++;
 						unset($valSplit[$i]);
 					} else {
@@ -160,7 +164,7 @@ class Keywords {
 				}
 
 				$delElement = $delOutputArray[$key];
-				if ($delElement['merged'] == false) {
+				if (array_key_exists('merged', $delElement) == false || array_key_exists('merged', $delElement) == true && $delElement['merged'] == false) {
 					$delOutput[$key] = $outputString;
 				}
 
