@@ -1,10 +1,11 @@
 <?php
 header('Content-Type: application/json');
-ini_set('display_errors', 1);
+#ini_set('display_errors', 1);
 
 class Keywords {
 	private $charLimit;
 	public function __construct($title, $venue, $city, $placements, $type) {
+		// Don't use title longer than 80 characters
 
 		$this->type = $type;
 		$this->title = $title;
@@ -76,26 +77,38 @@ class Keywords {
 		$output = array();
 		$outputKey = 0;
 		$merge = '';
+		// Defines the actual key of each string element, before the splitting.
+		$keyOrig = 0;
 
 		while ($partsAmount >= 0) {
 			$partsAmount--;
 
 			//Only merge string when character length <= character limit
 			if (isset($stringParts[$key]['string'])) {
+				// Merge string parts
 				$merge .= $stringParts[$key]['string'].' ';
 			}
+
 			if (strlen(trim($merge)) <= $maxLength) {
 
-				$output[$outputKey] = $merge;
+
+				// Check if end of original string has been reached
+				if ($keyOrig >= count($stringParts)-1) {
+					// If end is reached, remove last space from string
+					$output[$outputKey] = trim($merge);
+				} else {
+					$output[$outputKey] = $merge;
+				}
 
 			} else {
+
 				// If first string part ends with an unnecessary <= 3 characters word, remove that word
 				$valSplit = explode(' ', $output[$outputKey]);
 
 				// Loop splitted string values in descending order until string end doesn't unnecessary contain words with <=3 character length
 				$rightEndFound = false;
 				$uWordCount = 0;
-				print_r($valSplit);
+
 				for ($i = count($valSplit); $i >= 0; $i--) {
 					if (array_key_exists($i, $valSplit) == false || (array_key_exists($i, $valSplit) && !preg_match("/(big|bad|job|jam|joy|max|mol)/i", $valSplit[$i], $matches) && strlen($valSplit[$i]) <= 3) && $rightEndFound == false) {
 						$uWordCount++;
@@ -119,6 +132,7 @@ class Keywords {
 				$outputKey++;
 			}
 			$key++;
+			$keyOrig++;
 		} 
 		return $output;
 	}
@@ -140,8 +154,7 @@ class Keywords {
 		*/
 
 		// Split by predifined delimiters.
-
-		if (preg_match_all('/(, | en | and |&| - | i.s.m. | ism | ft. | feat. | -- | met |: |\/)/', $input, $matches, PREG_OFFSET_CAPTURE) && strlen($input) > $this->charLimit) {
+		if (preg_match_all('/(, | and |&| - | i.s.m. | ism | ft. | feat. | -- | met |: |\/)/', $input, $matches, PREG_OFFSET_CAPTURE) && strlen($input) > $this->charLimit) {
 
 			//echo $input."\n";
 
@@ -149,7 +162,6 @@ class Keywords {
 
 			// Merge string parts if they fit the max character limit
 			foreach($delOutputArray as $key => $delElement) {
-				//print_r($delElement);
 				$outputString = $delElement['string'];
 				if ($key < count($delOutputArray)-1) {
 					$merged = trim(substr($input, $delElement['startPos'], $delOutputArray[$key+1]['endPos']+$delOutputArray[$key+1]['startPos']));
@@ -163,16 +175,20 @@ class Keywords {
 
 				}
 
-				$delElement = $delOutputArray[$key];
+				#print_r($delOutputArray);
+
+				$delOutput[$key] = $delOutputArray[$key]['string'];
+
+				/*
 				if (array_key_exists('merged', $delElement) == false || array_key_exists('merged', $delElement) == true && $delElement['merged'] == false) {
-					$delOutput[$key] = $outputString;
+				$delOutput[$key] = $outputString;
 				}
-
-
+				*/
 
 			}
 
 			$this->newAdgroup = true;
+
 
 		} else {
 
@@ -321,7 +337,8 @@ class Keywords {
 	}
 }
 
-#$keywordsObj = new Keywords("Boris de Leeuw - masterclass klassiek ballet op het toneel", array("Stadsgehoorzaal"), "Leiden", array("concert", "muziek", "live"), "title");
+#$keywordsObj = new Keywords("Mini-college van Pieter Roelofs, hoofd Schilder- en Beeldhouwkunst van het Rijksmuseum", array("Stadsgehoorzaal"), "Leiden", array("concert", "muziek", "live"), "title");
 #print_r($keywordsObj);
+#echo memory_get_usage();
 #echo json_encode($keywordsObj);
 ?>
