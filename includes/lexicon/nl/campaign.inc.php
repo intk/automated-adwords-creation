@@ -63,7 +63,7 @@ class Lexicon {
 		$this->adPlacement['dance'] = array('dans', 'een danssshow', 'de danssshow');
 		$this->adPlacement['movie'] = array('film', 'de film', 'de film',);
 		$this->adPlacement['concert'] = array('concert', 'een concert', 'het concert');
-		$this->adPlacement['music'] = array('concert', 'een concert', 'het concert');
+		$this->adPlacement['music'] = array('muziek', 'een concert', 'het concert');
 		$this->adPlacement['classic'] = array('concert', 'een concert', 'het concert');
 		$this->adPlacement['expo'] = array('expo', 'de expo', 'de expo');
 		$this->adPlacement['opera'] = array('opera', 'opera', 'de opera');

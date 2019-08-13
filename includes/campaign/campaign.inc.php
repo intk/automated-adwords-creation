@@ -5,6 +5,7 @@
 // Include lexicon
 include('includes/lexicon/'.$lang.'/campaign.inc.php');
 
+// Include keywords module
 include('includes/methods/keywords/keywords.inc.php');
 
 //Contains name, date, target location, sitelink extentions, AdGroups, Ads, keywords
@@ -45,7 +46,13 @@ class Campaign {
 		} 
 		$this->city = $production->location;
 		$this->genre = $production->genre;
-		$this->performers = $production->performers;
+		if (isset($production->performers)) {
+			$this->performers = $production->performers;
+		} else {
+			$this->performers = false;
+		}
+		// Define date as object
+		$this->date = new stdClass();
 		$this->date->time = $itemDate;
 		$this->date->GaDate = $this->formatDate($itemDate)[0];	
 		$this->date->AdDate = $this->formatDate($itemDate)[1];
@@ -163,7 +170,7 @@ class Campaign {
 		//Loop keyword list
 		foreach($placements as $keyWord => $keyValue) {
 			//Check if genre has keyword array
-			if (stripos($genre, $keyWord) !== false) {
+			if (stripos($genre, $keyValue[0]) !== false) {
 				$placementsList = $keyValue;
 			}
 		}
@@ -243,7 +250,7 @@ class Campaign {
 		}
 
 		foreach ($keywordsObj->adgroup as $key => $adgroup) {
-
+			$this->adgroup[$key] = new stdClass();
 			$this->adgroup[$key]->name = $adgroup['name'];
 			$this->adgroup[$key]->type = $adgroup['type'];
 
@@ -382,16 +389,21 @@ class Campaign {
 		$pLabel->music = $this->lexicon->adPlacement['music'];
 		$pLabel->classic = $this->lexicon->adPlacement['classic'];
 		$pLabel->performance = $this->lexicon->adPlacement['performance'];
-		
+	
 		$genre = $this->genre[0];
 
 		// Determine if genre of performance has close match with predefined genres
-		foreach ($pLabel as $tempGenre) {
-			if (strpos($genre, $tempGenre[0]) > 1) {
-				$tLabel = $pLabel->$tempGenre;
-				$genre = $tempGenre;
+		$foundGenre = false;
+		foreach ($pLabel as $key => $tempGenre) {
+
+			if (stripos($genre, $tempGenre[0]) > -1) {
+				$tLabel = $tempGenre;
+				$genre = $tempGenre[0];
+				$foundGenre = true;
 			} else {
-				$tLabel = $pLabel->performance;
+				if (!$foundGenre) {
+					$tLabel = $pLabel->performance;
+				}
 			}
 		}
 		
@@ -490,8 +502,16 @@ class Campaign {
 
 					//Sort first description length from short to long. Needed to iterate them to fit the 90 characters.
 					foreach ($adProperties->description1 as $description1) {
-						$description = $this->replaceTpl($description1, $replace, $replacement, 90);
 
+						$description = $this->replaceTpl($description1, $replace, $replacement, 90);
+						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
+						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
+							$ad[$adkey]->description[0] = $description;
+						}
+						// Try to add the full title to the description if it fits the 90 characters
+						$tempReplacement = $replacement;
+						$tempReplacement[1] = $this->title;
+						$description = $this->replaceTpl($description1, $replace, $tempReplacement, 90);
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
 						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
 							$ad[$adkey]->description[0] = $description;
@@ -502,7 +522,15 @@ class Campaign {
 					//Sort second description length from short to long. Needed to iterate them to fit the 90 characters.
 					foreach ($adProperties->description2 as $description2) {
 						$description = $this->replaceTpl($description2, $replace, $replacement, 90);
+						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
+						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
+							$ad[$adkey]->description[1] = $description;
+						}
 
+						// Try to add the full title to the description if it fits the 90 characters
+						$tempReplacement = $replacement;
+						$tempReplacement[1] = $this->title;
+						$description = $this->replaceTpl($description2, $replace, $tempReplacement, 90);
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
 						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
 							$ad[$adkey]->description[1] = $description;
