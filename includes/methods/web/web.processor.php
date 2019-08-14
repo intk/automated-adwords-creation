@@ -225,7 +225,7 @@ for($i=1;$i<=$number;$i++) {
 	//}
 foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $production) {
 
-	echo $production->plaintext."\n\n";
+	//echo $production->plaintext."\n\n";
 
 	//Check if title, subtitle and date are placed in same tag
 	if ($tags['title'] == $tags['subtitle'] && $tags['date'] == $tags['title']) {
@@ -283,6 +283,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		}
 		if (preg_match("/\d{4}-\d{2}-\d{2}/", $tags['date'], $match)) {
 			$date = trimString($tags['date']);
+			$genre = $production->find($tags['genre'], 0)->plaintext;
 		} else {
 			$genre = $production->find($tags['genre'], 0)->plaintext;
 			if (count($production->find($tags['date'])) > 3) {
@@ -305,6 +306,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			}
 			
 		}
+
 		// Determine if date is an attribute of a dom element
 		if (array_key_exists('date', $tags) && strpos($tags['date'], 'itemprop') > 1) {
 			$date = trimString($production->find($tags['date'], -1)->content);
@@ -380,7 +382,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 
 	//Custom added 
-	print_r(array($title, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
+	#print_r(array($title, $tags['genre'], $production->find($tags['genre'], 0)->plaintext, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
 
 	// Filter by month
 	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {
@@ -466,7 +468,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				$productionObj->link = substr($productionObj->link, strpos($productionObj->link, $tags['baseUrl'])+strlen($tags['baseUrl']));
 			}
 
-			echo $productionObj->link;
+			//echo $productionObj->link;
 
 
 			$productionObj->date->time = $time;
