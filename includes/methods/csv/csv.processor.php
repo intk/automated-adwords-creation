@@ -1,12 +1,13 @@
 <?php
 function createCSV($theatre, $monthYear, $dailybudget, $location, $status, $package) {
+
 $data = array (
 	"campaign" => $package->campaign->name,
 	"labels" => "Automation;".implode(';', $package->campaign->genre),
 	"campaignDailyBudget" => str_replace(',', '.', $dailybudget),
 	"campaignType" => "Search Network only",
 	"networks" => "Google search",
-	"languages" => "nl",
+	"languages" => $package->campaign->language,
 	"bidStrategyType" => "Maximize conversions",
 	"bidStrategyName" => "",
 	"enhancedCPC" => "disabled",
@@ -166,9 +167,10 @@ for ($i = 0; $i < count($package->campaign->adgroup); $i++) {
 		*/
 		
 		$list[$i+count($list)] = $adArr;
-		if ($package->campaign->adgroup[$i]->name == "Performers" || $package->campaign->adgroup[$i]->type == "performer" && $key == 2) {
-			$list[$i+count($list)] = $adArr;
-		}
+
+		/*if ($package->campaign->adgroup[$i]->name == "Performers" || $package->campaign->adgroup[$i]->type == "performer" && $key >= 2) {*/
+		$list[$i+count($list)] = $adArr;
+		//}
 	}
 }
 
@@ -176,15 +178,20 @@ for ($i = 0; $i < count($package->campaign->adgroup); $i++) {
 $LocArr = $temp;
 $LocArr[array_search("campaign", array_keys($data))] = $data['campaign'];
 $LocArr[array_search("campaignStatus", array_keys($data))] = $data['campaignStatus'];
-if ($location == "Nederland") {
+if ($location == "Nederland" || $location == "Netherlands") {
 	$LocArr[array_search("ID", array_keys($data))] = "2528";
 	$LocArr[array_search("Location", array_keys($data))] = $location;
-	$LocArr[array_search("Reach", array_keys($data))] = "20000000";
+	$LocArr[array_search("Reach", array_keys($data))] = "25600000";
 }
 if (stripos($location, "Belg") !== false) {
 	$LocArr[array_search("ID", array_keys($data))] = "2056";
 	$LocArr[array_search("Location", array_keys($data))] = "België";
 	$LocArr[array_search("Reach", array_keys($data))] = "8540000";
+}
+if (stripos($location, "Spain") !== false) {
+	$LocArr[array_search("ID", array_keys($data))] = "2724";
+	$LocArr[array_search("Location", array_keys($data))] = $location;
+	$LocArr[array_search("Reach", array_keys($data))] = "38300000";
 }
 
  else {
