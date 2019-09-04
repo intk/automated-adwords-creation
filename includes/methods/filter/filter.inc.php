@@ -1,5 +1,6 @@
 <?php
 // Sanitize & trim string
+
 function trimString($string) {
 
 	
@@ -21,7 +22,7 @@ function trimString($string) {
 	//Remove curly single and double quotes from string
 	
 	//Replace UTF-8 special characters
-	$string = str_replace(array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6", "\xc3\xa0", "\xc3\xa4", "\xc3\xa9", "\xc3\xab", "\xc3\xbc", "&#39;", '&#039;', '&#038;', '&#8211;'), array("'", "'", '"', '"', '-', '--','...', "à", "ä", "é", "ë", "ü", "'", "'", "&", "-"), $string);
+	$string = str_replace(array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6", "\xc3\xa0", "\xc3\xa4", "\xc3\xa9", "\xc3\xab", "\xc3\xbc", "&#39;", '&#039;', '&#038;', '&#8211;', 'Ø'), array("'", "'", '"', '"', '-', '--','...', "à", "ä", "é", "ë", "ü", "'", "'", "&", "-", 'O'), $string);
 	
 	/*
 	//Replace Windows special characters
@@ -33,7 +34,7 @@ function trimString($string) {
 		$output = str_replace(array("&#39;", "/"), array("'","-"), $string);
 	}
 	*/
-	return $string;
+	return iconv("UTF-8","UTF-8//IGNORE",$string);
 
 }
 ?>
