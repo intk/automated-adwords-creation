@@ -26,7 +26,7 @@
 <?php
 */
 session_start();
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 include('includes/config.inc.php');
  header("Access-Control-Allow-Origin: *");
 
@@ -76,14 +76,20 @@ if (isset($_GET['lang']) && file_exists('includes/lexicon/'.filter_var($_GET['la
 	$lang = 'nl';
 }
 
+// Include lexicon
+include('includes/lexicon/'.$lang.'/campaign.inc.php');
+
 //Check if query string matches database records
 if ($_GET['theater']) {
+
+	//Set client character set to utf-8
+	mysqli_query($connect, "SET NAMES 'utf8'");
 
 	//Get custom templates by theater ID
 	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
 	if (mysqli_num_rows($query) < 1) {
 		// If no custom template is available, use default template
-		$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = 0 WHERE theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+		$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = 0 WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
 	}
 	
 	if (mysqli_num_rows($query) >= 1) {
@@ -106,7 +112,7 @@ if ($_GET['theater']) {
 		} else {
 			$venue = null;
 		}
-		$theater = new Theater($result['alias'], $month, $venue);
+		$theater = new Theater($result['alias'], $month, $venue, $result['language']);
 		$_SESSION['INTK-processID'] = base64_encode($theater->name.'_'.time());
 	
 		if ($_SESSION['INTK-processID']) {
@@ -155,8 +161,7 @@ if ($_GET['theater']) {
 					
 					//Import performance data to database
 					$select = mysqli_query($connect, "SELECT * FROM performances WHERE theaterId=".$result['id']." AND title='".$item->title."' AND performanceDate = '".$item->date->time."'");
-					$selectResult = mysqli_fetch_assoc($select);
-					if (count($selectResult) < 1) {
+					if (!$select || mysqli_num_rows($select) < 1) {
 						$import = mysqli_query($connect, "INSERT INTO performances (theaterId, title, subtitle, genre, performanceDate, creationDate, link) VALUES (".$result['id'].", '".$item->title."', '".$item->subtitle."', '".implode(';', $item->genre)."', '".$item->date->time."', '".time()."', '".$item->link."')");
 
 					}

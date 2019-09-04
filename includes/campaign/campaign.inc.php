@@ -1,9 +1,6 @@
 <?php
 #error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-// Include lexicon
-include('includes/lexicon/'.$lang.'/campaign.inc.php');
+#ini_set('display_errors', 1);
 
 // Include keywords module
 include('includes/methods/keywords/keywords.inc.php');
