@@ -4,6 +4,8 @@
 class Theater {
     public function __construct($name, $month, $venue) {
 		include('config.inc.php');
+		//Set client character set to utf-8
+		mysqli_query($connect, "SET NAMES 'utf8'");
 		//Obtain database records
 		$query = mysqli_query($connect, "SELECT * FROM theaters WHERE alias LIKE '%".$name."%'");
 		//Check if theater exists in database
@@ -17,9 +19,9 @@ class Theater {
 			
 			//Add different location formats
 			$location['city'] = $result['location'];
-			$location['venue'][0] = $result['name'];
+			$location['venue'][0] = utf8_encode($result['name']);
 			if (strlen($result['shortName']) > 1) {
-				$location['venue'][1] = $result['shortName'];
+				$location['venue'][1] = utf8_encode($result['shortName']);
 			}
 			//'exclude' parameter for preventing irrelevant campaign creation
 			$this->productions = $this->scrape($result['method'], $result['url'], $result['tags'], $location, $month, $venue, $result['exclude']);
