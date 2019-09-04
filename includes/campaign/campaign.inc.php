@@ -1,6 +1,6 @@
 <?php
 #error_reporting(E_ALL);
-#ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 
 // Include lexicon
 include('includes/lexicon/'.$lang.'/campaign.inc.php');
@@ -39,6 +39,10 @@ class Campaign {
 		if (strlen($this->name) > 120) {
 			$this->name = trim(substr($this->name, 0, strpos($this->name, ' - ')));
 		}
+		// Add language to campaign name
+		if (strpos($lang, 'nl') === false) {
+			$this->name = '['.strtoupper($lang).'] '.$this->name;
+		} 
 		$this->language = $lang;
 		$this->venue = $production->venue;
 		if (array_key_exists(1, $this->venue) == false) {
