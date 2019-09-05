@@ -1,5 +1,5 @@
 <?php
-/* Campaign Dutch lexicon */
+/* Dutch campaign lexicon */
 
 class Lexicon {
 	public function __construct() {
@@ -71,8 +71,8 @@ class Lexicon {
 		$this->adPlacement['performance'] = array('voorstelling', 'een voorstelling', 'de voorstelling');
 
 
-		// Prepositions to remove from end of ad group name
-		$this->prepositions = array('van', 'aan', 'voor', 'naast', 'in', 'op', 'door', 'over', 'uit', 'onder', 'om', 'tegen', 'aan', 'buiten', 'langs', 'tijdens', 'sinds', 'bij', 'tot', 'zonder', 'met', 'behalve', 'naar', 'na', 'via', 'per', 'te', 'tegen', 'volgens');
+		// Prepositions to remove from end or beginning of ad group name
+		$this->prepositions = array('van', 'door', 'met');
 	}
 
 }

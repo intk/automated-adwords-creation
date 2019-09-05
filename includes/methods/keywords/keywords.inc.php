@@ -1,16 +1,17 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 #ini_set('display_errors', 1);
 
 class Keywords {
 	private $charLimit;
+	private $lexicon;
 	public function __construct($title, $venue, $city, $placements, $type) {
 		// Don't use title longer than 80 characters
 
 		$this->type = $type;
 		$this->title = $title;
 		$this->charLimit = 30;
-
+		$this->lexicon = new Lexicon();
 		// Use short venue name when character length of venue name is >= Character Limit
 		if (strlen($venue[0]) > $this->charLimit && array_key_exists(1, $venue)) {
 			$this->venue = $venue[1];
@@ -259,6 +260,14 @@ class Keywords {
 		*/
 
 		foreach ($tempOutputArray as $key => $tempKeyword) {
+
+			//Remove prepositions on start or end of keyword string
+			$splitTempKeyword = explode(' ',$tempKeyword);
+			$firstWord = $splitTempKeyword[0];
+			$lastWord = $splitTempKeyword[count($splitTempKeyword)-1];
+			if (in_array($firstWord, $this->lexicon->prepositions) || in_array($lastWord, $this->lexicon->prepositions)) {
+				$tempKeyword = trim(str_replace($this->lexicon->prepositions, "", $tempKeyword));
+			}
 
 			// Create keywords for each new adgroup
 			if ($this->newAdgroup == 'true' || count($tempOutputArray) == 1) {
