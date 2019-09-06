@@ -31,6 +31,9 @@ class Lexicon {
 		$this->monthFull[10] = 'novembre';
 		$this->monthFull[11] = 'desembre';
 
+		// Date format
+		$this->dateFormat = '%DD de %MM';
+
 		// Keyword suffixes
 		$this->keyword['theatre'] = 'teatre';
 		$this->keyword['tickets'] = 'entrades';

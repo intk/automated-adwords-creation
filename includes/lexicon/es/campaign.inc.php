@@ -5,9 +5,9 @@ class Lexicon {
 	public function __construct() {
 
 		// Define months
-		$this->monthAbbr[0] = 'enero';
+		$this->monthAbbr[0] = 'ene';
 		$this->monthAbbr[1] = 'feb';
-		$this->monthAbbr[2] = 'marzo';
+		$this->monthAbbr[2] = 'mar';
 		$this->monthAbbr[3] = 'abr';
 		$this->monthAbbr[4] = 'mayo';
 		$this->monthAbbr[5] = 'jun'; 
@@ -18,18 +18,21 @@ class Lexicon {
 		$this->monthAbbr[10] = 'nov';
 		$this->monthAbbr[11] = 'dic';
 
-		$this->monthFull[0] = 'de enero';
-		$this->monthFull[1] = 'de febrero';
-		$this->monthFull[2] = 'de marzo';
-		$this->monthFull[3] = 'de abril';
-		$this->monthFull[4] = 'de mayo';
-		$this->monthFull[5] = 'de junio'; 
-		$this->monthFull[6] = 'de julio';
-		$this->monthFull[7] = 'de agosto';
-		$this->monthFull[8] = 'de septiembre';
-		$this->monthFull[9] = 'de octubre';
-		$this->monthFull[10] = 'de noviembre';
-		$this->monthFull[11] = 'de diciembre';
+		$this->monthFull[0] = 'enero';
+		$this->monthFull[1] = 'febrero';
+		$this->monthFull[2] = 'marzo';
+		$this->monthFull[3] = 'abril';
+		$this->monthFull[4] = 'mayo';
+		$this->monthFull[5] = 'junio'; 
+		$this->monthFull[6] = 'julio';
+		$this->monthFull[7] = 'agosto';
+		$this->monthFull[8] = 'septiembre';
+		$this->monthFull[9] = 'octubre';
+		$this->monthFull[10] = 'noviembre';
+		$this->monthFull[11] = 'diciembre';
+
+		// Date format
+		$this->dateFormat = '%DD de %MM';
 
 		// Keyword suffixes
 		$this->keyword['theatre'] = 'teatro';

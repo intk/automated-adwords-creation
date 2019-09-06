@@ -106,7 +106,8 @@ class Campaign {
 		if ($day < 10) { $day = substr($day, 1); }
 		$output[0] = date('M d, Y', $time);
 		$output[1] = $day.' '.str_ireplace($monthEN, $monthAbbr, date('M', $time)).'.';
-		$output[2] = $day.' '.str_ireplace($monthEN, $monthFull, date('M', $time));
+		$output[2] = str_replace(array('%DD', '%MM'), array($day, str_ireplace($monthEN, $monthFull, date('M', $time))), $this->lexicon->dateFormat);
+
 		$output[3] = date('Y-m-d', $time);
 		return $output;
 	}
