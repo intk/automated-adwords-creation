@@ -1,0 +1,147 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "¿Espectáculos de [title]?"
+      ],
+      "heading2": [
+        "Visita el [venueShort]",
+        "[venue]",
+        "Visita el [venue]"
+      ],
+      "heading3": ["[date] en [location]"],
+      "description1":[
+        "Ven a la obra de [title]? Compra tus tickets.",
+        "Ven a la obra de [title] en [venue]? Compra tus tickets.",
+        "Ven a la obra de [title] en [venue]? Compra tus tickets online.",
+        "Ven a la obra de [title] en [venue]? Compra tus tickets para el [date]"
+      ],
+      "description2":[
+        "Encuentra [genreSentence] [title] en [venue].",
+        "Descubre [genre] con [performer] en el [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "¿Quieres ver el [title]?"
+      ],
+      "heading2": ["[genre] el [date]"],
+      "heading3": [
+        "Conoce el [venueShort]",
+        "[venue]",
+        "Conoce el [venue]"
+      ],
+      "description1":[
+        "Descubre [title] en [venue].",
+        "Descubre [title] en [date] en el [venue].",
+        "Ven el espectáculo del [title] el [date] en el [venue].",
+        "Ven [title] el [dateFull]. Visita el [venue]."
+      ],
+      "description2":[
+        "Planea tu visita en el teatro y compra tus entradas en línea.",
+        "Descubre más información sobre este innovador espectáculo y reserva tus entradas aquí"
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": ["[venueShort]", "[venue]"],
+      "heading3": ["[genre] el [date]"],
+      "description1":[
+        "¿Te gusta [title]? Compra tus entradas.",
+        "¿Te gusta [title]? Compra tus entradas ahora.",
+        "¿Te gusta [title]? Visita el [venue]. Compra tus entradas para [date]",
+        "¿Te gusta [title]? Visita el [venue]. Compra tus entradas online para [date]",
+        "¿Te gusta [title]? con [performer]? Compra tus entradas para [date]",
+        "¿Te gusta [title]? con [performer]? Compra tus entradas para [date]"
+      ],
+      "description2":[
+        "Encuentra [title] en el programa del [venue]."
+      ]
+    }]
+  },
+  
+  
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Quires ir a ver [performer]?"
+      ],
+      "heading2": [
+        "Visita [venueShort]",
+        "[venue]",
+        "Visita [venue]"
+      ],
+      "heading3": ["[date] en [location]"],
+      "description1":[
+        "¿Descubre [performer]? Compra tus entradas.",
+        "¿[performer] llega al [venue]? Compra tus entradas.",
+        "¿[performer] en el [venue]? Compra tus entradas online.",
+        "¿[performer] en el [venue]? Compra tus entradas para [date]"
+      ],
+      "description2":[
+        "Encuentra [genreSentence] [title] en [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Quieres ver a [performer]?"
+      ],
+      "heading2": [
+        "[date] en [venueShort]",
+        "[venue]",
+        "[date] en [venue]"
+      ],
+      "heading3": [
+        "[title]",
+        "Visita [title]",
+        "Ven al [title]"
+      ],
+      "description1":[
+        "Descubre [performer] tocar en [date].",
+        "Descubre [performer] en [venue].",
+        "Ven a ver [performer] tocar en [date]. Visita [venue].",
+        "Descubre [title] a manos de [performer]. Visita [venue] en [date]"
+      ],
+      "description2":[
+        "Planea tu visita en el teatro y compra tus tickets online"
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+         "[genre] con [performer]?"
+      ],
+      "heading2": ["[title]"],
+      "heading3": [
+        "[date] en [venueShort]",
+        "[venue]",
+        "[date] en [venue]"
+      ],
+      "description1":[
+        "¿Te gusta [performer]? Compra tus tickets.",
+        "¿Te gusta [performer]? Compra tus tickets ahora.",
+        "¿Te gusta [performer]? Ven al [venue] y compra tus tickets para el [date]",
+        "¿Te gusta [performer]? Ven al [venue]. y compra tus tickets online para el [date]",
+        "¿Te gusta [title] con [performer]? Compra tus tickets para el [date]",
+        "¿Te gusta [title] con [performer]? Compra tus tickets online para el [date]"
+      ],
+      "description2":[
+        "Encuentra el [performer] en el programa del [venue]."
+      ]
+    }]
+  }
+]

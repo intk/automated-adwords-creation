@@ -1,0 +1,141 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Naar [title]?"
+      ],
+      "heading2": [
+        "Bezoek [venueShort]",
+        "[venue]",
+        "Bezoek [venue]"
+      ],
+      "heading3": ["[date] in [location]"],
+      "description1":[
+        "Naar [title] in [venue]? Bestel tickets.",
+        "Naar [title] in [venue]? Bestel tickets online.",
+        "Naar [title] in [venue]? Bestel nu je tickets voor [date]"
+      ],
+      "description2":[
+        "Vind [genreSentence] [title] bij [venue].",
+        "Vind [genre] met [performer] bij [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Naar [title]?"
+      ],
+      "heading2": ["[genre] op [date]"],
+      "heading3": [
+        "Bezoek [venueShort]",
+        "[venue]",
+        "Kom naar [venue]"
+      ],
+      "description1":[
+        "Kom naar [title] bij [venue].",
+        "Kom naar [title] op [date] bij [venue].",
+        "Kom kijken naar [title] op [date] Bezoek [venue].",
+        "Kom kijken naar [title] op [dateFull]. Bezoek [venue]."
+      ],
+      "description2":[
+        "Plan je bezoek naar het theater en bestel je tickets online."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": ["[venueShort]", "[venue]"],
+      "heading3": ["[genre] op [date]"],
+      "description1":[
+        "Geniet van [title] in [venue]. Bestel tickets.",
+        "Geniet van [title] in [venue]. Bestel tickets voor [date]",
+        "Geniet van [title] in [venue]. Bestel tickets online voor [date]",
+        "Geniet van [title] met [performer]. Bestel tickets voor [date]",
+        "Geniet van [title] met [performer]. Bestel tickets online voor [date]"
+      ],
+      "description2":[
+        "Vind [title] in het programma van [venue]."
+      ]
+    }]
+  },
+  
+  
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Naar [performer]?"
+      ],
+      "heading2": [
+        "Bezoek [venueShort]",
+        "[venue]",
+        "Bezoek [venue]"
+      ],
+      "heading3": ["[date] in [location]"],
+      "description1":[
+        "Naar [performer] in [venue]?. Bestel tickets.",
+        "Naar [performer] in [venue]? Bestel tickets online.",
+        "Naar [performer] in [venue]? Bestel nu je tickets voor [date]"
+      ],
+      "description2":[
+        "Vind [genreSentence] [title] bij [venue]"
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Naar [performer]?"
+      ],
+      "heading2": [
+        "[date] bij [venueShort]",
+        "[venue]",
+        "[date] bij [venue]"
+      ],
+      "heading3": [
+        "[title]",
+        "Bezoek [title]",
+        "Kom naar [title]"
+      ],
+      "description1":[
+        "Kom naar [performer]. Bezoek [venue].",
+        "Kom naar [title] met [performer]. Bezoek [venue].",
+        "Kom naar [title] met [performer]. Bezoek [venue] op [date]"
+      ],
+      "description2":[
+        "Plan je bezoek naar het theater en bestel je tickets online."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+         "[genre] met [performer]?"
+      ],
+      "heading2": ["[title]"],
+      "heading3": [
+        "[date] bij [venueShort]",
+        "[venue]",
+        "[date] bij [venue]"
+      ],
+      "description1":[
+        "Geniet van [performer] in [venue]. Bestel tickets.",
+        "Geniet van [performer] in [venue]. Bestel tickets voor [date]",
+        "Geniet van [performer] in [venue]. Bestel tickets online voor [date]",
+        "Geniet van [performer] met [title]. Bestel tickets voor [date]",
+        "Geniet van [title] met [performer]. Bestel tickets online voor [date]"
+      ],
+      "description2":[
+        "Vind [performer] in het programma van [venue]."
+      ]
+    }]
+  }
+]

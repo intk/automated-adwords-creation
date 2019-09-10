@@ -1,0 +1,141 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Go to [title]?"
+      ],
+      "heading2": [
+        "Visit [venueShort]",
+        "[venue]",
+        "Visit [venue]"
+      ],
+      "heading3": ["[date] in [location]"],
+      "description1":[
+        "Go to [title] at [venue]? Order your tickets.",
+        "Go to [title] at [venue]? Order your tickets online.",
+        "Go to [title] at [venue]? Order your tickets for [date]"
+      ],
+      "description2":[
+        "Find [genreSentence] [title] at [venue].",
+        "Find [genre] with [performer] at [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Go to [title]?"
+      ],
+      "heading2": ["[genre] on [date]"],
+      "heading3": [
+        "Visit [venueShort]",
+        "[venue]",
+        "Visit [venue]"
+      ],
+      "description1":[
+        "Discover [title] at [venue].",
+        "Discover [title] on [date] at [venue].",
+        "Watch [title] play on [date] Visit [venue].",
+        "Watch [title] play on [dateFull]. Visit [venue]."
+      ],
+      "description2":[
+        "Plan your visit to the theater and order your tickets online."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": ["[venueShort]", "[venue]"],
+      "heading3": ["[genre] on [date]"],
+      "description1":[
+        "Like [title]? Buy your tickets now.",
+        "Like [title]? Go to [venue]. Order your tickets for [date]",
+        "Like [title]? Go to [venue]. Order your tickets online for [date]",
+        "Like [title] with [performer]? Order your tickets for [date]",
+        "Like [title] with [performer]? Order your tickets online for [date]"
+      ],
+      "description2":[
+        "Find [title] in the program of [venue]."
+      ]
+    }]
+  },
+  
+  
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Go to [performer]?"
+      ],
+      "heading2": [
+        "Visit [venueShort]",
+        "[venue]",
+        "Visit [venue]"
+      ],
+      "heading3": ["[date] in [location]"],
+      "description1":[
+        "Go to [performer] at [venue]? Order your tickets.",
+        "Go to [performer] at [venue]? Order your tickets online.",
+        "Go to [performer] at [venue]? Order your tickets for [date]"
+      ],
+      "description2":[
+        "Find [genreSentence] [title] at [venue]"
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Go to [performer]?"
+      ],
+      "heading2": [
+        "[date] at [venueShort]",
+        "[venue]",
+        "[date] at [venue]"
+      ],
+      "heading3": [
+        "[title]",
+        "Visit [title]",
+        "Come to [title]"
+      ],
+      "description1":[
+        "Discover [performer] at [venue].",
+        "Watch [performer] play on [date] Visit [venue].",
+        "Discover [title] with [performer]. Visit [venue] on [date]"
+      ],
+      "description2":[
+        "Plan your visit to the theater and order your tickets online."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+         "[genre] with [performer]?"
+      ],
+      "heading2": ["[title]"],
+      "heading3": [
+        "[date] at [venueShort]",
+        "[venue]",
+        "[date] at [venue]"
+      ],
+      "description1":[
+        "Like [performer]? Buy your tickets now.",
+        "Like [performer]? Go to [venue] and order your tickets for [date]",
+        "Like [performer]? Go to [venue]. Order your tickets online for [date]",
+        "Like [title] with [performer]? Order your tickets for [date]",
+        "Like [title] with [performer]? Order your tickets online for [date]"
+      ],
+      "description2":[
+        "Find [performer] in the program of [venue]."
+      ]
+    }]
+  }
+]

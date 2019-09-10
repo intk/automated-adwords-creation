@@ -1,0 +1,143 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Vine a veure [title]?"
+      ],
+      "heading2": [
+        "Visita el [venueShort]",
+        "[venue]",
+        "Visita el [venue]"
+      ],
+      "heading3": ["[date] al [location]"],
+      "description1":[
+        "Vols anar a veure [title]? Compra entrades.",
+        "Vols anar a veure [title] al [venue]? Compra entrades.",
+        "Vols anar a veure [title] al [venue]? Compra entrades online.",
+        "Vols anar a veure [title] al [venue]? Compra entrades per [date]"
+      ],
+      "description2":[
+        "Descobreix [genreSentence] [title] al [venue].",
+        "Descobreix [genre] de [performer] al [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Vols visitar el [venue]?"
+      ],
+      "heading2": ["[genre] el [date]"],
+      "heading3": [
+        "Coneix el [venueShort]",
+        "[venue]",
+        "Coneix el [venue]"
+      ],
+      "description1":[
+        "Descobreix [title] al [venue].",
+        "Descobreix [title] el dia [date] al [venue].",
+        "Vine a veure [title] que tindrà lloc [date] Visita [venue].",
+        "Vine a veure [title] que tindrà lloc [dateFull]. Visita [venue]."
+      ],
+      "description2":[
+        "Prepara la teva visita al [venue] i compra entrades online."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": ["[venueShort]", "[venue]"],
+      "heading3": ["[genre] el [date]"],
+      "description1":[
+        "T'agrada [title]? Compra les teves entrades ara.",
+        "T'agrada [title]? Visita el [venue]. Compra les teves entrades per a [date]",
+        "T'agrada [title]? Visita el [venue]. Compra les teves entrades online per a [date]",
+        "T'agrada [title] a mans del [performer]? Compra les teves entrades per [date]",
+        "T'agrada [title] a mans del [performer]? Compra les teves entrades online per [date]"
+      ],
+      "description2":[
+        "Descobreix [title] en el programa del [venue]."
+      ]
+    }]
+  },
+  
+  
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Vine a [performer]?"
+      ],
+      "heading2": [
+        "Visita [venueShort]",
+        "[venue]",
+        "Visita [venue]"
+      ],
+      "heading3": ["[date] en el [location]"],
+      "description1":[
+        "Vols anar a veure [performer]? Compra entrades.",
+        "Vols anar a veure [performer] al [venue]? Compra entrades.",
+        "Vols anar a veure [performer] al [venue]? Compra entrades online.",
+        "Vols anar a veure [performer] al [venue]? Compra entrades per [date]"
+      ],
+      "description2":[
+        "Descobreix [genreSentence] [title] al [venue]"
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Vols veure [performer]?"
+      ],
+      "heading2": [
+        "[date] en el [venueShort]",
+        "[venue]",
+        "[date] en el [venue]"
+      ],
+      "heading3": [
+        "[title]",
+        "Visita [title]",
+        "Vine al [title]"
+      ],
+      "description1":[
+        "Descobreix [performer] al [venue].",
+        "Vine a veure [performer] tocar [date] Visita [venue].",
+        "Descobreix [title] a mans de [performer]. Visita [venue] el [date]"
+      ],
+      "description2":[
+        "Planifiqueu la vostra visita al teatre i demaneu les vostres entrades en línia."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+         "[genre] a mans de [performer]?"
+      ],
+      "heading2": ["[title]"],
+      "heading3": [
+        "[date] al [venueShort]",
+        "[venue]",
+        "[date] al [venue]"
+      ],
+      "description1":[
+        "T'agrada [performer]? Compra les teves entrades ara.",
+        "T'agrada [performer]? Visita el [venue]. Compra les teves entrades per a [date]",
+        "T'agrada [performer]? Go to [venue]. Compra les teves entrades online per a [date]",
+        "T'agrada [title] amb [performer]? Compra les teves entrades per [date]",
+        "T'agrada [title] amb [performer]? Compra les teves entrades online per [date]"
+      ],
+      "description2":[
+        "Descobreix [performer] en el programa del [venue]."
+      ]
+    }]
+  }
+]
