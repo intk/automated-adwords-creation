@@ -3,6 +3,8 @@
 $source = $url;
 $productions = array();
 
+$lexiconTemp = new Lexicon();
+
 function validateDate($date, $format = 'd-m-Y')
 {
     $d = DateTime::createFromFormat($format, $date);
@@ -164,8 +166,45 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			}
 			//Check if genre exist
 			if (count($productionObj->genre) < 1) {
-				$productionObj->genre[0] = 'overig';
+				// Use genres listed in configuration
+				if (strpos($tags['genre'], '/') !== false) {
+					$parts = explode(' ', $tags['genre']);
+					$needleHaystack = explode('/', $parts[0]);
+					if (stripos($production->find($needleHaystack[0]), $needleHaystack[0]) !== false) {
+						$productionObj->genre[0] = $needleHaystack[0];
+					} else {
+						$productionObj->genre[0] = $parts[1];
+					}
+				} else {
+					//$productionObj->genre[0] = 'overig';
+					if (strpos($tags['genre'], ' ') !== false && strpos($tags['genre'], '.') === false) {
+						$parts = explode(' ', $tags['genre']);
+						$productionObj->genre = $parts;
+					}
+				}
+			
 			}
+
+			// Check if predefined genre exists in url
+			if ($tags['genre'] == $tags['link']) {
+				$foundGenre = false;
+				foreach ($lexiconTemp->adPlacement as $key => $tempGenre) {
+
+					if (stripos(trim(toPath($production, $tags['genre'])), $tempGenre[0]) > -1) {
+						$productionObj->genre[0] = $tempGenre[0];
+						$foundGenre = true;
+					} 
+					else {
+						if (!$foundGenre) {
+							$productionObj->genre[0] = $lexiconTemp->adPlacement['performance'][0];
+						}
+					}
+
+				}
+		
+			}
+
+
 			#$productionObj->genre[0] = 'concert';
 			#$productionObj->genre[1] = 'muziek';
 			$productionObj->link = filter_var(trim(toPath($production, $tags['link'])), FILTER_SANITIZE_URL);
