@@ -238,7 +238,7 @@ class Keywords {
 			// Determine if string is written in capitals or in lowercase
 			if (strtoupper($delString) == $delString || strtolower($delString) == $delString) {
 				// Change capitalization to title case
-				$delString = ucwords(strtolower($delString));
+				$delString = ucwords(mb_strtolower($delString, 'UTF-8'));
 			}
 
 			// Split by predifined delimiters if string length is more than character limit

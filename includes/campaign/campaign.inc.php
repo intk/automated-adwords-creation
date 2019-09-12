@@ -78,7 +78,7 @@ class Campaign {
 		// Determine if string is written in capitals or in lowercase
 		if (strtoupper($output) == $output || strtolower($output) == $output) {
 			// Change capitalization to title case
-			$output = ucwords(strtolower($output));
+			$output = ucwords(mb_strtolower($output, 'UTF-8'));
 		}
 		
 		return $output;
