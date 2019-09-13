@@ -1,0 +1,139 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Voir [title]?"
+      ],
+      "heading2": [
+        "Visitez [venueShort]",
+        "[venue]",
+        "Visitez [venue]"
+      ],
+      "heading3": ["le [date] à [location]"],
+      "description1":[
+        "Voir [title] au [venue]? Achetez vos tickets maintenant.",
+        "Voir [title] au [venue]? Achetez vos tickets en ligne.",
+        "Voir [title] au [venue]? Achetez des tickets avant le [date]"
+      ],
+      "description2":[
+        "Trouvez [genreSentence] [title] au [venue].",
+        "Trouvez [genre] avec [performer] au [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Voir [title]?"
+      ],
+      "heading2": ["[genre] le [date]"],
+      "heading3": [
+        "Visitez [venueShort]",
+        "[venue]",
+        "Visitez [venue]"
+      ],
+      "description1":[
+        "Découvrez [title] au [venue].",
+        "Découvrez [title] le [date] au [venue].",
+        "Venez voir [title] au [venue]. Achetez des tickets avant le [date]"
+      ],
+      "description2":[
+        "Planifiez votre visite au théâtre et commandez vos tickets en ligne."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": ["[venueShort]", "[venue]"],
+      "heading3": ["[genre] le [date]"],
+      "description1":[
+        "Fan de [title]? Achetez vos tickets maintenant.",
+        "Fan de [title]? Venez au [venue]. Achetez des tickets avant le [date]",
+        "Fan de [title]? Venez au [venue]. Achetez des tickets en ligne avant le [date]",
+        "Fan de [title] avec [performer]? Achetez des tickets avant le [date]",
+        "Fan de [title] avec [performer]? Achetez des tickets en ligne avant online le [date]"
+      ],
+      "description2":[
+        "Trouvez [title] dans le program de [venue]."
+      ]
+    }]
+  },
+  
+  
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Voir [performer]?"
+      ],
+      "heading2": [
+        "Visitez [venueShort]",
+        "[venue]",
+        "Visitez [venue]"
+      ],
+      "heading3": ["le [date] in [location]"],
+      "description1":[
+        "Voir [performer] au [venue]? Achetez vos tickets maintenant.",
+        "Voir [performer] au [venue]? Achetez vos tickets en ligne.",
+        "Voir [performer] au [venue]? Achetez des tickets avant le [date]"
+      ],
+      "description2":[
+        "Trouvez [genreSentence] [performer] au [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Voir [performer]?"
+      ],
+      "heading2": [
+        "le [date] au [venueShort]",
+        "[venue]",
+        "le [date] au [venue]"
+      ],
+      "heading3": [
+        "[title]",
+        "Visitez [title]"
+      ],
+      "description1":[
+        "Découvrez [performer] au [venue].",
+        "Découvrez [performer] le [date] au [venue].",
+        "Découvrez [performer] avec [title] le [date] au [venue]."
+      ],
+      "description2":[
+        "Planifiez votre visite au théâtre et commandez vos tickets en ligne."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+         "[genre] avec [performer]?"
+      ],
+      "heading2": ["[title]"],
+      "heading3": [
+        "[date] au [venueShort]",
+        "[venue]",
+        "[date] au [venue]"
+      ],
+      "description1":[
+        "Fan de [performer]? Achetez vos tickets maintenant.",
+        "Fan de [performer]? Venez au [venue]. Achetez des tickets avant le [date]",
+        "Fan de [performer]? Venez au [venue]. Achetez des tickets en ligne avant le [date]",
+        "Fan de [performer] avec [title]? Achetez des tickets avant le [date]",
+        "Fan de [performer] avec [title]? Achetez des tickets en ligne avant le [date]"
+      ],
+      "description2":[
+        "Trouvez [performer] dans le program de [venue]."
+      ]
+    }]
+  }
+]
