@@ -6,6 +6,8 @@ $source = $url;
 $tempDate = '';
 $productions = array();
 
+$lexiconTemp = new Lexicon();
+
 // Sanitize & trim string
 include('includes/methods/filter/filter.inc.php');
 
@@ -18,12 +20,12 @@ function validateDate($date, $format = 'd-m-Y') {
 
 
 //Get date format from string
-function dateFromString($string) {
+function dateFromString($string, $lexicon) {
 
 	//Convert string to a date string
 	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
-	$string = str_replace('| ' , ' - ', $string);
-	$splittedDate = preg_split('/(t\/m|&|tm| -| - | to| and | tot )+/i', $string);
+	$string = str_replace(array('&#39;','| ' ), array('\'', ' - '), $string);
+	$splittedDate = preg_split('/(t\/m|&|tm| -| - | to| al | and | tot )+/i', $string);
 
 	// Determine if date and time are separated, choose part with date format
 	if (strpos($splittedDate[count($splittedDate)-1], 'uur') > 1 || strpos($string, ':') > 1) {
@@ -34,10 +36,10 @@ function dateFromString($string) {
 	if (strpos($date,'+') !== false) {
 		$date = substr($date, 0, strpos($date,'+'));
 	}
-	// Exclude days of the week and their abbreviations
-	$date = trim(preg_replace("/(from|maandag| maa |mon|ma |dinsdag|din|tue|di|woensdag|woe|wed|wo|donderdag|don|thu|do|vrijdag|vri|fri|vr|zaterdag|zat|sat|za|zondag|zon|sun|zo|om)/i", "", $date));
 
-	//$date = str_replace('.', '', $date);
+	// Exclude days of the week and their abbreviations
+	$date = trim(preg_replace("/(from|maandag|monday| maa |mon|ma |dinsdag|tuesday|din|tue|di|woensdag|wednesday|woe|wed|wo|donderdag|thursday|don|thu|do|vrijdag|friday|vri|fri|vr|zaterdag|saturday|zat|sat|za|zondag|sunday|zon|sun|zo|om)/i", "", $date));
+	$date = trim(str_replace(array('d\'', ' de '), array('', ' '), $date));
 
 	//Determine if wrong date format has been used
 	if (substr_count($date, '.') > 1) {
@@ -99,7 +101,22 @@ function dateFromString($string) {
 	}
 	
 	// Replace months and their abbreviations
-	$date = str_ireplace(array("januari", "january", "februari", "february", "maart", "march", "mrt", "april", "mei", "may", "juni", "june", "juli", "july", "augustus", "august", "september", "oktober", "october", "okt", "november", "december", "v.a.", " -", "uur", ".", "th", ","), array("jan", "jan", "feb", "feb", "mar", "mar", "mar", "apr", "may", "may", "jun", "jun", "jul", "jul", "aug", "aug", "sep", "oct", "oct", "oct", "nov", "dec", "", "", "", ":", "", ""), $date);
+	$date = str_ireplace(array_merge($lexicon->monthFull, array("v.a.", " -", "uur", ".", "th", ",")), 
+		array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "", "", "", ":", "", ""), $date);
+
+	$date = str_ireplace($lexicon->monthAbbr, 
+		array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), $date);
+
+	$date = str_ireplace(array_map(function($str) {return str_replace('.', '', $str);}, $lexicon->monthAbbr), 
+		array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), $date);
+
+
+	$array = array_map(
+    function($str) {
+        return str_replace('foo', 'bar', $str);
+    },
+    $array
+);
 
 	//Convert string to date format
 	$dateArray = explode(' ', trim($date));
@@ -378,7 +395,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		}	
 	// Get last date of production
 
-	$time = dateFromString($date); 
+	$time = dateFromString($date, $lexiconTemp); 
 
 
 	//Custom added 
@@ -428,7 +445,6 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 					$productionObj->genre = $parts;
 				}
 			}
-			
 
 			if (!$tags['link'])	{
 				$link = 'a';
@@ -502,6 +518,8 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				//$productionObj->venue[0] = trim($locationArr[0]).' '.$productionObj->location;
 
 			}
+
+			#print_r($productionObj);
 
 
 
