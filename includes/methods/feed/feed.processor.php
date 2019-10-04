@@ -78,6 +78,157 @@ function strpos_all($haystack, $needle) {
     return $allpos;
 }
 
+//Get date format from string
+function dateFromString($string, $lexicon) {
+
+
+	//Convert string to a date string
+	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
+	$string = str_replace(array('&#39;','| ' ), array('\'', ' - '), $string);
+	$splittedDate = preg_split('/(t\/m|&|tm| -| - | to| al | and | tot )+/i', $string);
+
+	// Determine if date and time are separated, choose part with date format
+	if (strpos($splittedDate[count($splittedDate)-1], 'uur') > 1 || strpos($string, ':') > 1) {
+		$splittedDate[0] = str_replace('.', ':', $splittedDate[0]);
+		$date = $splittedDate[0];
+	} else {
+		$date = $splittedDate[count($splittedDate)-1];
+	}
+	if (strpos($date,'+') !== false) {
+		$date = substr($date, 0, strpos($date,'+'));
+	}
+
+	// Exclude days of the week and their abbreviations
+	$date = trim(preg_replace("/(from|maandag|monday| maa |mon|ma |dinsdag|tuesday|din|tue|di|woensdag|wednesday|woe|wed|wo|donderdag|thursday|don|thu|do|vrijdag|friday|vri|fri|vr|zaterdag|saturday|zat|sat|za|zondag|sunday|zon|sun|zo|om)/i", "", $date));
+	$date = trim(str_replace(array('d\'', ' de '), array('', ' '), $date));
+
+	//Determine if wrong date format has been used
+	if (substr_count($date, '.') > 1) {
+		// Execute preg_match
+		$date = explode('-',$date)[count(explode('-',$date))-1];
+		if (preg_match("/\d{2}.\d{2}.\d{2}/", $date, $match) && !preg_match("/\d{2}.\d{2}.\d{4}/", $date, $match)) {
+			$dateTemp = trim(str_replace('.','-', $date));
+			$d = DateTime::createFromFormat('d-m-y', $dateTemp);
+			$time = strtotime($d->format('Y-m-d'));
+		}
+		else if (preg_match("/\d{2}.\d{2}.\d{4}/", $date, $match)) {
+			$dateTemp = trim(str_replace('.','-', $date));
+			$d = DateTime::createFromFormat('d-m-Y', $dateTemp);
+			$time = strtotime($d->format('Y-m-d'));
+		}
+	}
+
+	if (substr_count($date, '.') == 1) {
+
+		if (preg_match("/\d{2}.\d{2}/", $date, $match)) {
+			$dateTemp = trim(str_replace('.','-', $date));
+			// Determine year if only day and month is given 
+			$dateEl = explode('-', $dateTemp);
+			if ($dateEl[1] >= date('m')) {
+				$tempYear = date('y');
+			} else {
+				$tempYear = date('y')+1;
+			}
+
+			$d = DateTime::createFromFormat('d-m-y', $dateTemp.'-'.$tempYear);
+			$time = strtotime($d->format('Y-m-d'));
+		}
+	}
+	/*
+	if (substr_count($date, '-') == 1) {
+
+		if (preg_match("/\d{2}-\d{2}/", $date, $match)) {
+			$dateTemp = trim($date);
+			// Determine year if only day and month is given 
+			$dateEl = explode('-', $dateTemp);
+			if ($dateEl[1] >= date('m')) {
+				$tempYear = date('y');
+			} else {
+				$tempYear = date('y')+1;
+			}
+
+			$d = DateTime::createFromFormat('d-m-y', $dateTemp.'-'.$tempYear);
+			$time = strtotime($d->format('Y-m-d'));
+		}
+	}
+	*/
+	else if (substr_count($date, '-') > 1) {
+		$date =  preg_replace('/[\[{\(].*[\]}\)]/u', '', $date);
+		// Execute preg_match
+		if (preg_match("/\d{2}-\d{2}-\d{4}/", $date, $match)) {
+			$d = DateTime::createFromFormat('d-m-Y', $match[0]);
+			$time = strtotime($d->format('Y-m-d'));
+		}
+	}
+	
+	// Replace months and their abbreviations
+	$date = str_ireplace(array_merge($lexicon->monthFull, array("v.a.", " -", "uur", ".", "th", ",")), 
+		array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "", "", "", ":", "", ""), $date);
+
+	$date = str_ireplace($lexicon->monthAbbr, 
+		array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), $date);
+
+	$date = str_ireplace(array_map(function($str) {return str_replace('.', '', $str);}, $lexicon->monthAbbr), 
+		array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), $date);
+
+//Convert string to date format
+	$dateArray = explode(' ', trim($date));
+	$dateArray[1] = str_ireplace(array('01','02','03','04','05','06','07','08','09','10','11 ','12'), array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov ','dec'), $dateArray[1]);
+
+	//if (intval($dateArray[0]) < 10 && strpos($dateArray[0], '0') !== false) { $dateArray[0] = substr($dateArray[0], 1); }
+    if ($time < time()) {
+
+		//Determine if date string is already a valid date format
+		if (validateDate($dateArray[0]) || validateDate(date('d-m-Y', strtotime($date))) || validateDate($date)) {
+			if (strpos($date, ':') !== false) {
+				//$time = strtotime($dateArray[0].' '.$dateArray[count($dateArray)-1]);
+				//Define the year
+				if (strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.date('Y')) < time()) {
+					$year = date('Y')+1;
+				} else {
+					$year = date('Y');
+				}
+				//Convert date to timestamp
+				if (strpos($date, ':') !== false) {
+					$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year.' '.$dateArray[2]);
+				} else {
+					$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year);
+				}
+			} else {
+				$time = strtotime($dateArray[0]);
+				if (strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.date('Y')) < time()) {
+					$year = date('Y')+1;
+				} else {
+					$year = date('Y');
+				}
+				$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year);
+			}
+
+		} else {
+
+			//Define the year
+			if (strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.date('Y')) < time()) {
+				$year = date('Y')+1;
+			} else {
+				$year = date('Y');
+			}
+			if ($dateArray[2] == date('Y') || $dateArray[2] == date('Y')+1) {
+				$year = $dateArray[2];
+			}
+			//$year = '00';
+			//Convert date to timestamp
+			if (strpos($date, ':') !== false) {
+				$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year.' '.$dateArray[2]);
+			} else {
+				$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year);
+			}
+			
+		}
+	}
+	return $time;
+
+}
+
 //Scrape performer names from web page
 include('includes/methods/web/performers.processor.php');
 
@@ -123,6 +274,13 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			}
 		}
 
+		//Determine if date can be found on webpage of performance
+		if (strpos($tags['date'], '.') > -1) {
+			$dom = new simple_html_dom(getWebPage(toPath($production, $tags['link'])));
+			$time = dateFromString(trimString($dom->find($tags['date'], 0)->plaintext), $lexiconTemp);
+
+		}
+
 	}
 
 	// Filter by month
@@ -157,6 +315,15 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			// Put data to object
 			$productionObj->title = trimString(toPath($production, $tags['title']));
 			$productionObj->subtitle = trimString(toPath($production, $tags['subtitle']));
+
+			// Determine if title element contains subtitle
+			if (strlen($productionObj->subtitle) < 1 && strpos($productionObj->title, ' - ') > 1) {
+				$titleParts = explode(' - ', $productionObj->title);
+				$productionObj->title = $titleParts[0];
+				$productionObj->subtitle = $titleParts[1];
+			}
+
+
 			$productionObj->venue = $venue;
 			$productionObj->location = $location['city'];
 			if (count(toPath($production, $tags['genre'])) > 1) {
