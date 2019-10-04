@@ -44,7 +44,11 @@ include('includes/methods/filter/filter.inc.php');
 function listGenres($genre) {
 	$genreArr = array();
 	foreach ($genre as $genreItem) {
-		array_push($genreArr, filter_var(trim($genreItem->attributes()->code), FILTER_SANITIZE_STRING));
+		if (strlen($genreItem->attributes()->code) > 1) {
+			array_push($genreArr, filter_var(trim($genreItem->attributes()->code), FILTER_SANITIZE_STRING));
+		} else {
+			array_push($genreArr, filter_var(trim($genreItem), FILTER_SANITIZE_STRING));
+		}
 	}
 	return $genreArr;
 }
@@ -352,6 +356,11 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			
 			}
 
+			// If genre is still empty, use default genre
+			if (strlen($productionObj->genre[0]) < 1) {
+				$productionObj->genre[0] = $lexiconTemp->adPlacement['performance'][0];
+			}
+
 			// Check if predefined genre exists in url
 			if ($tags['genre'] == $tags['link']) {
 				$foundGenre = false;
@@ -378,7 +387,26 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			$productionObj->date->time = $time;
 			$productionObj->date->dateString = date('d-m-Y H:i', $productionObj->date->time);
 		
-			//$productionObj->performers = getPerformers($productionObj->link, null);
+			// Add performers to production object
+			if (array_key_exists('performers', $tags)) {
+				//If performers are given in feed
+				if (strpos($tags['performers'], '.') === false) {
+						if (strlen(toPath($production, $tags['performers'])) > 1) {
+							$productionObj->performers = explode(',', toPath($production, $tags['performers']));
+
+						}
+
+				// If performers are on the web page
+				} else {
+					if (strlen($productionObj->link) > 1) {
+						$productionObj->performers = getPerformers($productionObj->link, array("performers"=>$tags['performers']));
+					}
+					//$productionObj->performers = getsimilarPerformers($productionObj->title);
+					if (count($productionObj->performers) == 1 && strlen($productionObj->performers[0]) > 1) {
+						$productionObj->subtitle = $productionObj->performers[0];
+					}
+				}
+			}
 
 			// Push object to productions array
 			// Exclude productions with irrelevant tags, title or sold out
