@@ -105,7 +105,15 @@ class Campaign {
 		$day = date('d', $time);
 		if ($day < 10) { $day = substr($day, 1); }
 		$output[0] = date('M d, Y', $time);
-		$output[1] = $day.' '.str_ireplace($monthEN, $monthAbbr, date('M', $time)).'.';
+
+
+		// Determine if custom date format is given. Use custom date format
+		if (isset($this->lexicon->dateFormatShort)) {
+			$output[1] = str_replace(array('%DD', '%MM', '%m', '%Y'), array($day, str_ireplace($monthEN, $monthFull, date('M', $time)), date('n', $time), date('Y', $time)), $this->lexicon->dateFormatShort);
+		} else {
+			$output[1] = $day.' '.str_ireplace($monthEN, $monthAbbr, date('M', $time));
+		}
+
 		$output[2] = str_replace(array('%DD', '%MM'), array($day, str_ireplace($monthEN, $monthFull, date('M', $time))), $this->lexicon->dateFormat);
 
 		$output[3] = date('Y-m-d', $time);
@@ -152,6 +160,12 @@ class Campaign {
 		$placements->dance = array($this->lexicon->keyword['dance'], $this->lexicon->keyword['theater']);
 	    $placements->concert = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['music'], $this->lexicon->keyword['live']);
 	    $placements->expo = array($this->lexicon->keyword['expo'], $this->lexicon->keyword['exhibition']);
+	    if (isset($this->lexicon->keyword['visualArts'])) {
+	   		$placements->visualArts = array($this->lexicon->keyword['visualArts'], $this->lexicon->keyword['exhibition']);
+		}
+		if (isset($this->lexicon->keyword['workshop'])) {
+	   		$placements->workshop = array($this->lexicon->keyword['workshop']);
+		}
 		$placements->show = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['theater']);
 		$placements->music = array($this->lexicon->keyword['music'], $this->lexicon->keyword['concert']);
 		$placements->festival = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['music'], $this->lexicon->keyword['festival'], $this->lexicon->keyword['live']);
@@ -386,6 +400,15 @@ class Campaign {
 		$pLabel->dance = $this->lexicon->adPlacement['dance'];
 		$pLabel->movie = $this->lexicon->adPlacement['movie'];
 		$pLabel->concert = $this->lexicon->adPlacement['concert'];
+		if (isset($this->lexicon->adPlacement['visualArts'])) {
+			$pLabel->visualArts = $this->lexicon->adPlacement['visualArts'];
+		}
+		if (isset($this->lexicon->adPlacement['lecture'])) {
+			$pLabel->lecture = $this->lexicon->adPlacement['lecture'];
+		}
+		if (isset($this->lexicon->adPlacement['workshop'])) {
+			$pLabel->workshop = $this->lexicon->adPlacement['workshop'];
+		}
 		$pLabel->expo = $this->lexicon->adPlacement['expo'];
 		$pLabel->opera = $this->lexicon->adPlacement['opera'];
 		$pLabel->music = $this->lexicon->adPlacement['music'];
@@ -409,12 +432,7 @@ class Campaign {
 			}
 		}
 		
-		//If performance month is equal to May, don't use a dot in the heading.
-		if (strpos($this->date->AdDate, $this->lexicon->monthAbbr[4]) !== false) {
-			$hDate = substr($this->date->AdDate, 0, -1);
-		} else {
-			$hDate = $this->date->AdDate;
-		}
+		$hDate = $this->date->AdDate;
 
 		# If performer ad group, change swap title and performer attribute
 		if ($type == 'performer') {

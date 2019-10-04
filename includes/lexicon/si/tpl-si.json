@@ -1,0 +1,140 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Na [title]?"
+      ],
+      "heading2": [
+        "Obiščite [venueShort]",
+        "[venue]",
+        "Obiščite [venue]"
+      ],
+      "heading3": ["[date] v [location]"],
+      "description1":[
+        "Na [title] v [venue]? Naročite vstopnice.",
+        "Na [title] v [venue]? Kupite vstopnice na spletu.",
+        "Na [title] v [venue]? Kupite vstopnice za [date]"
+      ],
+      "description2":[
+        "Najdite [genreSentence] [title] v [venue].",
+        "Najdite [genre] z [performer] v [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Na [title]?"
+      ],
+      "heading2": ["[genre] [date]"],
+      "heading3": [
+        "Pridite v [venueShort]",
+        "[venue]",
+        "Pridite v [venue]"
+      ],
+      "description1":[
+        "Pridite na [title] v [venue].",
+        "Pridite [date] na [title] v [venue].",
+        "Oglejte si [title] [date]. Obiščite [venue].",
+        "Oglejte si [title] [dateFull]. Obiščite [venue]."
+      ],
+      "description2":[
+        "Polepšajte si večer z obiskom gledališča. Naročite vstopnice prek spleta."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": ["[venueShort]", "[venue]"],
+      "heading3": ["[genre] [date]"],
+      "description1":[
+        "Uživajte v [title] v [venue]. Naročite vstopnice.",
+        "Uživajte v [title] v [venue]. Naročite vstopnice za [date]",
+        "Uživajte v [title] v [venue]. Naročite vstopnice za [date] na spletu.",
+        "Uživajte v [title] z [performer]. Naročite vstopnice za [date]",
+        "Uživajte v [title] v [venue]. Naročite vstopnice za [date] na spletu."
+      ],
+      "description2":[
+        "Poiščite [title] na programu [venue]."
+      ]
+    }]
+  },
+  
+  
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Predstava z [performer]?"
+      ],
+      "heading2": [
+        "Obiščite [venueShort]",
+        "[venue]",
+        "Obiščite [venue]"
+      ],
+      "heading3": ["[date] v [location]"],
+      "description1":[
+        "[performer] v [venue]? Naročite/kupite vstopnice.",
+        "[performer] v [venue]? Naročite/kupite vstopnice na spletu/prek spleta.",
+        "[performer] v [venue]? Naročite/kupite vstopnice za [date]"
+      ],
+      "description2":[
+        "Oglejte si [genreSentence] [title] v [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "[date] v [venueShort]",
+        "[venue]",
+        "[date] v [venue]"
+      ],
+      "heading3": [
+        "[title]",
+        "Obiščite [title]",
+        "Pridite na [title]"
+      ],
+      "description1":[
+        "Oglejte si [performer]. Obiščite [venue].",
+        "Pridite na [title] z [performer]. Obiščite [venue].",
+        "Pridite na [title] z [performer]. Obiščite [venue] [date]"
+      ],
+      "description2":[
+        "Načrtujete obisk gledališča? Kupite/Naročite vstopnice prek spleta."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+         "[genre] z [performer]?"
+      ],
+      "heading2": ["[title]"],
+      "heading3": [
+        "[date] v [venueShort]",
+        "[venue]",
+        "[date] v [venue]"
+      ],
+      "description1":[
+        "Oglejte si [performer] v [venue]. Naročite vstopnice.",
+        "Oglejte si [performer] v [venue]. Naročite vstopnice za [date]",
+        "Oglejte si [performer] v [venue]. Naročite vstopnice za [date] na spletu.",
+        "Oglejte si [performer] v [title]. Naročite vstopnice za [date]",
+        "Uživajte v [title] z [performer]. Naročite vstopnice za [date] na spletu."
+      ],
+      "description2":[
+        "Poiščite [performer] na sporedu [venue]."
+      ]
+    }]
+  }
+]
