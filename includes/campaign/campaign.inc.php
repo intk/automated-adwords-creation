@@ -474,7 +474,7 @@ class Campaign {
 						$heading = $this->replaceTpl($heading1, $replace, $replacement, 30);
 
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && strlen($heading) <= 40)) {
+						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && stripos($heading, '{KeyWord:') > -1 && strlen($heading) <= 40)) {
 							$ad[$adkey]->heading[0] = $heading;
 						}
 
@@ -485,7 +485,7 @@ class Campaign {
 						$heading = $this->replaceTpl($heading2, $replace, $replacement, 30);
 
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && strlen($heading) <= 40)) {
+						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && stripos($heading, '{KeyWord:') > -1 && strlen($heading) <= 40)) {
 							$ad[$adkey]->heading[1] = $heading;
 						}
 
@@ -496,7 +496,7 @@ class Campaign {
 						$heading = $this->replaceTpl($heading3, $replace, $replacement, 30);
 
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && strlen($heading) <= 40)) {
+						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && stripos($heading, '{KeyWord:') > -1 && strlen($heading) <= 40)) {
 							$ad[$adkey]->heading[2] = $heading;
 						}
 
