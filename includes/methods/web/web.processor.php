@@ -24,7 +24,7 @@ function dateFromString($string, $lexicon) {
 
 	//Convert string to a date string
 	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
-	$string = str_replace(array('&#39;','| ' ), array('\'', ' - '), $string);
+	$string = str_replace(array('&nbsp;','&#39;','| ' ), array('','\'', ' - '), $string);
 	$splittedDate = preg_split('/(t\/m|&|tm| -| - | to| al | and | tot )+/i', $string);
 
 	// Determine if date and time are separated, choose part with date format
@@ -51,7 +51,7 @@ function dateFromString($string, $lexicon) {
 			$time = strtotime($d->format('Y-m-d'));
 		}
 		else if (preg_match("/\d{2}.\d{2}.\d{4}/", $date, $match)) {
-			$dateTemp = trim(str_replace('.','-', $date));
+			$dateTemp = trim(str_replace('.','-', $match[0]));
 			$d = DateTime::createFromFormat('d-m-Y', $dateTemp);
 			$time = strtotime($d->format('Y-m-d'));
 		}
@@ -73,6 +73,18 @@ function dateFromString($string, $lexicon) {
 			$time = strtotime($d->format('Y-m-d'));
 		}
 	}
+
+	# Determine if dd/mm/YYYY H:i date format is used
+	if (substr_count($date, ':') == 1) {
+		if (preg_match("/\d{2}\/\d{2}\/\d{4}/", $date, $match)) {
+			$match[0] = str_replace('/', '-', $match[0]);
+			$d = DateTime::createFromFormat('d-m-Y', $match[0]);
+			$time = strtotime($d->format('Y-m-d'));
+		}
+	}
+
+
+
 	/*
 	if (substr_count($date, '-') == 1) {
 
@@ -109,14 +121,6 @@ function dateFromString($string, $lexicon) {
 
 	$date = str_ireplace(array_map(function($str) {return str_replace('.', '', $str);}, $lexicon->monthAbbr), 
 		array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), $date);
-
-
-	$array = array_map(
-    function($str) {
-        return str_replace('foo', 'bar', $str);
-    },
-    $array
-);
 
 	//Convert string to date format
 	$dateArray = explode(' ', trim($date));
@@ -241,8 +245,6 @@ for($i=1;$i<=$number;$i++) {
 		$dom = new simple_html_dom(getWebPage($source.$pagination)); 
 	//}
 foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $production) {
-
-	//echo $production->plaintext."\n\n";
 
 	//Check if title, subtitle and date are placed in same tag
 	if ($tags['title'] == $tags['subtitle'] && $tags['date'] == $tags['title']) {
@@ -393,9 +395,19 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			}
 			
 		}	
+
+	//Determine if date can be found on webpage of performance
+	if (strlen($date) == 0 && strpos($tags['date'], '.') > -1) {
+		$dom = new simple_html_dom(getWebPage($tags['baseUrl'].$link));
+		$date = $dom->find($tags['date'], 0)->plaintext;
+	}
+
+
+
+
 	// Get last date of production
 
-	$time = dateFromString($date, $lexiconTemp); 
+	$time = dateFromString($date, $lexiconTemp);
 
 
 	//Custom added 
