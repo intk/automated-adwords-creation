@@ -38,7 +38,7 @@ function dateFromString($string, $lexicon) {
 	}
 
 	// Exclude days of the week and their abbreviations
-	$date = trim(preg_replace("/(from|maandag|monday| maa |mon|ma |dinsdag|tuesday|din|tue|di|woensdag|wednesday|woe|wed|wo|donderdag|thursday|don|thu|do|vrijdag|friday|vri|fri|vr|zaterdag|saturday|zat|sat|za|zondag|sunday|zon|sun|zo|om)/i", "", $date));
+	$date = trim(preg_replace("/(from|maandag|monday|lun. |mar. |mer. |jeu. |ven. |sam. |dim. | maa |mon|ma |dinsdag|tuesday|din|tue|di|woensdag|wednesday|woe|wed|wo|donderdag|thursday|don|thu|do|vrijdag|friday|vri|fri|vr|zaterdag|saturday|zat|sat|za|zondag|sunday|zon|sun|zo|om)/i", "", $date));
 	$date = trim(str_replace(array('d\'', ' de '), array('', ' '), $date));
 
 	//Determine if wrong date format has been used
