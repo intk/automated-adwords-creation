@@ -298,13 +298,14 @@ class Keywords {
 				}
 
 				// Placements will be placed after the keyword, so it becomes a new keyword
-				$outputArray[$key] = array_merge(array("name"=>$tempKeyword,"type"=>$this->type, "keywords"=>array_merge(array(strtolower($tempKeyword)), array_map(
+				$outputArray[$key] = array_merge(array("name"=>$tempKeyword,"type"=>$this->type, "keywords"=>array_merge(array(strtolower(str_replace(',', '', $tempKeyword))), array_map(
 					function($placement, $keyword) {
 						// Determine if placement doesn't partly match the keyword
 						if (stripos($keyword, $placement) === false) {
-							return strtolower($keyword .' '.$placement);
+							// Remove invalid usage of commas from keyword
+							return strtolower(str_replace(',', '', $keyword .' '.$placement));
 						} else {
-							return strtolower($keyword);
+							return strtolower(str_replace(',', '', $keyword));
 						}
 					}, $placements, $DuplicateKeywords
 				
@@ -337,7 +338,11 @@ class Keywords {
 		if ($this->newAdgroup == 'false') {
 			$outputArrayTemp = $outputArray;
 			$outputArray = array();
-			$outputArray[0] = array("name"=>$this->title,"type"=>$this->type, "keywords"=>$outputArrayTemp);
+			$outputArray[0] = array("name"=>$this->title,"type"=>$this->type, "keywords"=>array_map(
+					// Remove invalid usage of commas from keyword
+					function($keyword) {
+						return strtolower(str_replace(',', '', $keyword));
+					}, $outputArrayTemp));
 		}
 
 		return $outputArray;
