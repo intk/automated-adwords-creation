@@ -348,6 +348,13 @@ class Campaign {
 		$tempString = ucfirst(str_replace($replace, $replacement, $property)); 
 		#$tempString = $property;
 
+		// Determine if venue can be shortened if string doesn't fit within max characters
+		if (strlen($tempString) > $Maxcharacters) {
+			$replacement[5] = $replacement[6];
+			$tempString = ucfirst(str_replace($replace, $replacement, $property));
+		}
+
+
 		
 
 		/*
