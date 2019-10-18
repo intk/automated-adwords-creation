@@ -24,7 +24,7 @@ function dateFromString($string, $lexicon) {
 
 	//Convert string to a date string
 	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
-	$string = str_replace(array('&nbsp;','&#39;','| ' ), array('','\'', ' - '), $string);
+	$string = str_replace(array('&nbsp;','&#39;','| ' ), array('','\'', ', '), $string);
 	$splittedDate = preg_split('/(t\/m|&|tm| -| - | to| al | and | tot )+/i', $string);
 
 	// Determine if date and time are separated, choose part with date format
@@ -337,6 +337,11 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		$date = date('d-m-Y', strtotime("+1 week"));
 	}
 
+	// Check if date format is given
+	if (validateDate($tags['date'])) {
+		$date = $tags['date'];
+	}
+
 	// Check if title is not given
 	if (strlen($tags['title']) < 1) {
 		$titleparts = explode('/', $production->href);
@@ -398,15 +403,20 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 	//Determine if date can be found on webpage of performance
 	if (strlen($date) == 0 && strpos($tags['date'], '.') > -1) {
+		// Determine if URL starts with //. Remove it from the URL
+		$linkElement = $link;
+		if (strpos($linkElement, '//') > -1 && strpos($linkElement, 'http') < -1) {
+			$linkElement = str_replace('//'.parse_url($linkElement)['host'], '', $linkElement);
+		}
+		$link = $linkElement;
 		$dom = new simple_html_dom(getWebPage($tags['baseUrl'].$link));
-		$date = $dom->find($tags['date'], 0)->plaintext;
+		$date = $dom->find($tags['date'], -1)->plaintext;
 	}
 
 
 
 
 	// Get last date of production
-
 	$time = dateFromString($date, $lexiconTemp);
 
 
@@ -481,14 +491,16 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 					//	$productionObj->link = filter_var(trim($tags['baseUrl'].$production->href), FILTER_SANITIZE_URL);
 					//}
 				} else {
-					$productionObj->link = filter_var(trim($tags['baseUrl'].$production->find($link, 0)->href), FILTER_SANITIZE_URL);
-				}
 
-				if (strpos($productionObj->link, '//') > -1 && strpos($productionObj->link, 'http') < 0) {
-					$productionObj->link = str_replace('//', 'https://', $productionObj->link);
+					$linkElement = filter_var(trim($production->find($link, 0)->href), FILTER_SANITIZE_URL);
+
+					// Determine if URL starts with //. Remove it from the URL
+					if (strpos($linkElement, '//') > -1 && strpos($linkElement, 'http') < -1) {
+						$linkElement = str_replace('//'.parse_url($linkElement)['host'], '', $linkElement);
+					}
+					$productionObj->link = filter_var(trim($tags['baseUrl'].$linkElement), FILTER_SANITIZE_URL);
 				}
 			}
-
 
 
 			// Remove domainname from url when its added twice
