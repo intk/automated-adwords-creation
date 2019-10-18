@@ -86,10 +86,10 @@ if ($_GET['theater']) {
 	mysqli_query($connect, "SET NAMES 'utf8'");
 
 	//Get custom templates by theater ID
-	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id AND templates.type = theaters.type WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
 	if (mysqli_num_rows($query) < 1) {
 		// If no custom template is available, use default template
-		$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = 0 WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+		$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = 0 AND templates.type = theaters.type WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
 	}
 	
 	if (mysqli_num_rows($query) >= 1) {
