@@ -84,7 +84,6 @@ function dateFromString($string, $lexicon) {
 	}
 
 
-
 	/*
 	if (substr_count($date, '-') == 1) {
 
@@ -103,7 +102,7 @@ function dateFromString($string, $lexicon) {
 		}
 	}
 	*/
-	else if (substr_count($date, '-') > 1) {
+	if (substr_count($date, '-') > 1) {
 		$date =  preg_replace('/[\[{\(].*[\]}\)]/u', '', $date);
 		// Execute preg_match
 		if (preg_match("/\d{2}-\d{2}-\d{4}/", $date, $match)) {
@@ -111,6 +110,15 @@ function dateFromString($string, $lexicon) {
 			$time = strtotime($d->format('Y-m-d'));
 		}
 	}
+
+	if (substr_count($date, ':') == 1 && substr_count($date, '-') > 1) {
+		if (preg_match("/\d{2}\-\d{2}\-\d{4}/", $date, $match)) {
+			$match[0] = str_replace('/', '-', $match[0]);
+			$d = DateTime::createFromFormat('d-m-Y', $match[0]);
+			$time = strtotime($d->format('Y-m-d'));
+		}
+	}
+
 	
 	// Replace months and their abbreviations
 	$date = str_ireplace(array_merge($lexicon->monthFull, array("v.a.", " -", "uur", ".", "th", ",")), 
@@ -421,7 +429,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 
 	//Custom added 
-	#print_r(array($title, $tags['genre'], $production->find($tags['genre'], 0)->plaintext, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
+	print_r(array($title, $tags['genre'], $production->find($tags['genre'], 0)->plaintext, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
 
 	// Filter by month
 	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {
