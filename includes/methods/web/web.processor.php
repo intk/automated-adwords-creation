@@ -421,15 +421,17 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		$date = $dom->find($tags['date'], -1)->plaintext;
 	}
 
-
-
+	// If date is specified in datetime attribute of time element
+	if ($production->find($tags['date'], 0)->datetime) {
+		$date = filter_var($production->find($tags['date'], 0)->datetime, FILTER_SANITIZE_STRING);
+	}
 
 	// Get last date of production
 	$time = dateFromString($date, $lexiconTemp);
 
 
 	//Custom added 
-	print_r(array($title, $tags['genre'], $production->find($tags['genre'], 0)->plaintext, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
+	#print_r(array($title, $tags['genre'], $production->find($tags['genre'], 0)->plaintext, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
 
 	// Filter by month
 	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {
