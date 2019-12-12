@@ -276,10 +276,18 @@ foreach (toPath($xml, $tags['item']) as $production) {
 
 				}
 			}
+
+			// Check for date string in text
+			if (preg_match("/tot \d{1,2} \w+ \d{4}|\d{1,2} \w+ \d{4}/i", toPath($production, $tags['date']), $match)) {
+
+				$time = dateFromString(trimString(str_replace('tot', '', strtolower($match[0]))), $lexiconTemp);
+			}
+
+
 		}
 
 		//Determine if date can be found on webpage of performance
-		if (strpos($tags['date'], '.') > -1) {
+		if (strpos($tags['date'], '.') > -1 && !preg_match("/tot \d{1,2} \w+ \d{4}/i", toPath($production, $tags['date']), $match)) {
 			$dom = new simple_html_dom(getWebPage(toPath($production, $tags['link'])));
 			$time = dateFromString(trimString($dom->find($tags['date'], 0)->plaintext), $lexiconTemp);
 
@@ -354,6 +362,12 @@ foreach (toPath($xml, $tags['item']) as $production) {
 					}
 				}
 			
+			}
+
+			//Determine if genre can be found on webpage of performance
+			if (strpos($tags['genre'], '.') > -1) {
+				$dom = new simple_html_dom(getWebPage(toPath($production, $tags['link'])));
+				$productionObj->genre[0] = trimString($dom->find($tags['genre'], 0)->plaintext);
 			}
 
 			// If genre is still empty, use default genre
