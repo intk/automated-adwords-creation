@@ -57,9 +57,10 @@ function dateFromString($string, $lexicon) {
 		}
 	}
 
-	if (substr_count($date, '.') == 1) {
+	// If date format is DD.MM or DD-MM
+	if (substr_count($date, '.') == 1 || preg_match("/\d{2}\-\d{2}/", $date, $match)) {
 
-		if (preg_match("/\d{2}.\d{2}/", $date, $match)) {
+		if (preg_match("/\d{2}.\d{2}|\d{2}\-\d{2}/", $date, $match)) {
 			$dateTemp = trim(str_replace('.','-', $date));
 			// Determine year if only day and month is given 
 			$dateEl = explode('-', $dateTemp);
