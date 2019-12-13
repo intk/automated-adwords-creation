@@ -378,6 +378,9 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 	// Determine if given date is invalid
 		if (validateDate($date) == false  || validateDate(date('d-m-Y',$time)) == false) {
 			$link = $production->find($tags['link'], 0)->href;
+			if (strlen($tags['link']) < 1)	{
+				$link = $production->href;
+			}
 
 			// Check for a valid date format in the given url
 			if (preg_match("/\d{2}-\d{2}-\d{4}/", $link, $match)) {
@@ -411,14 +414,25 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		}	
 
 	//Determine if date can be found on webpage of performance
-	if (strlen($date) == 0 && strpos($tags['date'], '.') > -1) {
-		// Determine if URL starts with //. Remove it from the URL
+	if (strlen($date) < 1 && strpos($tags['date'], '.') > -1) {
+		$link = $production->find($tags['link'], 0)->href;
+		if (strlen($tags['link']) < 1)	{
+			$link = $production->href;
+		}
+
+		if (strpos($link, $tags['baseUrl']) < -1) {
+			$link = $tags['baseUrl'].$link;
+		}
+
+
 		$linkElement = $link;
+
+		// Determine if URL starts with //. Remove it from the URL
 		if (strpos($linkElement, '//') > -1 && strpos($linkElement, 'http') < -1) {
 			$linkElement = str_replace('//'.parse_url($linkElement)['host'], '', $linkElement);
 		}
 		$link = $linkElement;
-		$dom = new simple_html_dom(getWebPage($tags['baseUrl'].$link));
+		$dom = new simple_html_dom(getWebPage($link));
 		$date = $dom->find($tags['date'], -1)->plaintext;
 	}
 
@@ -494,13 +508,14 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			} else {
 				// Determine if item is an anchor link
 				if (strlen($production->href) > 1) {
-					$productionObj->link = filter_var(trim($production->href), FILTER_SANITIZE_URL);
+					$linkElement = filter_var(trim($production->href), FILTER_SANITIZE_URL);
 
-					//if (strpos($production->href, $tags['baseUrl']) !== false) {
-					//	$productionObj->link = filter_var(trim($production->href), FILTER_SANITIZE_URL);
-					//} else {
-					//	$productionObj->link = filter_var(trim($tags['baseUrl'].$production->href), FILTER_SANITIZE_URL);
-					//}
+					// Determine if URL starts with //. Remove it from the URL
+					if (strpos($linkElement, '//') > -1 && strpos($linkElement, 'http') < -1) {
+						$linkElement = str_replace('//'.parse_url($linkElement)['host'], '', $linkElement);
+					}
+					$productionObj->link = filter_var(trim($tags['baseUrl'].$linkElement), FILTER_SANITIZE_URL);
+					
 				} else {
 
 					$linkElement = filter_var(trim($production->find($link, 0)->href), FILTER_SANITIZE_URL);
