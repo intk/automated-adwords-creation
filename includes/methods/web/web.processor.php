@@ -58,7 +58,7 @@ function dateFromString($string, $lexicon) {
 	}
 
 	// If date format is DD.MM or DD-MM
-	if (substr_count($date, '.') == 1 || preg_match("/\d{2}\-\d{2}/", $date, $match)) {
+	if (substr_count($date, '.') == 1 || (preg_match("/\d{2}\-\d{2}/", $date, $match) && !preg_match("/\d{2}\-\d{2}\-\d{4}/", $date, $match))) {
 
 		if (preg_match("/\d{2}.\d{2}|\d{2}\-\d{2}/", $date, $match)) {
 			$dateTemp = trim(str_replace('.','-', $date));
@@ -305,15 +305,17 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 	
 	} else {
 		$title = $production->find($tags['title'], 0)->plaintext;
-		$subtitle = $production->find($tags['subtitle'], 0)->plaintext;
-		if (strpos($subtitle, "&nbsp;") !== false || strlen($subtitle) < 2) {
-			$subtitle = trimString($production->find($tags['subtitle'], 1)->plaintext);
+		if (strlen($tags['subtitle']) > 0) {
+			$subtitle = $production->find($tags['subtitle'], 0)->plaintext;
+			if (strpos($subtitle, "&nbsp;") !== false || strlen($subtitle) < 2) {
+				$subtitle = trimString($production->find($tags['subtitle'], 1)->plaintext);
+			}
 		}
 		if (preg_match("/\d{4}-\d{2}-\d{2}/", $tags['date'], $match)) {
 			$date = trimString($tags['date']);
 			$genre = $production->find($tags['genre'], 0)->plaintext;
 		} else {
-			$genre = $production->find($tags['genre'], 0)->plaintext;
+			//$genre = $production->find($tags['genre'], 0)->plaintext;
 			if (count($production->find($tags['date'])) > 3) {
 				$date = trimString($production->find($tags['date'], -1)->plaintext);
 			} else {
