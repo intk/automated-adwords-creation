@@ -138,6 +138,48 @@ class Keywords {
 		return $output;
 	}
 
+    // Change capitalization to title case. Ignore names of people
+	private function my_ucwords($str, $is_name=false) {
+	   // exceptions to standard case conversion
+	   if ($is_name) {
+	       $all_uppercase = '';
+	       $all_lowercase = 'De La|De Las|Der|Van De|Van Der|Vit De|Von|Or|And|Ten';
+	   } else {
+	       // addresses, essay titles ... and anything else
+	       $all_uppercase = 'Po|Rr|Se|Sw|Ne|Nw';
+	       $all_lowercase = 'A|And|As|By|In|Of|Or|To';
+	   }
+	   $prefixes = 'Mc';
+	   $suffixes = "'S";
+
+	   // captialize all first letters
+	   $str = preg_replace('/\\b(\\w)/e', 'strtoupper("$1")', strtolower(trim($str)));
+
+	   if ($all_uppercase) {
+	       // capitalize acronymns and initialisms e.g. PHP
+	       $str = preg_replace("/\\b($all_uppercase)\\b/e", 'strtoupper("$1")', $str);
+	   }
+	   if ($all_lowercase) {
+	       // decapitalize short words e.g. and
+	       if ($is_name) {
+	           // all occurences will be changed to lowercase
+	           $str = preg_replace("/\\b($all_lowercase)\\b/e", 'strtolower("$1")', $str);
+	       } else {
+	           // first and last word will not be changed to lower case (i.e. titles)
+	           $str = preg_replace("/(?<=\\W)($all_lowercase)(?=\\W)/e", 'strtolower("$1")', $str);
+	       }
+	   }
+	   if ($prefixes) {
+	       // capitalize letter after certain name prefixes e.g 'Mc'
+	       $str = preg_replace("/\\b($prefixes)(\\w)/e", '"$1".strtoupper("$2")', $str);
+	   }
+	   if ($suffixes) {
+	       // decapitalize certain word suffixes e.g. 's
+	       $str = preg_replace("/(\\w)($suffixes)\\b/e", '"$1".strtolower("$2")', $str);
+	   }
+	   return $str;
+	}
+
 
 
 	private function keywordsParser() {
@@ -155,7 +197,7 @@ class Keywords {
 		*/
 
 		// Split by predifined delimiters.
-		if (preg_match_all('/(, | and |&| - | i.s.m. | ism | ft. | feat. | -- | met |: |\/)/', $input, $matches, PREG_OFFSET_CAPTURE) && strlen($input) > $this->charLimit) {
+		if (preg_match_all('/(, | and |&| - | i.s.m. | ism | ft. | feat. | -- | met |: |\/)/', $input, $matches, PREG_OFFSET_CAPTURE) && strlen($input) > $this->charLimit && strpos($input, "&#") == false) {
 
 			//echo $input."\n";
 
@@ -238,7 +280,7 @@ class Keywords {
 			// Determine if string is written in capitals or in lowercase
 			if (strtoupper($delString) == $delString || strtolower($delString) == $delString) {
 				// Change capitalization to title case
-				$delString = ucwords(mb_strtolower($delString, 'UTF-8'));
+				$delString = $this->my_ucwords(mb_strtolower($delString, 'UTF-8'));
 			}
 
 			// Split by predifined delimiters if string length is more than character limit
