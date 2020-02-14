@@ -244,6 +244,8 @@ class Campaign {
 		// Create keywords and adgroups of title + genre if < 2 adgroups created
 		if (count($keywordsObj->adgroup) < 2 && $performersList == false) {
 
+			//
+
 			/*
 			// Insert placement text
 			$newElement = $this->title.' '.$this->genre[0];
@@ -259,10 +261,20 @@ class Campaign {
 			// Add genre name to filtered element
 			$newElement = implode(' ', $splittedPair).' '. $this->genre[0];
 
-
 			$titleObj = new Keywords($newElement, $this->venue, $this->city, $placementsList, 'title');
+
+			// Remove duplicate keywords
+			foreach ($titleObj->adgroup[0]['keywords'] as $newKeyword) {
+				$key = array_search($newKeyword, $keywordsObj->adgroup[0]['keywords']);
+				if ($key !== false) {
+					unset($keywordsObj->adgroup[0]['keywords'][$key]);
+				}
+			}
+
+
 			# Merge ad groups from keyword object
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $titleObj->adgroup);
+
 		}
 
 		foreach ($keywordsObj->adgroup as $key => $adgroup) {
@@ -415,6 +427,9 @@ class Campaign {
 		}
 		if (isset($this->lexicon->adPlacement['workshop'])) {
 			$pLabel->workshop = $this->lexicon->adPlacement['workshop'];
+		}
+		if (isset($this->lexicon->adPlacement['film'])) {
+			$pLabel->film = $this->lexicon->adPlacement['film'];
 		}
 		$pLabel->expo = $this->lexicon->adPlacement['expo'];
 		$pLabel->opera = $this->lexicon->adPlacement['opera'];
