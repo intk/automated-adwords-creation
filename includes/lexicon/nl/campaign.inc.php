@@ -75,7 +75,7 @@ class Lexicon {
 
 
 		// Prepositions to remove from end or beginning of ad group name
-		$this->prepositions = array('van', 'door', ' met ', 'o.l.v.', 'olv', 'e.a.', 'e.v.a.', 'Regisseur:', 'Acteurs:', '(Stem)' , '(Zichzelf)', '(try-out)', '(reprise)', '(première)', 'Film:');
+		$this->prepositions = array('van', 'door', ' met ', 'o.l.v.', 'olv', 'e.a.', 'e.v.a.', 'i.s.m.', 'Regisseur:', 'Acteurs:', '(Stem)' , '(Zichzelf)', '(try-out)', '(reprise)', '(première)', 'Film:');
 	}
 
 }
