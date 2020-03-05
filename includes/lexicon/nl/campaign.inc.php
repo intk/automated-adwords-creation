@@ -5,18 +5,18 @@ class Lexicon {
 	public function __construct() {
 
 		// Define months
-		$this->monthAbbr[0] = 'jan';
-		$this->monthAbbr[1] = 'feb';
-		$this->monthAbbr[2] = 'mrt';
-		$this->monthAbbr[3] = 'apr';
+		$this->monthAbbr[0] = 'jan.';
+		$this->monthAbbr[1] = 'feb.';
+		$this->monthAbbr[2] = 'mrt.';
+		$this->monthAbbr[3] = 'apr.';
 		$this->monthAbbr[4] = 'mei';
-		$this->monthAbbr[5] = 'jun'; 
-		$this->monthAbbr[6] = 'jul';
-		$this->monthAbbr[7] = 'aug';
-		$this->monthAbbr[8] = 'sep';
-		$this->monthAbbr[9] = 'okt';
-		$this->monthAbbr[10] = 'nov';
-		$this->monthAbbr[11] = 'dec';
+		$this->monthAbbr[5] = 'jun.'; 
+		$this->monthAbbr[6] = 'jul.';
+		$this->monthAbbr[7] = 'aug.';
+		$this->monthAbbr[8] = 'sep.';
+		$this->monthAbbr[9] = 'okt.';
+		$this->monthAbbr[10] = 'nov.';
+		$this->monthAbbr[11] = 'dec.';
 
 		$this->monthFull[0] = 'januari';
 		$this->monthFull[1] = 'februari';
@@ -64,7 +64,7 @@ class Lexicon {
 		$this->adPlacement['cabaret'] = array('cabaret', 'cabaret', 'cabaret');
 		$this->adPlacement['musical'] = array('musical', 'een musical', 'de musical');
 		$this->adPlacement['dance'] = array('dans', 'een danssshow', 'de danssshow');
-		$this->adPlacement['movie'] = array('film', 'de film', 'de film',);
+		$this->adPlacement['movie'] = array('film', 'een film', 'de film');
 		$this->adPlacement['concert'] = array('concert', 'een concert', 'het concert');
 		$this->adPlacement['music'] = array('muziek', 'een concert', 'het concert');
 		$this->adPlacement['classic'] = array('concert', 'een concert', 'het concert');
@@ -75,7 +75,7 @@ class Lexicon {
 
 
 		// Prepositions to remove from end or beginning of ad group name
-		$this->prepositions = array('van', 'door', 'met');
+		$this->prepositions = array('van', 'door', ' met ', 'o.l.v.', 'olv', 'e.a.', 'e.v.a.', 'Regisseur:', 'Acteurs:', '(Stem)' , '(Zichzelf)', '(try-out)', '(reprise)', '(première)', 'Film:');
 	}
 
 }
