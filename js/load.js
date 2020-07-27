@@ -24,8 +24,10 @@ $(document).ready(function() {
 		$('.loader').fadeIn(200);
 		$(this).find('input[type=submit]').remove();
 		$('.wrapper form').append('<span class="status">Campaigns will be created</span>');
+		console.log(queryString);
+
 		$.ajax({
-			url: "https://picturage.nl/intk/theaterads/automateAdWords.php?getNumber=true&"+queryString,
+			url: "https://localhost/adwords-automation/automateAdWords.php?getNumber=true&"+queryString,
 			type: "GET",
 			dataType: "json",
 			success: function(data) {

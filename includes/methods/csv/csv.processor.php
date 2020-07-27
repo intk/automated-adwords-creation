@@ -193,6 +193,16 @@ if (stripos($location, "Spain") !== false) {
 	$LocArr[array_search("Location", array_keys($data))] = $location;
 	$LocArr[array_search("Reach", array_keys($data))] = "38300000";
 }
+if (stripos($location, "Luxembourg") !== false) {
+	$LocArr[array_search("ID", array_keys($data))] = "2442";
+	$LocArr[array_search("Location", array_keys($data))] = $location;
+	$LocArr[array_search("Reach", array_keys($data))] = "1090000";
+}
+if (stripos($location, "Slovenia") !== false) {
+	$LocArr[array_search("ID", array_keys($data))] = "2705";
+	$LocArr[array_search("Location", array_keys($data))] = $location;
+	$LocArr[array_search("Reach", array_keys($data))] = "2270000";
+}
 
  else {
 	$LocArr[array_search("Location", array_keys($data))] = $location;

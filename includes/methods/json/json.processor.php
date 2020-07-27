@@ -336,8 +336,10 @@ foreach ($sourceArray as $production) {
 
 	}
 
+	#print_r(array(trimString(toPath($production, $tags['title'])), trimString(toPath($production, $tags['subtitle'])), date('Y-m', $time)));
+
 	// Filter by month
-	if (date('Y-m', $time) == $month || date('Y-m-d', $time) == $month || strtoupper($month) == "ALL" && $time > time()) {
+	if (date('Y-m', $time) == $month || date('Y-m-d', $time) == $month || strtoupper($month) == "ALL" && $time > time()) {	
 
 			$productionObj = new stdClass();
 			$otherHall = false;
@@ -409,6 +411,7 @@ foreach ($sourceArray as $production) {
 			if (count($productionObj->genre) < 1 || strlen($productionObj->genre[0]) < 1) {
 				// Use genres listed in configuration
 				if (strpos($tags['genre'], '/') !== false) {
+					/*
 					$parts = explode(' ', $tags['genre']);
 					$needleHaystack = explode('/', $parts[0]);
 					if (stripos($production->find($needleHaystack[0]), $needleHaystack[0]) !== false) {
@@ -416,6 +419,8 @@ foreach ($sourceArray as $production) {
 					} else {
 						$productionObj->genre[0] = $parts[1];
 					}
+					*/
+					$productionObj->genre[0] = 'theater';
 				} else {
 					//$productionObj->genre[0] = 'overig';
 					if (strpos($tags['genre'], ' ') !== false && strpos($tags['genre'], '.') === false) {
@@ -472,6 +477,7 @@ foreach ($sourceArray as $production) {
 				if ($excludeFound == false) {
 					*/
 					array_push($productions, $productionObj);
+					
 				//}
 			//}
 

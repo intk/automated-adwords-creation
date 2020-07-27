@@ -1,0 +1,4 @@
+.DS_Store
+includes/config.inc.php
+campaigns/
+ca-bundle.pem

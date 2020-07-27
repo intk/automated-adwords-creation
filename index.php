@@ -1,18 +1,35 @@
 <?php 
+header('Content-Type: text/html');
 include('includes/config.inc.php'); 
 $theater['success'] = false;
+
+//Set client character set to utf-8
+mysqli_query($connect, "SET NAMES 'utf8'");
+
 $query = mysqli_query($connect, "SELECT * FROM theaters WHERE alias='".mysqli_real_escape_string($connect, $_GET['theater'])."'");
 if (mysqli_num_rows($query) >= 1) {
 	$result = mysqli_fetch_array($query);
 
+	$queryString = '';
+
 	if ($_GET['theater'] && !$_GET['month']) {
-		echo "<script>var queryString = 'theater=".$result['alias']."'; </script>";
+		$queryString = "theater=".$result['alias'];
 		$month = date('m', strtotime('+1 month', time()));
 	}
 	if ($_GET['theater'] && $_GET['month']) {
-		echo "<script> var queryString = 'theater=".$result['alias']."&month=".$_GET['month']."'; </script>";
+		$queryString = "theater=".$result['alias']."&month=".$_GET['month'];
 		$month = explode('-', $_GET['month'])[1];
 	}
+	if ($_GET['theater'] && $_GET['month'] && $_GET['splitKeywords']) {
+		$queryString = "theater=".$result['alias']."&month=".$_GET['month']."&splitKeywords=".$_GET['splitKeywords'];
+		$month = explode('-', $_GET['month'])[1];
+	}
+
+	if ($_GET['lang']) {
+		$queryString .= "&lang=".$_GET['lang'];
+	}
+
+	echo "<script>var queryString = '".$queryString."';</script>";
 	
 	$theater['name'] = $result['name'];
 	$months = array("January", "February", "March", "April", "May", "June", "July", "Augustus", "September", "October", "November", "December");
@@ -24,7 +41,7 @@ if (mysqli_num_rows($query) >= 1) {
 <!doctype html>
 <html>
 <head>
-<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <title>Adwords Automation <?php if ($theater['success']) { echo '&#124; '.$theater['name']; } ?></title>
 <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="css/stylesheet.css">
@@ -48,6 +65,7 @@ if (mysqli_num_rows($query) >= 1) {
 <div id="csvInput"></div>
 <div class="wrapper">
 <?php
+
 if (!$theater['success']) {
 	echo "<span>This theater doesn't exsist.</span>";
 } else {
@@ -58,7 +76,7 @@ if (!$theater['success']) {
       <circle class="loader-path" cx="50" cy="50" r="20" fill="none" />
     </svg>
 </div>
-<input type="submit" value="Create <?php echo $theater['month']; ?> campaigns for <?php echo $theater['name']; ?>">
+<input type="submit" value="Create <?php if (strlen($theater['month']) > 1) {echo $theater['month'].' ';} ?>campaigns for <?php echo $theater['name']; ?>">
 <input type="button" data="" class="copyOutput" value="Copy campaigns">
 </form>
 <?php

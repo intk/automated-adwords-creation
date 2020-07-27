@@ -85,7 +85,7 @@ if ($_GET['theater']) {
 	//Set client character set to utf-8
 	mysqli_query($connect, "SET NAMES 'utf8'");
 
-	//Get custom templates by theater ID
+	//Get custom templates by organisation ID and organisation type
 	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id AND templates.type = theaters.type WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
 	if (mysqli_num_rows($query) < 1) {
 		// If no custom template is available, use default template

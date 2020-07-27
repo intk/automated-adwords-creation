@@ -73,7 +73,7 @@ function getsimilarPerformers($inputTitle) {
 		
 		// Filter array and return element on case insensitive partial match of artist
 		$filter = array_filter($xlsx->rows(), function($el) use ($inputTitle) {
-			return (stripos($inputTitle, $el[0]) !== false);
+			return (stripos($el[0], $inputTitle) !== false);
 		});
 		if (count($filter) > 0) {
 			sort($filter);

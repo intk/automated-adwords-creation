@@ -2,6 +2,7 @@
 // Crawl XML feed and parse productions
 $source = $url;
 $productions = array();
+#ini_set('display_errors', 1);
 
 $lexiconTemp = new Lexicon();
 
@@ -238,6 +239,7 @@ include('includes/methods/web/performers.processor.php');
 
 // XML scraper
 $xml = simplexml_load_file($source, 'SimpleXMLElement', LIBXML_NOCDATA);
+
 foreach (toPath($xml, $tags['item']) as $production) {
 
 	// Get last date of production
@@ -335,7 +337,6 @@ foreach (toPath($xml, $tags['item']) as $production) {
 				$productionObj->subtitle = $titleParts[1];
 			}
 
-
 			$productionObj->venue = $venue;
 			$productionObj->location = $location['city'];
 			if (count(toPath($production, $tags['genre'])) > 1) {
@@ -347,6 +348,7 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			if (count($productionObj->genre) < 1) {
 				// Use genres listed in configuration
 				if (strpos($tags['genre'], '/') !== false) {
+					/*
 					$parts = explode(' ', $tags['genre']);
 					$needleHaystack = explode('/', $parts[0]);
 					if (stripos($production->find($needleHaystack[0]), $needleHaystack[0]) !== false) {
@@ -354,6 +356,8 @@ foreach (toPath($xml, $tags['item']) as $production) {
 					} else {
 						$productionObj->genre[0] = $parts[1];
 					}
+					*/
+					$productionObj->genre[0] = 'theater';
 				} else {
 					//$productionObj->genre[0] = 'overig';
 					if (strpos($tags['genre'], ' ') !== false && strpos($tags['genre'], '.') === false) {

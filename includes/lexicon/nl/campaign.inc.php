@@ -75,7 +75,7 @@ class Lexicon {
 
 
 		// Prepositions to remove from end or beginning of ad group name
-		$this->prepositions = array('van', 'door', ' met ', 'o.l.v.', 'olv', 'e.a.', 'e.v.a.', 'i.s.m.', 'Regisseur:', 'Acteurs:', '(Stem)' , '(Zichzelf)', '(try-out)', '(reprise)', '(première)', 'Film:');
+		$this->prepositions = array('van', 'door', ' met ', 'o.l.v.', 'olv', 'e.a.', 'o.a.', 'e.v.a.', 'i.s.m.', 'Regisseur:', 'Acteurs:', '(Stem)' , '(Zichzelf)', '(try-out)', '(reprise)', '(première)', 'Film:', 'support', 'sopraan', 'alt', 'tenor', 'piano', 'tenorsaxofoon', 'altsaxofoon', 'saxofoon', 'klarinet', 'trombone', 'trompet', 'dirigent', 'organ', 'componist', 'producer', 'harp', 'contrabas', 'bas', 'altviool', 'viool',  'zang', 'basgitaar', 'gitaar', 'spoken word', 'fluit', 'cello', 'drums', 'percussie', 'harp', 'hobo', 'hoorn', 'DJ');
 	}
 
 }
