@@ -27,7 +27,7 @@ $(document).ready(function() {
 		console.log(queryString);
 
 		$.ajax({
-			url: "https://localhost/adwords-automation/automateAdWords.php?getNumber=true&"+queryString,
+			url: "https://dev.intk.com/ads-automation/automateAdWords.php?getNumber=true&"+queryString,
 			type: "GET",
 			dataType: "json",
 			success: function(data) {
