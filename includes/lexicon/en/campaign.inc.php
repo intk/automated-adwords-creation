@@ -5,18 +5,18 @@ class Lexicon {
 	public function __construct() {
 
 		// Define months
-		$this->monthAbbr[0] = 'Jan';
-		$this->monthAbbr[1] = 'Feb';
-		$this->monthAbbr[2] = 'Mar';
-		$this->monthAbbr[3] = 'Apr';
-		$this->monthAbbr[4] = 'May';
-		$this->monthAbbr[5] = 'Jun'; 
-		$this->monthAbbr[6] = 'Jul';
-		$this->monthAbbr[7] = 'Aug';
-		$this->monthAbbr[8] = 'Sep';
-		$this->monthAbbr[9] = 'Oct';
-		$this->monthAbbr[10] = 'Nov';
-		$this->monthAbbr[11] = 'Dec';
+		$this->monthAbbr[0] = 'Jan.';
+		$this->monthAbbr[1] = 'Feb.';
+		$this->monthAbbr[2] = 'Mar.';
+		$this->monthAbbr[3] = 'Apr.';
+		$this->monthAbbr[4] = 'May.';
+		$this->monthAbbr[5] = 'Jun.'; 
+		$this->monthAbbr[6] = 'Jul.';
+		$this->monthAbbr[7] = 'Aug.';
+		$this->monthAbbr[8] = 'Sep.';
+		$this->monthAbbr[9] = 'Oct.';
+		$this->monthAbbr[10] = 'Nov.';
+		$this->monthAbbr[11] = 'Dec.';
 
 		$this->monthFull[0] = 'January';
 		$this->monthFull[1] = 'February';
@@ -64,7 +64,8 @@ class Lexicon {
 		$this->adPlacement['cabaret'] = array('cabaret', 'cabaret', 'cabaret');
 		$this->adPlacement['musical'] = array('musical', 'a musical', 'the musical');
 		$this->adPlacement['dance'] = array('dance', 'a dance', 'the dance');
-		$this->adPlacement['movie'] = array('movie', 'the movie', 'the movie',);
+		$this->adPlacement['movie'] = array('movie', 'a movie', 'the movie',);
+		$this->adPlacement['film'] = array('film', 'a movie', 'the movie',);
 		$this->adPlacement['concert'] = array('concert', 'a concert', 'the concert');
 		$this->adPlacement['music'] = array('concert', 'a concert', 'the concert');
 		$this->adPlacement['classic'] = array('concert', 'a concert', 'the concert');

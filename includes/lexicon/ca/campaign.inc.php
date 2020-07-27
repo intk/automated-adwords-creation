@@ -5,18 +5,18 @@ class Lexicon {
 	public function __construct() {
 
 		// Define months
-		$this->monthAbbr[0] = 'gen';
-		$this->monthAbbr[1] = 'feb';
+		$this->monthAbbr[0] = 'gen.';
+		$this->monthAbbr[1] = 'feb.';
 		$this->monthAbbr[2] = 'març';
-		$this->monthAbbr[3] = 'abr';
+		$this->monthAbbr[3] = 'abr.';
 		$this->monthAbbr[4] = 'maig';
-		$this->monthAbbr[5] = 'jun'; 
-		$this->monthAbbr[6] = 'jul';
-		$this->monthAbbr[7] = 'ago';
-		$this->monthAbbr[8] = 'set';
-		$this->monthAbbr[9] = 'oct';
-		$this->monthAbbr[10] = 'nov';
-		$this->monthAbbr[11] = 'des';
+		$this->monthAbbr[5] = 'jun.'; 
+		$this->monthAbbr[6] = 'jul.';
+		$this->monthAbbr[7] = 'ago.';
+		$this->monthAbbr[8] = 'set.';
+		$this->monthAbbr[9] = 'oct.';
+		$this->monthAbbr[10] = 'nov.';
+		$this->monthAbbr[11] = 'des.';
 
 		$this->monthFull[0] = 'gener';
 		$this->monthFull[1] = 'febrer';

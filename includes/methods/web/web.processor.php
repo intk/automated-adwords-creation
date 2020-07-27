@@ -24,8 +24,11 @@ function dateFromString($string, $lexicon) {
 
 	//Convert string to a date string
 	$string = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $string)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
-	$string = str_replace(array('&nbsp;','&#39;','| ' ), array('','\'', ', '), $string);
-	$splittedDate = preg_split('/(t\/m|&|tm| -| - | to| al | and | tot )+/i', $string);
+	#if (substr_count('|') == 1) {
+	#	$string = preg_replace("/\| \d{2}\:\d{2}/", "", $string);
+   # }
+	$string = str_replace(array('&nbsp;','&#39;','| '), array('','\'', ', '), $string);
+	$splittedDate = preg_split('/( \| |t\/m|&|tm| -| - |au | to| al | and | tot )+/i', $string);
 
 	// Determine if date and time are separated, choose part with date format
 	if (strpos($splittedDate[count($splittedDate)-1], 'uur') > 1 || strpos($string, ':') > 1) {
@@ -45,8 +48,9 @@ function dateFromString($string, $lexicon) {
 	if (substr_count($date, '.') > 1) {
 		// Execute preg_match
 		$date = explode('-',$date)[count(explode('-',$date))-1];
-		if (preg_match("/\d{2}.\d{2}.\d{2}/", $date, $match) && !preg_match("/\d{2}.\d{2}.\d{4}/", $date, $match)) {
-			$dateTemp = trim(str_replace('.','-', $date));
+		if (preg_match("/\d{2}.\d{2}.\d{2}/", $date, $match) && !preg_match("/\d{2}.\d{2}.\d{4}/", $date, $matched)) {
+
+			$dateTemp = trim(str_replace('.','-', $match[0]));
 			$d = DateTime::createFromFormat('d-m-y', $dateTemp);
 			$time = strtotime($d->format('Y-m-d'));
 		}
@@ -58,7 +62,7 @@ function dateFromString($string, $lexicon) {
 	}
 
 	// If date format is DD.MM or DD-MM
-	if (substr_count($date, '.') == 1 || (preg_match("/\d{2}\-\d{2}/", $date, $match) && !preg_match("/\d{2}\-\d{2}\-\d{4}/", $date, $match))) {
+	if (substr_count($date, '.') == 1 || (preg_match("/\d{2}\-\d{2}/", $date, $match) && !preg_match("/\d{2}\-\d{2}\-\d{4}/", $date, $match) && !preg_match("/\d{4}\-\d{2}\-\d{2}/", $date, $match))) {
 
 		if (preg_match("/\d{2}.\d{2}|\d{2}\-\d{2}/", $date, $match)) {
 			$dateTemp = trim(str_replace('.','-', $date));
@@ -124,6 +128,7 @@ function dateFromString($string, $lexicon) {
 	// Replace months and their abbreviations
 	$date = str_ireplace(array_merge($lexicon->monthFull, array("v.a.", " -", "uur", ".", "th", ",")), 
 		array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "", "", "", ":", "", ""), $date);
+
 
 	$date = str_ireplace($lexicon->monthAbbr, 
 		array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), $date);
@@ -304,7 +309,14 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 	
 	} else {
-		$title = $production->find($tags['title'], 0)->plaintext;
+
+		// If title tag doesn't contain class
+		if (preg_match("/^(.+)\[(\d{1})\]/", $tags['title'], $match)) {
+			$title = trimString($production->find($match[1], $match[2])->plaintext);
+		} else {
+			$title = $production->find($tags['title'], 0)->plaintext;
+		}
+
 		if (strlen($tags['subtitle']) > 0) {
 			$subtitle = $production->find($tags['subtitle'], 0)->plaintext;
 			if (strpos($subtitle, "&nbsp;") !== false || strlen($subtitle) < 2) {
@@ -320,10 +332,12 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				$date = trimString($production->find($tags['date'], -1)->plaintext);
 			} else {
 
+
+
 				// Use last date if multiple dates are given
 				$dateRaw = $production->find($tags['date'], 0);
 				// Find blank rows as seperator of the dates and its offset
-				if (preg_match_all('/(<br\/>|<br>)/', $dateRaw, $matches, PREG_OFFSET_CAPTURE) && preg_match("/\<br\>\d{2}<br\>\d{2}/", $dateRaw, $match) == false) {
+				if (preg_match_all('/(<br\/>|<br>)/', $dateRaw, $matches, PREG_OFFSET_CAPTURE) && preg_match("/\<br\>\d{2}<br\>\d{2}/", $dateRaw, $match) == false && preg_match("/\<h4\>/", $dateRaw, $match) == false) {
 					// Return the portion of dates string specified by the seperator offset as start parameter
 					$date = trimString(substr($dateRaw, $matches[0][count($matches[0])-1][1]));
 					if (strlen($date) <= 1) {
@@ -331,7 +345,14 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 					}
 				} else {
 
-					$date = trimString($production->find($tags['date'], -1)->plaintext);
+					// If date can't be selected by classname
+					if (preg_match("/^(.+)\[(\d{1})\]/", $tags['date'], $match)) {
+						$date = trimString($production->find($match[1], $match[2])->plaintext);
+					} else {
+						$date = trimString($production->find($tags['date'], -1)->plaintext);
+					}
+
+					$genre = $production->find($tags['genre'], 0)->plaintext;
 				}
 			}
 			
@@ -451,7 +472,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 	#print_r(array($title, $tags['genre'], $production->find($tags['genre'], 0)->plaintext, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
 
 	// Filter by month
-	if ((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) {
+	if (((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) || $month == "PAST") {
 
 		
 		//Check if genre exist
@@ -519,8 +540,8 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 					$productionObj->link = filter_var(trim($tags['baseUrl'].$linkElement), FILTER_SANITIZE_URL);
 					
 				} else {
-
-					$linkElement = filter_var(trim($production->find($link, 0)->href), FILTER_SANITIZE_URL);
+					
+					$linkElement = filter_var(trim($production->find($link, -1)->href), FILTER_SANITIZE_URL);
 
 					// Determine if URL starts with //. Remove it from the URL
 					if (strpos($linkElement, '//') > -1 && strpos($linkElement, 'http') < -1) {
@@ -571,7 +592,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 			}
 
-			#print_r($productionObj);
+			//print_r($productionObj);
 
 
 

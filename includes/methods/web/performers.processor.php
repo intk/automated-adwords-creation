@@ -262,7 +262,12 @@ function getPerformers($url, $tag) {
 
 			// Determine if credits aren't listed in an array, but in a string. Make an array of it
 			if (!is_array($credits)) {
-				$credits = explode(', ', preg_replace("/\s+/", " ", $credits));
+				// If credits string end with a period, remove it from the string
+				if (strpos(trim($credits), '.', -1) >= strlen(trim($credits))-1) {
+					$credits = substr(trim($credits), 0, -1);
+				}
+				$credits = preg_split("/(,|\. Met )/", preg_replace("/\s+/", " ", $credits));
+
 			}
 
 			// Check if performer is enclosed within paragraph and exclude paragraph content
@@ -338,7 +343,7 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
-#print_r(getPerformers("https://www.zwolleunlimited.nl/herken-de-kansen-in-jouw-verhaal-plotting/", array("performers"=>".et_pb_text_inner p")));
+#print_r(getPerformers("https://lumiere.nl/films/carmen-lola", array("performers"=>".movie-info.text-indent")));
 
 #print_r(getPerformers("https://www.filmhuisalkmaar.nl/films/becoming-astrid", array("performers"=>".film-header .film-header-info .film-actors")));
 

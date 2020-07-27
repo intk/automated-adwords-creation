@@ -88,7 +88,7 @@ if ($xlsx = SimpleXLSX::parse($url)) {
 
 			$productionObj->title = $production[$tags['title']];
 			$productionObj->genre[0] = $production[$tags['category']];
-			$productionObj->subtitle = $production[$tags['artist']];
+			$productionObj->subtitle = $production[$tags['subtitle']];
 			$productionObj->venue = $location['venue'];
 			$productionObj->location = $location['city'];
 
@@ -133,6 +133,7 @@ if ($xlsx = SimpleXLSX::parse($url)) {
 			if (array_key_exists('performers', $tags)) {
 				$productionObj->performers = getPerformers($productionObj->link, $tags);
 			}
+
 			if (array_key_exists('cast', $tags) && strlen($production[$tags['cast']]) > 1) {
 				$productionObj->performers = preg_split('/(, | i.s.m. )+/i', str_replace(array('/', 'e.a.'), array(',', ''), $production[$tags['cast']]));
 			}
