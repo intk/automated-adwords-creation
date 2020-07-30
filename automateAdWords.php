@@ -80,16 +80,16 @@ if (isset($_GET['lang']) && file_exists('includes/lexicon/'.filter_var($_GET['la
 include('includes/lexicon/'.$lang.'/campaign.inc.php');
 
 //Check if query string matches database records
-if ($_GET['theater']) {
+if ($_GET['client']) {
 
 	//Set client character set to utf-8
 	mysqli_query($connect, "SET NAMES 'utf8'");
 
 	//Get custom templates by organisation ID and organisation type
-	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id AND templates.type = theaters.type WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id AND templates.type = theaters.type WHERE templates.language = '".$lang."' AND (theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['client'])."%' OR theaters.googleAds = '".mysqli_real_escape_string($connect, $_GET['client'])."')");
 	if (mysqli_num_rows($query) < 1) {
 		// If no custom template is available, use default template
-		$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = 0 AND templates.type = theaters.type WHERE templates.language = '".$lang."' AND theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['theater'])."%'");
+		$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = 0 AND templates.type = theaters.type WHERE templates.language = '".$lang."' AND (theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['client'])."%' OR theaters.googleAds = '".mysqli_real_escape_string($connect, $_GET['client'])."')");
 	}
 	
 	if (mysqli_num_rows($query) >= 1) {

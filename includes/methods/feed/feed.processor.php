@@ -425,7 +425,7 @@ foreach (toPath($xml, $tags['item']) as $production) {
 					}
 				}
 			}
-
+			
 			// Push object to productions array
 			// Exclude productions with irrelevant tags, title or sold out
 			if (stripos($exclude, $productionObj->genre[0]) === false && stripos($exclude, $productionObj->genre[1]) === false && stripos($exclude, $productionObj->title) === false && stripos($productionObj->title, 'inleiding') === false && stripos($lastShow->status, "uitverkocht") === false && stripos($lastShow->status, "geannuleerd") === false) {
