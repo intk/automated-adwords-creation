@@ -166,6 +166,12 @@ class Campaign {
 		if (isset($this->lexicon->keyword['workshop'])) {
 	   		$placements->workshop = array($this->lexicon->keyword['workshop']);
 		}
+		if (isset($this->lexicon->keyword['uitstap'])) {
+	   		$placements->workshop = array($this->lexicon->keyword['uitstap']);
+		}
+		if (isset($this->lexicon->keyword['vorming'])) {
+	   		$placements->workshop = array($this->lexicon->keyword['vorming']);
+		}
 		$placements->show = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['theater']);
 		$placements->music = array($this->lexicon->keyword['music'], $this->lexicon->keyword['concert']);
 		$placements->festival = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['music'], $this->lexicon->keyword['festival'], $this->lexicon->keyword['live']);
@@ -427,6 +433,12 @@ class Campaign {
 		}
 		if (isset($this->lexicon->adPlacement['workshop'])) {
 			$pLabel->workshop = $this->lexicon->adPlacement['workshop'];
+		}
+		if (isset($this->lexicon->adPlacement['uitstap'])) {
+			$pLabel->workshop = $this->lexicon->adPlacement['uitstap'];
+		}
+		if (isset($this->lexicon->adPlacement['vorming'])) {
+			$pLabel->workshop = $this->lexicon->adPlacement['vorming'];
 		}
 		if (isset($this->lexicon->adPlacement['film'])) {
 			$pLabel->film = $this->lexicon->adPlacement['film'];

@@ -57,6 +57,9 @@ class Lexicon {
 		$this->keyword['opera'] = 'opera'; 
 		$this->keyword['online'] = 'online';
 		$this->keyword['agenda'] = 'agenda';
+		$this->keyword['workshop'] = 'workshop';
+		$this->keyword['uitstap'] = 'uitstap';
+		$this->keyword['vorming'] = 'vorming';
 
 
 		// Genre placements for the ads
@@ -71,11 +74,14 @@ class Lexicon {
 		$this->adPlacement['expo'] = array('expo', 'de expo', 'de expo');
 		$this->adPlacement['opera'] = array('opera', 'opera', 'de opera');
 		$this->adPlacement['show'] = array('show', 'een show', 'de show');
+		$this->adPlacement['workshop'] = array('workshop', 'een workshop', 'de workshop');
+		$this->adPlacement['uitstap'] = array('uitstap', 'een activiteit', 'de activiteit');
+		$this->adPlacement['vorming'] = array('vorming', 'een cursus', 'de cursus');
 		$this->adPlacement['performance'] = array('voorstelling', 'een voorstelling', 'de voorstelling');
 
 
 		// Prepositions to remove from end or beginning of ad group name
-		$this->prepositions = array('van', 'door', ' met ', 'o.l.v.', 'olv', 'e.a.', 'o.a.', 'e.v.a.', 'i.s.m.', 'Regisseur:', 'Acteurs:', '(Stem)' , '(Zichzelf)', '(try-out)', '(reprise)', '(première)', 'Film:', 'support', 'sopraan', 'alt', 'tenor', 'piano', 'tenorsaxofoon', 'altsaxofoon', 'saxofoon', 'klarinet', 'trombone', 'trompet', 'dirigent', 'organ', 'componist', 'producer', 'harp', 'contrabas', 'bas', 'altviool', 'viool',  'zang', 'basgitaar', 'gitaar', 'spoken word', 'fluit', 'cello', 'drums', 'percussie', 'harp', 'hobo', 'hoorn', 'DJ');
+		$this->prepositions = array('van', 'door', ' met ', 'o.l.v.', 'olv', 'e.a.', 'o.a.', 'e.v.a.', 'i.s.m.', 'Regisseur:', 'Acteurs:', '(Stem)' , '(Zichzelf)', 'try-out', '(try-out)', '(reprise)', 'première', '(première)', 'Film:', 'support', 'sopraan', 'alt', 'tenor', 'piano', 'tenorsaxofoon', 'altsaxofoon', 'saxofoon', 'klarinet', 'trombone', 'trompet', 'dirigent', 'organ', 'componist', 'producer', 'harp', 'contrabas', 'bas', 'altviool', 'viool',  'zang', 'basgitaar', 'gitaar', 'spoken word', 'fluit', 'cello', 'drums', 'percussie', 'harp', 'hobo', 'hoorn', 'DJ');
 	}
 
 }
