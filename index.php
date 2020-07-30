@@ -6,22 +6,22 @@ $theater['success'] = false;
 //Set client character set to utf-8
 mysqli_query($connect, "SET NAMES 'utf8'");
 
-$query = mysqli_query($connect, "SELECT * FROM theaters WHERE alias='".mysqli_real_escape_string($connect, $_GET['theater'])."'");
+$query = mysqli_query($connect, "SELECT * FROM theaters WHERE alias='".mysqli_real_escape_string($connect, $_GET['client'])."'");
 if (mysqli_num_rows($query) >= 1) {
 	$result = mysqli_fetch_array($query);
 
 	$queryString = '';
 
-	if ($_GET['theater'] && !$_GET['month']) {
-		$queryString = "theater=".$result['alias'];
+	if ($_GET['client'] && !$_GET['month']) {
+		$queryString = "client=".$result['alias'];
 		$month = date('m', strtotime('+1 month', time()));
 	}
-	if ($_GET['theater'] && $_GET['month']) {
-		$queryString = "theater=".$result['alias']."&month=".$_GET['month'];
+	if ($_GET['client'] && $_GET['month']) {
+		$queryString = "client=".$result['alias']."&month=".$_GET['month'];
 		$month = explode('-', $_GET['month'])[1];
 	}
-	if ($_GET['theater'] && $_GET['month'] && $_GET['splitKeywords']) {
-		$queryString = "theater=".$result['alias']."&month=".$_GET['month']."&splitKeywords=".$_GET['splitKeywords'];
+	if ($_GET['client'] && $_GET['month'] && $_GET['splitKeywords']) {
+		$queryString = "client=".$result['alias']."&month=".$_GET['month']."&splitKeywords=".$_GET['splitKeywords'];
 		$month = explode('-', $_GET['month'])[1];
 	}
 
