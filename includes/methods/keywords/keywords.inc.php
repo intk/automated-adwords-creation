@@ -153,29 +153,29 @@ class Keywords {
 	   $suffixes = "'S";
 
 	   // captialize all first letters
-	   $str = preg_replace('/\\b(\\w)/e', 'strtoupper("$1")', strtolower(trim($str)));
+	   $str = preg_replace_callback('/\\b(\\w)/e', function($matches) { return strtoupper("\0"); }, strtolower(trim($str)));
 
 	   if ($all_uppercase) {
 	       // capitalize acronymns and initialisms e.g. PHP
-	       $str = preg_replace("/\\b($all_uppercase)\\b/e", 'strtoupper("$1")', $str);
+	       $str = preg_replace_callback("/\\b($all_uppercase)\\b/e", function($matches) { return strtoupper("\0"); }, $str);
 	   }
 	   if ($all_lowercase) {
 	       // decapitalize short words e.g. and
 	       if ($is_name) {
 	           // all occurences will be changed to lowercase
-	           $str = preg_replace("/\\b($all_lowercase)\\b/e", 'strtolower("$1")', $str);
+	           $str = preg_replace_callback("/\\b($all_lowercase)\\b/e", function($matches) { return strtolower("\0"); }, $str);
 	       } else {
 	           // first and last word will not be changed to lower case (i.e. titles)
-	           $str = preg_replace("/(?<=\\W)($all_lowercase)(?=\\W)/e", 'strtolower("$1")', $str);
+	           $str = preg_replace_callback("/(?<=\\W)($all_lowercase)(?=\\W)/e", function($matches) { return strtolower("\0"); }, $str);
 	       }
 	   }
 	   if ($prefixes) {
 	       // capitalize letter after certain name prefixes e.g 'Mc'
-	       $str = preg_replace("/\\b($prefixes)(\\w)/e", '"$1".strtoupper("$2")', $str);
+	       $str = preg_replace_callback("/\\b($prefixes)(\\w)/e", function($matches) { return "\0".strtoupper("\1"); }, $str);
 	   }
 	   if ($suffixes) {
 	       // decapitalize certain word suffixes e.g. 's
-	       $str = preg_replace("/(\\w)($suffixes)\\b/e", '"$1".strtolower("$2")', $str);
+	       $str = preg_replace_callback("/(\\w)($suffixes)\\b/e",  function($matches) { return "\0".strtolower("\1"); }, $str);
 	   }
 	   return $str;
 	}
