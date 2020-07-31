@@ -2,8 +2,7 @@
 // Crawl XML feed and parse productions
 $source = $url;
 $productions = array();
-ini_set('display_errors', 1);
-
+#ini_set('display_errors', 1);
 
 $lexiconTemp = new Lexicon();
 
