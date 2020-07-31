@@ -208,7 +208,7 @@ class Campaign {
 		$performersList = false;
 
 		// If this is true, don't make another ad group from the title
-		if (count($this->performers) > 0 && $this->performers !== false) {
+		if ($this->performers !== false && count($this->performers) > 0) {
 			$performersList = true;
 		}
 
@@ -223,7 +223,7 @@ class Campaign {
 				}
 			}
 
-			if (count($this->performers) > 1) {
+			if ($this->performers !== false && count($this->performers) > 1) {
 				array_push($titlePlacementList, $this->performers[0]);
 			}
 
@@ -239,7 +239,7 @@ class Campaign {
 			$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $subtitleObj->adgroup);
 		}
 
-		if (count($this->performers) > 0 && $this->performers !== false && count($this->performers) <= $this->maxPerformers && $manyPerformers == false) {
+		if ($this->performers !== false && count($this->performers) > 0 && count($this->performers) <= $this->maxPerformers && $manyPerformers == false) {
 			foreach ($this->performers as $performer) {
 				$performersObj = new Keywords($performer, $this->venue, $this->city, $placementsList, 'performer');
 				$keywordsObj->adgroup = array_merge($keywordsObj->adgroup, $performersObj->adgroup);
@@ -298,8 +298,10 @@ class Campaign {
 			} 
 
 			// If subtitle is empty use first performer as subtitle
-			else if (strlen(trim($this->subtitle)) < 1 && count($this->performers) > 0) {
+			else if (strlen(trim($this->subtitle)) < 1 && $this->performers !== false && count($this->performers) > 0) {
 				$subtitle = $this->performers[0];
+			} else {
+				$subtitle = '';
 			}
 
 			$this->adgroup[$key]->ad = $this->createAds(trim($this->adgroup[$key]->name), $this->adgroup[$key]->type, $subtitle);
@@ -307,7 +309,7 @@ class Campaign {
 		}
 
 		// Create keywords and adgroups of performers list
-		if (count($this->performers) > $this->maxPerformers && $manyPerformers == false) {
+		if ($this->performers !== false && count($this->performers) > $this->maxPerformers && $manyPerformers == false) {
 			$adGroupCount = count($this->adgroup);
 			$this->adgroup[$adGroupCount]->name = 'Performers';
 			$this->adgroup[$adGroupCount]->type = 'performer';
@@ -479,14 +481,14 @@ class Campaign {
 		$replace = array('[performer]', '[title]', '[genre]', '[genreSentence]', '[genreTerm]', '[venue]', '[venueShort]', '[location]', '[date]', '[dateFull]');
 
 		# Add keyword insertion when performers amount > maxPerformers
-		if (count($this->performers) > $this->maxPerformers && $type == 'performer') {
+		if ($this->performers !== false && count($this->performers) > $this->maxPerformers && $type == 'performer') {
 			//Sort performers by length for keyword insertion
 			usort($this->performers,'sortByLength');
 			# Placeholder for longest keyword
 			$performer = '{KeyWord:'.$this->performers[0].'}';
 		}
 
-		if ($type == 'title' || ($type == 'performer' && count($this->performers) <= $this->maxPerformers)) {
+		if ($type == 'title' || ($type == 'performer' && $this->performers !== false && count($this->performers !== false && $this->performers) <= $this->maxPerformers)) {
 			$replacement = array($performer, $this->shortstring($title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->venue[1], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		} else {
 			$replacement = array($performer,  $this->shortstring($this->title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->venue[1], $this->city, $this->date->AdDate, $this->date->AdDateFull);
@@ -508,7 +510,7 @@ class Campaign {
 						$heading = $this->replaceTpl($heading1, $replace, $replacement, 30);
 
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && stripos($heading, '{KeyWord:') > -1 && strlen($heading) <= 40)) {
+						if (strlen($heading) <= 30 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && stripos($heading, '{KeyWord:') > -1 && strlen($heading) <= 40)) {
 							$ad[$adkey]->heading[0] = $heading;
 						}
 
@@ -559,7 +561,7 @@ class Campaign {
 
 						$description = $this->replaceTpl($description1, $replace, $replacement, 90);
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
+						if (strlen($description) <= 90 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
 							$ad[$adkey]->description[0] = $description;
 						}
 						// Try to add the full title to the description if it fits the 90 characters
@@ -567,7 +569,7 @@ class Campaign {
 						$tempReplacement[1] = $this->title;
 						$description = $this->replaceTpl($description1, $replace, $tempReplacement, 90);
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
+						if (strlen($description) <= 90 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
 							$ad[$adkey]->description[0] = $description;
 						}
 
@@ -586,7 +588,7 @@ class Campaign {
 						$tempReplacement[1] = $this->title;
 						$description = $this->replaceTpl($description2, $replace, $tempReplacement, 90);
 						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
+						if (strlen($description) <= 90 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
 							$ad[$adkey]->description[1] = $description;
 						}
 
@@ -598,7 +600,7 @@ class Campaign {
 					$keywordInsertionPath = false;
 
 					
-					if (count($this->performers) > $this->maxPerformers && $type == 'performer') {
+					if ($this->performers !== false && count($this->performers) > $this->maxPerformers && $type == 'performer') {
 						if (strlen($title) <= 25) {
 							$ad[$adkey]->path[0] = $this->removeChars(strtolower($genre));
 							$ad[$adkey]->path[1] = $title;
@@ -610,7 +612,7 @@ class Campaign {
 
 
 						// Replace path title if keyword insertion couldn't be applied
-						if (count($this->performers) > $this->maxPerformers && $type == 'performer') {
+						if ($this->performers !== false && count($this->performers) > $this->maxPerformers && $type == 'performer') {
 							if (strlen($this->title)>1) {
 								$pathTitle = $this->title;
 							} else {
@@ -618,7 +620,7 @@ class Campaign {
 							}
 						}
 
-						else if (count($this->performers) <= $this->maxPerformers && $type == 'performer') {
+						else if ($this->performers !== false && count($this->performers) <= $this->maxPerformers && $type == 'performer') {
 							$pathTitle = $performer;
 						
 						} else {

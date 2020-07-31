@@ -32,7 +32,6 @@ include('includes/config.inc.php');
 
 //load method for creating CSV
 include('includes/methods/csv/csv.processor.php');
-error_reporting(E_ALL);
 
 // Determine if performance already exists 
 
