@@ -100,7 +100,7 @@ if ($_GET['client']) {
 
 		//Parse monthly season
 		include('includes/scraper.inc.php');
-		if ($_GET['month']) {
+		if (isset($_GET['month'])) {
 			$month = filter_var($_GET['month'], FILTER_SANITIZE_STRING);
 		} else {
 			$month = date('Y-m', strtotime('+1 month', time()));
