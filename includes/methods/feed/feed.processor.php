@@ -2,7 +2,7 @@
 // Crawl XML feed and parse productions
 $source = $url;
 $productions = array();
-#ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 
 $lexiconTemp = new Lexicon();
 
@@ -249,7 +249,7 @@ foreach (toPath($xml, $tags['item']) as $production) {
 	} else {
 		
 		// Determine if the time has been given
-		if (strlen($tags['time']) > 1) {
+		if (isset($tags['time']) && strlen($tags['time']) > 1) {
 			$time = strtotime(toPath($production, $tags['date']).' '.toPath($production, $tags['time']));
 		} else {
 			$time = strtotime(toPath($production, $tags['date']));
@@ -402,6 +402,7 @@ foreach (toPath($xml, $tags['item']) as $production) {
 			#$productionObj->genre[0] = 'concert';
 			#$productionObj->genre[1] = 'muziek';
 			$productionObj->link = filter_var(trim(toPath($production, $tags['link'])), FILTER_SANITIZE_URL);
+			$productionObj->date = new stdClass();
 			$productionObj->date->time = $time;
 			$productionObj->date->dateString = date('d-m-Y H:i', $productionObj->date->time);
 		
