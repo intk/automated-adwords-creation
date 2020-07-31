@@ -4,6 +4,7 @@ $source = $url;
 $productions = array();
 ini_set('display_errors', 1);
 
+
 $lexiconTemp = new Lexicon();
 
 function validateDate($date, $format = 'd-m-Y')
