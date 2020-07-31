@@ -6,7 +6,7 @@ $theater['success'] = false;
 //Set client character set to utf-8
 mysqli_query($connect, "SET NAMES 'utf8'");
 
-$query = mysqli_query($connect, "SELECT * FROM theaters WHERE alias='".mysqli_real_escape_string($connect, $_GET['client'])."'");
+$query = mysqli_query($connect, "SELECT * FROM theaters WHERE alias='".mysqli_real_escape_string($connect, $_GET['client'])."' OR googleAds='".mysqli_real_escape_string($connect, $_GET['client'])."'");
 if (mysqli_num_rows($query) >= 1) {
 	$result = mysqli_fetch_array($query);
 
