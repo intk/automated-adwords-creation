@@ -620,7 +620,7 @@ class Campaign {
 							}
 						}
 
-						else if ($this->performers !== false && count($this->performers) <= $this->maxPerformers && $type == 'performer') {
+						else if (($this->performers !== false && count($this->performers) <= $this->maxPerformers || $this->performers == false) && $type == 'performer') {
 							$pathTitle = $performer;
 						
 						} else {
@@ -657,9 +657,30 @@ class Campaign {
 								$pathFits = true;
 							} else {
 
-								// Devide path string over 2 paths for display url
-								for ($i = 0; $i < 2; $i++) {
-									$ad[$adkey]->path[$i] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', $pathElements[$i])));
+								// Divide path string over 2 paths for display url
+								$pathNum = 0;
+								$i = 0;
+								while ($i < count($pathElements)) {
+
+									// Don't split when a path part contains more than 15 characters
+									if (strlen($pathElements[$i]) > 15) {
+										$ad[$adkey]->path[0] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', $pathElements[0])));
+										$ad[$adkey]->path[1] = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', $pathElements[1])));
+									} else {
+										// Divide string parts between 2 paths of max 15 characters
+										if ($pathNum < 2) {
+											$tempString = $this->removeChars(str_replace('--', '-', str_replace(' ', '-', trim($ad[$adkey]->path[$pathNum].' '.$pathElements[$i]))));
+
+											if (strlen($tempString) <= 15) {
+												$ad[$adkey]->path[$pathNum] = $tempString;
+											} else {
+												$pathNum++;
+												$i--;
+											}
+										}
+									}
+
+									$i++;
 								}
 
 							}
