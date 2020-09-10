@@ -28,7 +28,12 @@ function dateFromString($string, $lexicon) {
 	#	$string = preg_replace("/\| \d{2}\:\d{2}/", "", $string);
    # }
 	$string = str_replace(array('&nbsp;','&#39;','| '), array('','\'', ', '), $string);
-	$splittedDate = preg_split('/( \| |t\/m|&|tm| -| - |au | to| al | and | tot )+/i', $string);
+
+	if (strpos($string, ' - ') > -1 && strpos($string, '/') > -1) {
+		$splittedDate = preg_split('/( \| |t\/m|&|tm|au | to| al | and | tot )+/i', $string);
+	} else {
+		$splittedDate = preg_split('/( \| |t\/m|&|tm| -| - |au | to| al | and | tot )+/i', $string);
+	}
 
 	// Determine if date and time are separated, choose part with date format
 	if (strpos($splittedDate[count($splittedDate)-1], 'uur') > 1 || strpos($string, ':') > 1) {
@@ -61,11 +66,12 @@ function dateFromString($string, $lexicon) {
 		}
 	}
 
-	// If date format is DD.MM or DD-MM
-	if (substr_count($date, '.') == 1 || (preg_match("/\d{2}\-\d{2}/", $date, $match) && !preg_match("/\d{2}\-\d{2}\-\d{4}/", $date, $match) && !preg_match("/\d{4}\-\d{2}\-\d{2}/", $date, $match))) {
+	// If date format is DD.MM, DD-MM or DD/MM
+	if (substr_count($date, '.') == 1 || (preg_match("/\d{2}\-\d{2}|\d{2}\/\d{2}/", $date, $match) && !preg_match("/\d{2}\-\d{2}\-\d{4}/", $date, $match) && !preg_match("/\d{4}\-\d{2}\-\d{2}/", $date, $match))) {
 
-		if (preg_match("/\d{2}.\d{2}|\d{2}\-\d{2}/", $date, $match)) {
-			$dateTemp = trim(str_replace('.','-', $date));
+
+		if (preg_match("/\d{2}.\d{2}|\d{2}\-\d{2}|\d{2}\/\d{2}/", $date, $match)) {
+			$dateTemp = trim(str_replace(array('.','/'),'-', $match[0]));
 			// Determine year if only day and month is given 
 			$dateEl = explode('-', $dateTemp);
 			if ($dateEl[1] >= date('m')) {
@@ -322,6 +328,15 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			if (strpos($subtitle, "&nbsp;") !== false || strlen($subtitle) < 2) {
 				$subtitle = trimString($production->find($tags['subtitle'], 1)->plaintext);
 			}
+
+			// If subtitle tag doesn't contain class
+			if (preg_match("/^(.+)\[(\d{1})\]/", $tags['subtitle'], $match)) {
+				$subtitle = trimString($production->find($match[1], $match[2])->plaintext);
+			} else {
+				$subtitle = $production->find($tags['subtitle'], 0)->plaintext;
+			}
+
+
 		}
 		if (preg_match("/\d{4}-\d{2}-\d{2}/", $tags['date'], $match)) {
 			$date = trimString($tags['date']);
@@ -469,7 +484,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 
 
 	//Custom added 
-	#print_r(array($title, $tags['genre'], $production->find($tags['genre'], 0)->plaintext, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
+	print_r(array($title, $tags['genre'], $production->find($tags['genre'], 0)->plaintext, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
 
 	// Filter by month
 	if (((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) || $month == "PAST") {
