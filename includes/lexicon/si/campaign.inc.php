@@ -58,6 +58,7 @@ class Lexicon {
 		$this->keyword['art'] = 'umetnost'; 
 		$this->keyword['circus'] = 'cirkus'; 
 		$this->keyword['opera'] = 'opera'; 
+		$this->keyword['drama'] = 'drama';
 		$this->keyword['online'] = 'na spletu';
 		$this->keyword['agenda'] = 'dnevni red';
 

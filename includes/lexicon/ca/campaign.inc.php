@@ -74,7 +74,7 @@ class Lexicon {
 		$this->adPlacement['performance'] = array('espectacle', 'un espectacle', 'l\'espectacle');
 
 		// Prepositions to remove from end or beginning of ad group name
-		$this->prepositions = array('de', 'per', 'amb');
+		$this->prepositions = array('de', 'per', 'amb', 'con');
 	}
 
 }

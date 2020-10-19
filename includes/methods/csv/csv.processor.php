@@ -1,4 +1,8 @@
 <?php
+// Encode special characters before output
+include(dirname(__FILE__).'/encoding.inc.php');
+use \ForceUTF8\Encoding;
+
 function createCSV($theatre, $monthYear, $dailybudget, $location, $status, $package) {
 
 $data = array (
@@ -233,6 +237,7 @@ foreach ($data as $key => $value) {
 $fp = fopen('campaigns/'.$_SESSION['INTK-processID'].'.csv', 'a');
 
 foreach ($list as $fields) {
+	$fields = Encoding::toUTF8($fields);
     fputcsv($fp, $fields);
 }
 fclose($fp);

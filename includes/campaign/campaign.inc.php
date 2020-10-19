@@ -311,6 +311,7 @@ class Campaign {
 		// Create keywords and adgroups of performers list
 		if ($this->performers !== false && count($this->performers) > $this->maxPerformers && $manyPerformers == false) {
 			$adGroupCount = count($this->adgroup);
+			$this->adgroup[$adGroupCount] = new stdClass();
 			$this->adgroup[$adGroupCount]->name = 'Performers';
 			$this->adgroup[$adGroupCount]->type = 'performer';
 			$this->adgroup[$adGroupCount]->ad = $this->createAds(trim($this->adgroup[$adGroupCount]->name), $this->adgroup[$adGroupCount]->type, $this->trimArtist($this->subtitle));
@@ -488,7 +489,7 @@ class Campaign {
 			$performer = '{KeyWord:'.$this->performers[0].'}';
 		}
 
-		if ($type == 'title' || ($type == 'performer' && $this->performers !== false && count($this->performers !== false && $this->performers) <= $this->maxPerformers)) {
+		if ($type == 'title' || $type == 'performer' && ($this->performers !== false && count($this->performers) <= $this->maxPerformers)) {
 			$replacement = array($performer, $this->shortstring($title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->venue[1], $this->city, $this->date->AdDate, $this->date->AdDateFull);
 		} else {
 			$replacement = array($performer,  $this->shortstring($this->title), $tLabel[1], $tLabel[2], $tLabel[0], $this->venue[0], $this->venue[1], $this->city, $this->date->AdDate, $this->date->AdDateFull);
@@ -603,7 +604,7 @@ class Campaign {
 					if ($this->performers !== false && count($this->performers) > $this->maxPerformers && $type == 'performer') {
 						if (strlen($title) <= 25) {
 							$ad[$adkey]->path[0] = $this->removeChars(strtolower($genre));
-							$ad[$adkey]->path[1] = $title;
+							$ad[$adkey]->path[1] = mb_strtolower($title, 'UTF-8');
 							$keywordInsertionPath = true;
 						}
 					} 
@@ -628,8 +629,7 @@ class Campaign {
 							$pathTitle = $title;
 						}
 
-						$pathString = strtolower(trim(preg_replace('/( de | een | en | het |:|, | & )/', ' ', trim($pathTitle))));
-
+						$pathString = mb_strtolower(trim(preg_replace('/( de | een | en | het |:|, | & )/', ' ', trim($pathTitle))), 'UTF-8');
 						// Check if pathString length <= 15 characters
 						if (strlen($pathString) <= 15) {
 							// Only use first genre if there are more
