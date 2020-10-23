@@ -151,35 +151,9 @@ class Campaign {
 		$adGroups = array();
 
 		$placements = new stdClass();
-		$placements->theater = array($this->lexicon->keyword['theater'], $this->lexicon->keyword['tickets']);
-		$placements->theatre = array($this->lexicon->keyword['theatre'], $this->lexicon->keyword['tickets'], $this->lexicon->keyword['theater']);
-		$placements->cabaret = array($this->lexicon->keyword['cabaret'], $this->lexicon->keyword['theater'], $this->lexicon->keyword['tickets']);
-		$placements->musical = array($this->lexicon->keyword['theater']);
-		$placements->lecture = array($this->lexicon->keyword['lecture'], $this->lexicon->keyword['theater']);
-		$placements->family = array($this->lexicon->keyword['family'], $this->lexicon->keyword['theater']);
-		$placements->dance = array($this->lexicon->keyword['dance'], $this->lexicon->keyword['theater']);
-	    $placements->concert = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['music'], $this->lexicon->keyword['live']);
-	    $placements->expo = array($this->lexicon->keyword['expo'], $this->lexicon->keyword['exhibition']);
-	    if (isset($this->lexicon->keyword['visualArts'])) {
-	   		$placements->visualArts = array($this->lexicon->keyword['visualArts'], $this->lexicon->keyword['exhibition']);
-		}
-		if (isset($this->lexicon->keyword['workshop'])) {
-	   		$placements->workshop = array($this->lexicon->keyword['workshop']);
-		}
-		if (isset($this->lexicon->keyword['uitstap'])) {
-	   		$placements->workshop = array($this->lexicon->keyword['uitstap']);
-		}
-		if (isset($this->lexicon->keyword['vorming'])) {
-	   		$placements->workshop = array($this->lexicon->keyword['vorming']);
-		}
-		$placements->show = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['theater']);
-		$placements->music = array($this->lexicon->keyword['music'], $this->lexicon->keyword['concert']);
-		$placements->festival = array($this->lexicon->keyword['concert'], $this->lexicon->keyword['music'], $this->lexicon->keyword['festival'], $this->lexicon->keyword['live']);
-		$placements->classic = array($this->lexicon->keyword['classic'], $this->lexicon->keyword['concert'], $this->lexicon->keyword['theater']);
-		$placements->art = array($this->lexicon->keyword['collection'], $this->lexicon->keyword['art']);
-		$placements->opera = array($this->lexicon->keyword['opera'], $this->lexicon->keyword['theater']);
-		$placements->circus = array($this->lexicon->keyword['circus'], $this->lexicon->keyword['theater']);
-		$placements->movie = array($this->lexicon->keyword['movie']);
+
+		//Get keyword placements from lexicon file
+		$placements = $this->lexicon->keyword;
 
 		if (count($this->genre) > 1) {
 			$genre = $this->genre[1];
@@ -191,15 +165,26 @@ class Campaign {
 
 		//Loop keyword list
 		foreach($placements as $keyWord => $keyValue) {
-			//Check if genre has keyword array
-			if (stripos($genre, $keyValue[0]) !== false) {
-				$placementsList = $keyValue;
+			//Check if genre has a keyword
+			if (stripos($genre, $keyValue) !== false) {
+
+				// Add keyword placements for specific genres
+				if ($keyWord == 'cabaret' || $keyWord == 'lecture' || $keyWord == 'family' || $keyWord == 'dance') {
+					$placementsList = array($keyValue, $placements->theater, $placements->tickets);
+				} 
+				if ($keyWord == 'concert' || $keyWord == 'music') {
+					$placementsList = array($placements['concert'], $placements['music'], $placements['live'], $placements['tickets']);
+				}
+				else {
+					$placementsList = array($keyValue, $placements['tickets']);
+				}
 			}
 		}
 
+
 		# Add default placements if placement list is still empty
 		if (count($placementsList) == 0) {
-			$placementsList = $placements->theater;
+			$placementsList = array($genre, $placements['tickets']);
 		}
 
 		$keywordsObj = new stdClass();
@@ -421,36 +406,8 @@ class Campaign {
 		$ad = array();
 		$pLabel = new stdClass();
 		
-		//Genre placements
-		$pLabel->theatre = $this->lexicon->adPlacement['theatre'];
-		$pLabel->cabaret = $this->lexicon->adPlacement['cabaret'];
-		$pLabel->musical = $this->lexicon->adPlacement['musical'];
-		$pLabel->dance = $this->lexicon->adPlacement['dance'];
-		$pLabel->movie = $this->lexicon->adPlacement['movie'];
-		$pLabel->concert = $this->lexicon->adPlacement['concert'];
-		if (isset($this->lexicon->adPlacement['visualArts'])) {
-			$pLabel->visualArts = $this->lexicon->adPlacement['visualArts'];
-		}
-		if (isset($this->lexicon->adPlacement['lecture'])) {
-			$pLabel->lecture = $this->lexicon->adPlacement['lecture'];
-		}
-		if (isset($this->lexicon->adPlacement['workshop'])) {
-			$pLabel->workshop = $this->lexicon->adPlacement['workshop'];
-		}
-		if (isset($this->lexicon->adPlacement['uitstap'])) {
-			$pLabel->workshop = $this->lexicon->adPlacement['uitstap'];
-		}
-		if (isset($this->lexicon->adPlacement['vorming'])) {
-			$pLabel->workshop = $this->lexicon->adPlacement['vorming'];
-		}
-		if (isset($this->lexicon->adPlacement['film'])) {
-			$pLabel->film = $this->lexicon->adPlacement['film'];
-		}
-		$pLabel->expo = $this->lexicon->adPlacement['expo'];
-		$pLabel->opera = $this->lexicon->adPlacement['opera'];
-		$pLabel->music = $this->lexicon->adPlacement['music'];
-		$pLabel->classic = $this->lexicon->adPlacement['classic'];
-		$pLabel->performance = $this->lexicon->adPlacement['performance'];
+		//Get genre placements from lexicon file
+		$pLabel = $this->lexicon->adPlacement;
 	
 		$genre = $this->genre[0];
 
