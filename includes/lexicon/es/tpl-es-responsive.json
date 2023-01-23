@@ -1,0 +1,117 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "¿Espectáculos de [title]?"
+      ],
+      "heading2": [
+        "Visita el [venueShort]",
+        "[venue]",
+        "Visita el [venue]"
+      ],
+      "heading3": [
+        "[date]",
+        "[genre] el [date]"
+      ],
+      "heading4": ["[date] en [location]"],
+      "heading5": ["Míralo ahora"],
+      "heading6": ["Ver el programa en línea"],
+      "heading7": ["Planifica tu visita"],
+      "heading8": ["Descobreix [venue]"],
+      "heading9": [
+        "[venue]",
+        "Conoce el [venue]"
+      ],
+      "heading10": ["Consulta nuestra agenda"],
+      "heading11": ["Descubre nuestras actuaciones"],
+      "heading12": ["En [location]"],
+      "heading13": ["Compra tus entradas ahora"],
+      "heading14": ["Compra entradas online"],
+      "heading15": ["Conoce la programación propia"],
+      "description1":[
+        "Ven a la obra de [title]? Compra tus tickets.",
+        "Ven a la obra de [title] en [venue]? Compra tus tickets.",
+        "Ven a la obra de [title] en [venue]? Compra tus tickets online.",
+        "Ven a la obra de [title] en [venue]? Compra tus tickets para el [date]"
+      ],
+      "description2":[
+        "Descubre [title] en [venue].",
+        "Descubre [title] en [date] en el [venue].",
+        "Ven el espectáculo del [title] el [date] en el [venue].",
+        "Ven [title] el [dateFull]. Visita el [venue]."
+      ],
+      "description3":[
+         "¿Te gusta [title]? Compra tus entradas.",
+        "¿Te gusta [title]? Compra tus entradas ahora.",
+        "¿Te gusta [title]? Visita el [venue]. Compra tus entradas para [date]",
+        "¿Te gusta [title]? Visita el [venue]. Compra tus entradas online para [date]",
+        "¿Te gusta [title]? con [performer]? Compra tus entradas para [date]",
+        "¿Te gusta [title]? con [performer]? Compra tus entradas para [date]"
+      ],
+      "description4":[
+        "Descubre [title] al [venue].",
+        "Encuentra [title] en el programa del [venue]."
+      ]
+    }]
+  },
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "Visita el [venueShort]",
+        "[venue]",
+        "Visita el [venue]"
+      ],
+      "heading3": [
+        "[date]",
+        "[genre] el [date]"
+      ],
+      "heading4": ["[date] en [location]"],
+      "heading5": ["Míralo ahora"],
+      "heading6": ["Ver el programa en línea"],
+      "heading7": ["Planifica tu visita"],
+      "heading8": ["Descobreix [venue]"],
+      "heading9": [
+        "[venue]",
+        "Conoce el [venue]"
+      ],
+      "heading10": ["Consulta nuestra agenda"],
+      "heading11": ["Descubre nuestras actuaciones"],
+      "heading12": ["En [location]"],
+      "heading13": ["Compra tus entradas ahora"],
+      "heading14": ["Compra entradas online"],
+      "heading15": ["En [venue]"],
+      "description1":[
+        "¿Descubre [performer]? Compra tus entradas.",
+        "¿[performer] llega al [venue]? Compra tus entradas.",
+        "¿[performer] en el [venue]? Compra tus entradas online.",
+        "¿[performer] en el [venue]? Compra tus entradas para [date]"
+      ],
+      "description2":[
+        "Descubre [performer] tocar en [date]",
+        "Descubre [performer] en [venue].",
+        "Ven a ver [performer] tocar en [date] Visita [venue].",
+        "Descubre [title] a manos de [performer]. Visita [venue] en [date]"
+      ],
+      "description3":[
+        "¿Te gusta [performer]? Compra tus tickets.",
+        "¿Te gusta [performer]? Compra tus tickets ahora.",
+        "¿Te gusta [performer]? Ven al [venue] y compra tus tickets para el [date]",
+        "¿Te gusta [performer]? Ven al [venue]. y compra tus tickets online para el [date]",
+        "¿Te gusta [title] con [performer]? Compra tus tickets para el [date]",
+        "¿Te gusta [title] con [performer]? Compra tus tickets online para el [date]"
+      ],
+      "description4":[
+        "Descubre [performer] al [venue].",
+        "Encuentra [performer] en el programa del [venue]."
+      ]
+    }]
+  }
+]
