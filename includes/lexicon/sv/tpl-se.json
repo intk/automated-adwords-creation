@@ -1,0 +1,148 @@
+[
+  {
+    "type": "title",
+    "ads": [
+      {
+        "heading1": [
+          "[title]",
+          "[title]?"
+        ],
+        "heading2": [
+          "Besök [venueShort]",
+          "[venue]",
+          "Besök [venue]"
+        ],
+        "heading3": [
+          "[date] i [location]"
+        ],
+        "description1": [
+          "[title] - Se [title] på [venue]? Boka dina biljetter.",
+          "[title] - Se [title] på [venue]? Boka dina biljetter online.",
+          "[title] - Se [title] på [venue]? Boka biljetter för den [date]"
+        ],
+        "description2": [
+          "Upptäck [genreSentence] [title] på [venue].",
+          "Upptäck [genre] med [performer] på [venue]."
+        ]
+      },
+      {
+        "heading1": [
+          "[title]",
+          "Vill du se [title]?"
+        ],
+        "heading2": [
+          "[genre] den [date]"
+        ],
+        "heading3": [
+          "Besök [venueShort]",
+          "[venue]",
+          "Besök [venue]"
+        ],
+        "description1": [
+          "[title] - Upptäck [title] på [venue].",
+          "[title] - Upptäck [title] på [date] den [venue].",
+          "[title] spelas den [date] Besök [venue].",
+          "[title] spelas den [dateFull]. Besök [venue]."
+        ],
+        "description2": [
+          "Planera ditt besök och boka biljetter online."
+        ]
+      },
+      {
+        "heading1": [
+          "[title]"
+        ],
+        "heading2": [
+          "[venueShort]",
+          "[venue]"
+        ],
+        "heading3": [
+          "[genre] den [date]"
+        ],
+        "description1": [
+          "[title] - Gillar du [title]? Köp dina biljetter nu.",
+          "[title] - Gillar du [title]? Besök [venue]. Boka biljetter till föreställningen den [date]",
+          "[title] - Gillar du [title]? Besök [venue]. Boka biljetter online till föreställningen den [date]"
+        ],
+        "description2": [
+          "Upptäck [title] på [venue]",
+          "Upptäck [title] i [venue]s program."
+        ]
+      }
+    ]
+  },
+  {
+    "type": "performer",
+    "ads": [
+      {
+        "heading1": [
+          "[performer]",
+          "Se [performer]?"
+        ],
+        "heading2": [
+          "Besök [venueShort]",
+          "[venue]",
+          "Besök [venue]"
+        ],
+        "heading3": [
+          "[date] i [location]"
+        ],
+        "description1": [
+          "[performer] på [venue]? Boka dina biljetter.",
+          "[performer] - Vill du se [performer] på [venue]? Boka dina biljetter.",
+          "[performer] - Vill du se [performer] på [venue]? Boka dina biljetter online.",
+          "[performer] - Vill du se [performer] på [venue]? Boka dina biljetter till föreställningen den [date]."
+        ],
+        "description2": [
+          "Upptäck [genreSentence] [title] på [venue]."
+        ]
+      },
+      {
+        "heading1": [
+          "[performer]",
+          "Vill du se [performer]?"
+        ],
+        "heading2": [
+          "[date] på [venueShort]",
+          "[venue]",
+          "[date] på [venue]"
+        ],
+        "heading3": [
+          "[title]",
+          "Se [title]",
+          "Kom och se [title]"
+        ],
+        "description1": [
+          "[performer] - Upptäck [performer] på [venue].",
+          "[performer] - Se [performer] uppträda den [date] Besök [venue].",
+          "[performer] - Upptäck [title] med [performer]. Besök [venue] den [date]"
+        ],
+        "description2": [
+          "Planera ditt besök och boka dina biljetter online."
+        ]
+      },
+      {
+        "heading1": [
+          "[performer]"
+        ],
+        "heading2": [
+          "[title]"
+        ],
+        "heading3": [
+          "[date] på [venueShort]",
+          "[venue]",
+          "[date] på [venue]"
+        ],
+        "description1": [
+          "[performer] - Gillar du [performer]? Köp dina biljetter nu.",
+          "[performer] - Gillar du [performer]? Besök [venue] och boka biljetter till föreställningen den [date].",
+          "[performer] - Gillar du [performer]? Besök [venue]. Boka biljetter online till föreställningen den [date]."
+        ],
+        "description2": [
+          "Upptäck [performer] på [venue].",
+          "Upptäck [performer] i [venue]s program."
+        ]
+      }
+    ]
+  }
+]

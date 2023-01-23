@@ -1,0 +1,99 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": [
+        "Vieraile [venueShort]",
+        "[venue]",
+        "Vieraile [venue]"
+      ],
+      "heading3": [
+        "[date]",
+        "[genre] [date]"
+      ],
+      "heading4": ["[date] [location]"],
+      "heading5": ["Katso sitä nyt"],
+      "heading6": ["Katso ohjelma verkossa"],
+      "heading7": ["Suunnittele vierailusi"],
+      "heading8": ["[venue] [genre]"],
+      "heading9": [
+        "[venue]",
+        "Mene [venue]"
+      ],
+      "heading10": ["Katso esityslistamme"],
+      "heading11": ["Lue lisää"],
+      "heading12": ["[location]"],
+      "heading13": ["Tilaa lippusi nyt"],
+      "heading14": ["Osta lippusi verkosta nyt"],
+      "heading15": ["Tutustu elokuvaan"],
+      "description1":[
+        "[title] elokuva osana [venue].",
+        "[title] elokuva osana [venue] syyskuussa.",
+      ],
+      "description2":[
+        "[title] - Katso se nyt paikassa [venue].",
+        "[title] – Katso se nyt [venue] [dateFull]."
+      ],
+      "description3":[
+        "Tule katsomaan ohjaaja [performer]in [title] elokuva teatterihin."
+      ],
+      "description4":[
+        "Helsinki International Film Festival - Rakkautta ja anarkiaa - Tutustu nyt"
+      ]
+    }]
+  },
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "Vieraile [venueShort]",
+        "[venue]",
+        "Vieraile [venue]"
+      ],
+      "heading3": [
+        "[date]",
+        "[genre] [date]"
+      ],
+      "heading4": ["[date] [location]"],
+      "heading5": [
+        "[title]"
+      ],
+      "heading6": ["Katso ohjelma verkossa"],
+      "heading7": ["Suunnittele vierailusi"],
+      "heading8": ["[venue] [genre]"],
+      "heading9": [
+        "[venue]",
+        "Mene [venue]"
+      ],
+      "heading10": ["Katso esityslistamme"],
+      "heading11": ["Lue lisää"],
+      "heading12": ["[location]"],
+      "heading13": ["Tilaa lippusi nyt"],
+      "heading14": ["Osta lippusi verkosta nyt"],
+      "heading15": ["Tutustu elokuvaan"],
+      "description1":[
+        "[performer]in elokuva näytetään [venue]",
+        "[performer] - [title] elokuva näytetään [venue]."
+      ],
+      "description2":[
+        "Lue lisää ohjaaja [performer]in elokuvasta ja tule katsomaan teatterihin.",
+        "Lue lisää ohjaaja [performer]in [title] elokuva ja tule katsomaan teatterihin."
+      ],
+      "description3":[
+        "[performer]in elokuva - Katso se nyt paikassa [venue].",
+        "[performer]in [title] – Katso se nyt [venue] [dateFull]."
+      ],
+      "description4":[
+        "Helsinki International Film Festival - Rakkautta ja anarkiaa - Tutustu nyt"
+      ]
+    }]
+  }
+]

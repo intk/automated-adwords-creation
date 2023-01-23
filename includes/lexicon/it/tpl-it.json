@@ -1,0 +1,137 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": [
+        "Visita [venueShort]",
+        "[venue]",
+        "Visita [venue]"
+      ],
+      "heading3": ["[date] a [location]"],
+      "description1":[
+        "[title] al [venue]? Compra i biglietti.",
+        "[title] al [venue]? Compra online i biglietti.",
+        "[title] al [venue]? Compra i biglietti per il [date]"
+      ],
+      "description2":[
+        "Scopri [genreSentence] [title] al [venue].",
+        "Scopri [genre] con [performer] al [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Vedere [title]?"
+      ],
+      "heading2": ["[genre] il [date]"],
+      "heading3": [
+        "Visita [venueShort]",
+        "[venue]",
+        "Visita [venue]"
+      ],
+      "description1":[
+        "[title] - Vivi [title] al [venue].",
+        "[title] - Guarda [title] il [date] al [venue].",
+        "[title] - Vivi [title] il [date]. Visita [venue].",
+        "[title] - Guarda [title] il [dateFull]. Visita [venue]."
+      ],
+      "description2":[
+        "Organizza la tua visita al teatro e prenota i ticket online."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": ["[venueShort]", "[venue]"],
+      "heading3": ["[genre] il [date]"],
+      "description1":[
+        "[title] - Vieni al [venue]. Compra qui i tuoi biglietti.",
+        "[title]? Vieni al [venue]. Prenota i tuoi ticket per il [date]",
+        "[title]? Vieni al [venue]. Prenota i tuoi biglietti online per il [date]",
+        "[title] con [performer]? Prenota i tuoi biglietti per il [date]",
+        "[title] con [performer]? Prenota i tuoi biglietti online per il [date]"
+      ],
+      "description2":[
+        "Scopri [title] e il programma completo del [venue]."
+      ]
+    }]
+  },
+  
+  
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "Visita [venueShort]",
+        "[venue]",
+        "Visita [venue]"
+      ],
+      "heading3": ["[date] a [location]"],
+      "description1":[
+        "[performer] al [venue]? Prenota i tuoi biglietti.",
+        "[performer] al [venue]? Prenota i tuoi ticket online.",
+        "[performer] al [venue]? Prenota i tuoi biglietti per il [date]"
+      ],
+      "description2":[
+        "Scopri [genreSentence] [title] al [venue]"
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "[performer] dal vivo?"
+      ],
+      "heading2": [
+        "[genre] il [date]"
+      ],
+      "heading3": [
+        "[title]",
+        "Scopri [title]",
+        "Da non perdere: [title]"
+      ],
+      "description1":[
+        "[performer] - Dal vivo al [venue].",
+        "[performer] - Vedere [performer], [title]? Visita [venue].",
+        "[performer] - Vedere [title] con [performer]? Visita [venue] il [date]"
+      ],
+      "description2":[
+        "Organizza la tua visita al teatro e ordina i tuoi biglietti online."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": ["[title]"],
+      "heading3": [
+        "[date] al [venueShort]",
+        "[venue]",
+        "[date] al [venue]"
+      ],
+      "description1":[
+        "[performer]? Compra i tuoi ticket qui.",
+        "[performer]? Prenota i tuoi biglietti per il [venue].",
+        "[performer]? Prenota i tuoi ticket online per il [venue].",
+        "[performer]? Vieni al [venue]. Prenota i ticket online per il [date]",
+        "[performer]. Scopri [title]. Prenota i ticket per il [date]",
+        "[performer]. Scopri [genreSentence] [title]. Prenota i ticket online per il [date]"
+      ],
+      "description2":[
+        "Scopri [performer] e il programma completo del [venue]."
+      ]
+    }]
+  }
+]

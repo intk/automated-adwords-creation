@@ -1,0 +1,110 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "[title] - Film"
+      ],
+      "heading2": [
+        "Bezoek [venueShort]",
+        "[venue]",
+        "Bezoek [venue]"
+      ],
+      "heading3": [
+        "Film bij [venue]"
+      ],
+      "heading4": ["Film in [location]"],
+      "heading5": ["Nu te zien"],
+      "heading6": ["Bekijk het filmprogramma online"],
+      "heading7": ["Plan je bezoek"],
+      "heading8": ["Ontdek [venue]"],
+      "heading9": [
+        "[venue]",
+        "Kom naar [venue]"
+      ],
+      "heading10": ["Bekijk onze agenda"],
+      "heading11": ["Ontdek ons filmaanbod"],
+      "heading12": ["In [location]"],
+      "heading13": ["Koop nu je tickets"],
+      "heading14": ["Bestel tickets online"],
+      "heading15": ["Bij [venue]"],
+      "description1":[
+        "[title] zien bij [venue]? Bestel tickets.",
+        "[title] zien? Bekijk [genreSentence] bij [venue]. Bestel tickets.",
+        "[title] zien? Bekijk [genreSentence] bij [venue]. Bestel tickets online."
+      ],
+      "description2":[
+        "[title] - Nu te zien bij [venue].",
+        "De film [title] is nu te zien bij [venue].",
+        "De film [title] is nu te zien bij [venue] in [location]."
+      ],
+      "description3":[
+       "[title] - Kom naar [genreSentence] bij [venue]. Bestel tickets.",
+          "[title] - Kom naar [genreSentence] bij [venue]. Bestel tickets online.",
+          "[title] met [performer] nu te zien bij [venue]. Bestel tickets.",
+          "[title] met [performer] nu te zien bij [venue]. Bestel tickets online."
+      ],
+      "description4":[
+        "Vind [title] bij [venue].",
+        "Vind [title] in het programma van [venue]."
+      ]
+    }]
+  },
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "Bezoek [venueShort]",
+        "[venue]",
+        "Bezoek [venue]"
+      ],
+      "heading3": [
+        "Film bij [venue]"
+      ],
+      "heading4": ["Film in [location]"],
+      "heading5": [
+        "[title]",
+        "Bezoek [title]",
+        "Kom naar [title]"
+      ],
+      "heading6": ["Bekijk het filmprogramma online"],
+      "heading7": ["Plan je bezoek"],
+      "heading8": ["Ontdek [venue]"],
+      "heading9": [
+        "[venue]",
+        "Kom naar [venue]"
+      ],
+      "heading10": ["Bekijk onze agenda"],
+      "heading11": ["Ontdek ons filmaanbod"],
+      "heading12": ["In [location]"],
+      "heading13": ["Koop nu je tickets"],
+      "heading14": ["Bestel tickets online"],
+      "heading15": ["Bij [venue]"],
+      "description1":[
+        "[performer] zien bij [venue]? Bestel tickets.",
+        "[performer] zien bij [venue]? Bestel tickets online.",
+        "[performer] zien bij [venue]? Koop nu je tickets voor de film."
+      ],
+      "description2":[
+         "Een film met [performer] is nu te zien bij [venue].",
+         "Een film met [performer] is nu te zien bij [venue] in [location]."
+      ],
+      "description3":[
+        "[performer] zien? - Kom naar [genreSentence] bij [venue]. Bestel tickets.",
+        "[performer] zien? - Kom naar [genreSentence] bij [venue]. Bestel tickets online.",
+        "[performer] in de film [title] is nu te zien bij [venue]. Bestel tickets.",
+        "[performer] in de film [title] is nu te zien bij [venue]. Bestel tickets online."
+      ],
+      "description4":[
+        "Vind [performer] bij [venue].",
+        "Vind [performer] in het programma van [venue]."
+      ]
+    }]
+  }
+]

@@ -1,0 +1,112 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": [
+        "Visit [venueShort]",
+        "[venue]",
+        "Visit [venue]"
+      ],
+      "heading3": [
+        "On [date]",
+        "[genre] on [date]"
+      ],
+      "heading4": ["[date] in [location]"],
+      "heading5": ["Watch it now"],
+      "heading6": ["View the program online"],
+      "heading7": ["Plan your visit"],
+      "heading8": ["Discover [venue]"],
+      "heading9": [
+        "[venue]",
+        "Go to [venue]"
+      ],
+      "heading10": ["View our agenda"],
+      "heading11": ["Discover our performances"],
+      "heading12": ["In [location]"],
+      "heading13": ["Buy your tickets now"],
+      "heading14": ["Order tickets online"],
+      "heading15": ["At [venue]"],
+      "description1":[
+        "[title] at [venue]? Order your tickets.",
+        "[title] at [venue]? Order your tickets online.",
+        "[title] at [venue]? Order your tickets for [date]"
+      ],
+      "description2":[
+        "[title] - Watch it now at [venue].",
+        "[title] - Watch it now at [venue] on [date]",
+        "[title] - Watch now on [date] Visit [venue].",
+        "[title] - Watch now at [venue] on [dateFull]."
+      ],
+      "description3":[
+        "[title] - Go to [venue]. Order tickets online.",
+        "[title]. Come to [genre] at [venue]. Order tickets.",
+        "[title]. Come to [genre] at [venue]. Order tickets for [date]",
+        "[title]. Come to [genre] at [venue]. Order tickets online for [date]",
+        "[title]. Come to [genre] with [performer]. Order tickets for [date]",
+        "[title]. Come to [genre] with [performer]. Order tickets online for [date]"
+      ],
+      "description4":[
+        "Find [title] at [venue].",
+        "Find [title] in the program of [venue]."
+      ]
+    }]
+  },
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "Visit [venueShort]",
+        "[venue]",
+        "Visit [venue]"
+      ],
+      "heading3": [
+        "On [date]",
+        "[genre] on [date]"
+      ],
+      "heading4": ["[date] in [location]"],
+      "heading5": ["Watch it now"],
+      "heading6": ["View the program online"],
+      "heading7": ["Plan your visit"],
+      "heading8": ["Discover [venue]"],
+      "heading9": [
+        "[venue]",
+        "Go to [venue]"
+      ],
+      "heading10": ["View our agenda"],
+      "heading11": ["Discover our performances"],
+      "heading12": ["In [location]"],
+      "heading13": ["Buy your tickets now"],
+      "heading14": ["Order tickets online"],
+      "heading15": ["At [venue]"],
+      "description1":[
+        "[performer] at [venue]? Order your tickets.",
+        "[performer] at [venue]? Order your tickets online.",
+        "[performer] at [venue]? Order your tickets for [date]"
+      ],
+      "description2":[
+        "[performer] - Watch now at [venue].",
+        "[performer] - Watch now at [venue] on [date]",
+        "[performer] - Watch now on [date]. Visit [venue].",
+        "[performer] - Watch now at [venue] on [dateFull]."
+      ],
+      "description3":[
+        "[performer]. Order your tickets at [venue].",
+        "[performer]. Order your tickets online at [venue] for [date]",
+        "[performer]. Come to [title]. Order tickets for [date]",
+        "[performer]. Come to [genreSentence] [title]. Order tickets online for [date]"
+      ],
+      "description4":[
+        "Find [title] at [venue].",
+        "Find [title] in the program of [venue]."
+      ]
+    }]
+  }
+]

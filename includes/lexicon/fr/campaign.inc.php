@@ -46,6 +46,7 @@ class Lexicon {
 		$this->keyword['classic'] = 'classique';
 		$this->keyword['music'] = 'musique'; 
 		$this->keyword['movie'] = 'film'; 
+		$this->keyword['screening'] = 'projection'; 
 		$this->keyword['live'] = 'vivre'; 
 		$this->keyword['expo'] = 'expo'; 
 		$this->keyword['exhibition'] = 'exposition'; 
@@ -64,6 +65,7 @@ class Lexicon {
 		$this->adPlacement['musical'] = array('musicale', 'une comédie musicale', 'la comédie musicale');
 		$this->adPlacement['dance'] = array('danse', 'un danse', 'le danse');
 		$this->adPlacement['movie'] = array('film', 'un film', 'le film',);
+		$this->adPlacement['screening'] = array('projection', 'une projection', 'la projection',);
 		$this->adPlacement['concert'] = array('concert', 'un concert', 'le concert');
 		$this->adPlacement['music'] = array('concert', 'un concert', 'le concert');
 		$this->adPlacement['classic'] = array('concert', 'un concert', 'le concert');

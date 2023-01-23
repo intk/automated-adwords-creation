@@ -1,0 +1,135 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": [
+        "[venue]",
+        "Odwiedź [venueShort]",
+        "Odwiedź [venue]"
+      ],
+      "heading3": ["[date] w [location]"],
+      "description1":[
+        "Zobacz [title] w [venue]? Zamów bilety.",
+        "Zobacz [title] w [venue]? Zamów bilety online.",
+        "Zobacz [title] w [venue]? Zamów bilety na [date]."
+      ],
+      "description2":[
+        "Znajdź [genreSentence] [title] w [venue].",
+        "Znajdź [genre] z [performer] w [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": ["[genre] [date]"],
+      "heading3": [
+        "[venue]",
+        "Odwiedź [venueShort]",
+        "Odwiedź [venue]"
+      ],
+      "description1":[
+        "[title] - Obejrzyj [title] w [venue].",
+        "[title] - Obejrzyj [title] [date] w [venue].",
+        "[title] - Obejrzyj [title] [date] Odwiedź [venue].",
+        "[title] - Obejrzyj [title] [dateFull]. Odwiedź [venue]."
+      ],
+      "description2":[
+        "Zaplanuj wizytę do teatru i zamów bilety online."
+      ]
+    },
+    {
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": ["[venueShort]", "[venue]"],
+      "heading3": ["[genre] [date]"],
+      "description1":[
+        "[title] - Idź do [venue]. Kup bilety teraz.",
+        "[title] - Idź do [venue]. Kup bilety na [date]",
+        "[title] - Idź do [venue]. Kup bilety online na [date]",
+        "[title] z [performer]? Zamów bilety na [date]",
+        "[title] z [performer]? Zamów bilety online na [date]"
+      ],
+      "description2":[
+        "Znajdź [title] w programie [venue]."
+      ]
+    }]
+  },
+  
+  
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "[venue]",
+        "Odwiedź [venueShort]",
+        "Odwiedź [venue]"
+      ],
+      "heading3": ["[date] w [location]"],
+      "description1":[
+        "Zobacz [performer] w [venue]? Zamów bilety.",
+        "Zobacz [performer] w [venue]? Zamów bilety online.",
+        "Zobacz [performer] w [venue]? Zamów bilety online na [date]"
+      ],
+      "description2":[
+        "Znajdź [genreSentence] [title] w [venue]."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "[genre] [date]"
+      ],
+      "heading3": [
+        "[title]",
+        "Odwiedź [title]",
+        "Zapraszamy na [title]"
+      ],
+      "description1":[
+        "[performer] - w [venue].",
+        "[performer] - Zobacz [performer] w [title]? Odwiedź [venue].",
+        "[performer] - Zobacz [performer] w [title]? Odwiedź [venue] [date]"
+      ],
+      "description2":[
+        "Zaplanuj swoją wizytę do teatru i zamów bilety online."
+      ]
+    },
+    {
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": ["[title]"],
+      "heading3": [
+        "[date] w [venueShort]",
+        "[venue]",
+        "[date] w [venue]"
+      ],
+      "description1":[
+        "[performer]? Kup bilety teraz.",
+        "[performer]? Zamów bilety w [venue].",
+        "[performer]? Zamów bilety online.",
+        "[performer]? Zapraszamy do [venue]. Zamów bilety online na [date]",
+        "[performer]. Zapraszamy na [title]. Zamów bilety na [date]",
+        "'[performer]. Zapraszamy na [genreSentence][title]. Zamów bilety online na [date]"
+      ],
+      "description2":[
+        "Znajdź [performer] w programie [venue]."
+      ]
+    }]
+  }
+]

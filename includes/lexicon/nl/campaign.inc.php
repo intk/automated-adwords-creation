@@ -47,6 +47,7 @@ class Lexicon {
 		$this->keyword['classic'] = 'klassiek';
 		$this->keyword['music'] = 'muziek'; 
 		$this->keyword['movie'] = 'film'; 
+		$this->keyword['screening'] = 'screening'; 
 		$this->keyword['live'] = 'live'; 
 		$this->keyword['expo'] = 'expo'; 
 		$this->keyword['exhibition'] = 'tentoonstelling'; 
@@ -66,8 +67,9 @@ class Lexicon {
 		$this->adPlacement['theatre'] = array('toneel', 'toneel', 'toneel');
 		$this->adPlacement['cabaret'] = array('cabaret', 'cabaret', 'cabaret');
 		$this->adPlacement['musical'] = array('musical', 'een musical', 'de musical');
-		$this->adPlacement['dance'] = array('dans', 'een danssshow', 'de danssshow');
+		$this->adPlacement['dance'] = array('dans', 'een dansshow', 'de dansshow');
 		$this->adPlacement['movie'] = array('film', 'een film', 'de film');
+		$this->adPlacement['screening'] = array('screening', 'a filmvertoning', 'de filmvertoning');
 		$this->adPlacement['concert'] = array('concert', 'een concert', 'het concert');
 		$this->adPlacement['music'] = array('muziek', 'een concert', 'het concert');
 		$this->adPlacement['classic'] = array('concert', 'een concert', 'het concert');
@@ -81,7 +83,7 @@ class Lexicon {
 
 
 		// Prepositions to remove from end or beginning of ad group name
-		$this->prepositions = array('van', 'door', ' met ', 'o.l.v.', 'olv', 'e.a.', 'o.a.', 'e.v.a.', 'i.s.m.', 'Regisseur:', 'Acteurs:', '(Stem)' , '(Zichzelf)', 'try-out', '(try-out)', '(reprise)', 'première', '(première)', 'Film:', 'support', 'sopraan', 'alt', 'tenor', 'piano', 'tenorsaxofoon', 'altsaxofoon', 'saxofoon', 'klarinet', 'trombone', 'trompet', 'dirigent', 'organ', 'componist', 'producer', 'harp', 'contrabas', 'bas', 'altviool', 'viool',  'zang', 'basgitaar', 'gitaar', 'spoken word', 'fluit', 'cello', 'drums', 'percussie', 'harp', 'hobo', 'hoorn', 'DJ');
+		$this->prepositions = array('van', 'door', 'Door ', 'Met o.a. ', ' met ', 'o.l.v.', 'olv', 'e.a.', 'o.a.', 'e.v.a.', 'i.s.m.', 'Regisseur:', 'Acteurs:', '(Stem)' , '(Zichzelf)', 'try-out', '(try-out)', '(reprise)', 'première', '(première)', 'Film:', 'support', 'sopraan', 'alt', 'tenor', 'piano', 'tenorsaxofoon', 'altsaxofoon', 'saxofoon', 'klarinet', 'trombone', 'trompet', 'dirigent', 'organ', 'componist', 'producer', 'harp', 'contrabas', 'bas', 'altviool', 'viool',  'zang', 'basgitaar', 'gitaar', 'spoken word', 'fluit', 'cello', 'drums', 'percussie', 'harp', 'hobo', 'hoorn', 'DJ');
 	}
 
 }

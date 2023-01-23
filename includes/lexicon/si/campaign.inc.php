@@ -1,5 +1,5 @@
 <?php
-/* Dutch campaign lexicon */
+/* Slovenian campaign lexicon */
 
 class Lexicon {
 	public function __construct() {

@@ -1,0 +1,104 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": [
+        "Besök [venueShort]",
+        "[venue]",
+        "Besök [venue]"
+      ],
+      "heading3": ["[genre] den [date]"],
+      "heading4": ["[date] i [location]"],
+      "heading5": ["[genre] på [venue]"],
+      "heading6": ["Besök vår hemsida"],
+      "heading7": ["Läs mer här"],
+      "heading8": ["Kolla in våra [genre]"],
+      "heading9": [
+        "[venue]",
+        "Gå till [venue]"
+      ],
+      "heading10": ["Kom och se [title]"],
+      "heading11": ["Upptäck våra [genre]"],
+      "heading12": ["i [location]"],
+      "heading13": ["Köp dina biljetter nu"],
+      "heading14": ["Boka biljetter online"],
+      "heading15": ["På [venue]"],
+      "description1":[
+        "[title] - Se [title] på [venue]? Boka dina biljetter.",
+        "[title] - Se [title] på [venue]? Boka dina biljetter online.",
+        "[title] - Se [title] på [venue]? Boka biljetter för den [date]"
+      ],
+      "description2":[
+        "[title] - Upptäck [title] på [venue].",
+        "[title] - Upptäck [title] på [date] den [venue].",
+        "[title] spelas den [date] Besök [venue].",
+        "[title] spelas den [dateFull]. Besök [venue]. "
+      ],
+      "description3":[
+        "[title] - Gillar du [title]? Köp dina biljetter nu.",
+        "[title] - Gillar du [title]? Besök [venue]. Boka biljetter till föreställningen den [date]",
+        "[title] - Gillar du [title]? Besök [venue]. Boka biljetter online till föreställningen den [date]",
+        "[title] - Gillar du [title] med [performer]? Boka biljetter till föreställningen den [date]"
+      ],
+      "description4":[
+        "Upptäck [genreSentence] [title] på [venue].",
+        "Upptäck [genre] med [performer] på [venue]."
+      ]
+    }]
+  },
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "Besök [venueShort]",
+        "[venue]",
+        "Besök [venue]"
+      ],
+      "heading3": ["[genre] den [date]"],
+      "heading4": ["[date] i [location]"],
+      "heading5": ["[genre] på [venue]"],
+      "heading6": ["Besök vår hemsida"],
+      "heading7": ["Läs mer här"],
+      "heading8": ["Kolla in våra [genre]"],
+      "heading9": [
+        "[venue]",
+        "Gå till [venue]"
+      ],
+      "heading10": ["Kom och se [title]"],
+      "heading11": ["Upptäck våra [genre]"],
+      "heading12": ["i [location]"],
+      "heading13": ["Köp dina biljetter nu"],
+      "heading14": ["Boka biljetter online"],
+      "heading15": ["På [venue]"],
+      "description1":[
+        "[performer] - Vill du se [performer]? Boka dina biljetter.",
+        "[performer] - Vill du se [performer] på [venue]? Boka dina biljetter.",
+        "[performer] - Vill du se [performer] på [venue]? Boka dina biljetter online.",
+        "[performer] - Vill du se [performer] på [venue]? Boka dina biljetter till föreställningen den [date]"
+      ],
+      "description2":[
+        "[performer] - Upptäck [performer] på [venue].",
+        "[performer] - Se [performer] uppträda den [date] Besök [venue].",
+        "[performer] - Upptäck [title] med [performer]. Besök [venue] den [date]"
+      ],
+      "description3":[
+        "[performer] - Gillar du [performer]? Köp dina biljetter nu.",
+        "[performer] - Gillar du [performer]? Besök [venue] och boka biljetter till föreställningen den [date]",
+        "[performer] - Gillar du [performer]? Besök [venue]. Boka biljetter online till föreställningen den [date]",
+        "[performer] - Gillar du [performer]? Boka biljetter till föreställningen den [date]",
+        "[performer] - Gillar du [performer]? Boka biljetter online till föreställningen den [date]"
+      ],
+      "description4":[
+        "Upptäck [performer] i [venue]s program."
+      ]
+    }]
+  }
+]

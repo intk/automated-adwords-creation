@@ -1,0 +1,105 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Na [title]?"
+      ],
+      "heading2": [
+        "Obiščite [venueShort]",
+        "[venue]",
+        "Obiščite [venue]"
+      ],
+      "heading3": ["[date] v [location]"],
+      "heading4": ["[date] in [location]"],
+      "heading5": ["Pazi zdaj"],
+      "heading6": ["Oglejte si program na spletu"],
+      "heading7": ["Načrtujte svoj obisk"],
+      "heading8": ["Odkrijte [venue]"],
+      "heading9": [
+        "[venue]",
+        "Pridite v [venue]"
+      ],
+      "heading10": ["Oglejte si naš dnevni red"],
+      "heading11": ["Odkrijte naše predstave"],
+      "heading12": ["V [location]"],
+      "heading13": ["Kupite vstopnice zdaj"],
+      "heading14": ["Naročite vstopnice na spletu"],
+      "heading15": ["Na [venue]"],
+      "description1":[
+        "Na [title] v [venue]? Naročite vstopnice.",
+        "Na [title] v [venue]? Kupite vstopnice na spletu.",
+        "Na [title] v [venue]? Kupite vstopnice za [date]"
+      ],
+      "description2":[
+        "Pridite na [title] v [venue].",
+        "Pridite [date] na [title] v [venue].",
+        "Oglejte si [title] [date]. Obiščite [venue].",
+        "Oglejte si [title] [dateFull]. Obiščite [venue]."
+      ],
+      "description3":[
+        "Uživajte v [title] v [venue]. Naročite vstopnice.",
+        "Uživajte v [title] v [venue]. Naročite vstopnice za [date]",
+        "Uživajte v [title] v [venue]. Naročite vstopnice za [date] na spletu.",
+        "Uživajte v [title] z [performer]. Naročite vstopnice za [date]",
+        "Uživajte v [title] v [venue]. Naročite vstopnice za [date] na spletu."
+      ],
+      "description4":[
+        "Poiščite [title] v [venue].",
+        "Poiščite [title] na programu [venue]."
+      ]
+    }]
+  },
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "Obiščite [venueShort]",
+        "[venue]",
+        "Obiščite [venue]"
+      ],
+      "heading3": ["[date] v [location]"],
+      "heading4": ["[date] in [location]"],
+      "heading5": ["Pazi zdaj"],
+      "heading6": ["Oglejte si program na spletu"],
+      "heading7": ["Načrtujte svoj obisk"],
+      "heading8": ["Odkrijte [venue]"],
+      "heading9": [
+        "[venue]",
+        "Pridite v [venue]"
+      ],
+      "heading10": ["Oglejte si naš dnevni red"],
+      "heading11": ["Odkrijte naše predstave"],
+      "heading12": ["V [location]"],
+      "heading13": ["Kupite vstopnice zdaj"],
+      "heading14": ["Naročite vstopnice na spletu"],
+      "heading15": ["Na [venue]"],
+      "description1":[
+        "[performer] v [venue]? Naročite vstopnice.",
+        "[performer] v [venue]? Naročite vstopnice na spletu.",
+        "[performer] v [venue]? Naročite vstopnice za [date]"
+      ],
+      "description2":[
+        "Oglejte si [performer]. Obiščite [venue].",
+        "Pridite na [title] z [performer]. Obiščite [venue].",
+        "Pridite na [title] z [performer]. Obiščite [venue] [date]"
+      ],
+      "description3":[
+        "Oglejte si [performer] v [venue]. Naročite vstopnice.",
+        "Oglejte si [performer] v [venue]. Naročite vstopnice za [date]",
+        "Oglejte si [performer] v [venue]. Naročite vstopnice za [date] na spletu.",
+        "Oglejte si [performer] v [title]. Naročite vstopnice za [date]",
+        "Uživajte v [title] z [performer]. Naročite vstopnice za [date] na spletu."
+      ],
+      "description4":[
+        "Ačrtujete obisk gledališča? Kupite vstopnice prek spleta."
+      ]
+    }]
+  }
+]

@@ -1,0 +1,114 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": [
+        "Visit [venueShort]",
+        "[venue]",
+        "Visit [venue]"
+      ],
+      "heading3": [
+        "On [date]",
+        "[genre] op [date]"
+      ],
+      "heading4": ["[date] in [location]"],
+      "heading5": ["Watch it now"],
+      "heading6": ["View the program online"],
+      "heading7": ["Plan your visit"],
+      "heading8": ["[venue] [genre]"],
+      "heading9": [
+        "[venue]",
+        "Visit [venue]"
+      ],
+      "heading10": ["View our agenda"],
+      "heading11": ["Discover our line-up"],
+      "heading12": ["In [location]"],
+      "heading13": ["Order your tickets now"],
+      "heading14": ["Buy your tickets online now"],
+      "heading15": ["Come to the festival"],
+      "description1":[
+        "Go to [title] at [venue]? Order your tickets.",
+        "Go to [title] at [venue]? Order your tickets online.",
+        "Go to [title] at [venue]? Order your tickets for [date]"
+      ],
+      "description2":[
+        "[title] - Watch it now at [venue].",
+        "[title] - Watch it now at [venue] on [date].",
+        "[title] - Watch now on [date] Visit [venue].",
+        "[title] - Watch now at [venue] on [dateFull]."
+      ],
+      "description3":[
+        "[title] - Go to [venue]. Order tickets online.",
+        "[title]. Come to [genre] at [venue]. Order tickets.",
+        "[title]. Come to [genre] at [venue]. Order tickets for [date]",
+        "[title]. Come to [genre] at [venue]. Order tickets online for [date]",
+        "[title]. Come to [genre] with [performer]. Order tickets for [date]",
+        "[title]. Come to [genre] with [performer]. Order tickets online for [date]"
+      ],
+      "description4":[
+        "Motel Mozaïque: Concerts at Rotterdam harbor locations. Buy your tickets now!"
+      ]
+    }]
+  },
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "Visit [venueShort]",
+        "[venue]",
+        "Visit [venue]"
+      ],
+       "heading3": [
+        "On [date]",
+        "[genre] on [date]"
+      ],
+      "heading4": ["[date] in [location]"],
+      "heading5": [
+        "[title]",
+        "Visit [title]",
+        "Go to [title]"
+      ],
+      "heading6": ["View the program online"],
+      "heading7": ["Plan your visit"],
+      "heading8": ["[venue] [genre]"],
+      "heading9": [
+        "[venue]",
+        "Visit [venue]"
+      ],
+      "heading10": ["View our agenda"],
+      "heading11": ["Discover our line-up"],
+      "heading12": ["In [location]"],
+      "heading13": ["Order your tickets here"],
+      "heading14": ["Buy your tickets online now"],
+      "heading15": ["Come to the festival"],
+      "description1":[
+        "[performer] at [venue]? Order tickets.",
+        "[performer] at [venue]? Order tickets online.",
+        "[performer] at [venue]? Order your tickets now for [date]"
+      ],
+      "description2":[
+        "[performer] - Watch it now at [venue].",
+        "[performer] - Watch it now at [venue] on [date].",
+        "[performer] - Watch now on [date] Visit [venue].",
+        "[performer] - Watch now at [venue] on [dateFull]."
+      ],
+      "description3":[
+        "[performer]. Order your tickets at [venue].",
+        "[performer]. Order your tickets online at [venue] for [date]",
+        "[performer]. Come to [title]. Order tickets for [date]",
+        "[performer]. Come to [genreSentence] [title]. Order tickets online for [date]"
+      ],
+      "description4":[
+        "Motel Mozaïque: Concerts at Rotterdam harbor locations. Buy your tickets now!"
+      ]
+    }]
+  }
+]

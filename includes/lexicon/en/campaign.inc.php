@@ -23,7 +23,7 @@ class Lexicon {
 		$this->monthFull[2] = 'March';
 		$this->monthFull[3] = 'April';
 		$this->monthFull[4] = 'May';
-		$this->monthFull[5] = 'Juni'; 
+		$this->monthFull[5] = 'June'; 
 		$this->monthFull[6] = 'July';
 		$this->monthFull[7] = 'August';
 		$this->monthFull[8] = 'September';
@@ -47,6 +47,7 @@ class Lexicon {
 		$this->keyword['classic'] = 'classic';
 		$this->keyword['music'] = 'music'; 
 		$this->keyword['movie'] = 'movie'; 
+		$this->keyword['screening'] = 'screening';
 		$this->keyword['live'] = 'live'; 
 		$this->keyword['expo'] = 'expo'; 
 		$this->keyword['exhibition'] = 'exhibition'; 
@@ -57,6 +58,7 @@ class Lexicon {
 		$this->keyword['opera'] = 'opera'; 
 		$this->keyword['online'] = 'online';
 		$this->keyword['agenda'] = 'agenda';
+		$this->keyword['workshop'] = 'workshop';
 
 
 		// Genre placements for the ads
@@ -65,13 +67,16 @@ class Lexicon {
 		$this->adPlacement['musical'] = array('musical', 'a musical', 'the musical');
 		$this->adPlacement['dance'] = array('dance', 'a dance', 'the dance');
 		$this->adPlacement['movie'] = array('movie', 'a movie', 'the movie',);
-		$this->adPlacement['film'] = array('film', 'a movie', 'the movie',);
+		$this->adPlacement['film'] = array('film', 'a movie', 'the movie');
+		$this->adPlacement['screening'] = array('screening', 'a film screening', 'the film screening');
 		$this->adPlacement['concert'] = array('concert', 'a concert', 'the concert');
 		$this->adPlacement['music'] = array('concert', 'a concert', 'the concert');
 		$this->adPlacement['classic'] = array('concert', 'a concert', 'the concert');
 		$this->adPlacement['expo'] = array('expo', 'the expo', 'the expo');
 		$this->adPlacement['opera'] = array('opera', 'opera', 'the opera');
 		$this->adPlacement['show'] = array('show', 'a show', 'the show');
+		$this->adPlacement['workshop'] = array('workshop', 'a workshop', 'the workshop');
+		$this->adPlacement['tour'] = array('tour', 'a guided tour', 'the guided tour');
 		$this->adPlacement['performance'] = array('performance', 'a performance', 'the performance');
 
 		// Prepositions to remove from end or beginning of ad group name

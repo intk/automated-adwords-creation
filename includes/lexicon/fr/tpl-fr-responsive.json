@@ -1,0 +1,110 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?"
+      ],
+      "heading2": [
+        "Visitez [venueShort]",
+        "[venue]",
+        "Visitez [venue]"
+      ],
+      "heading3": [
+        "le [date]",
+        "[genre] le [date]"
+      ],
+      "heading4": ["le [date] à [location]"],
+      "heading5": ["Regardez-le maintenant"],
+      "heading6": ["Consultez le programme en ligne"],
+      "heading7": ["Planifiez votre visite"],
+      "heading8": ["Découvrez [venue]"],
+      "heading9": [
+        "[venue]",
+        "Venir à [venue]"
+      ],
+      "heading10": ["Voir notre agenda"],
+      "heading11": ["Découvrez nos spectacles"],
+      "heading12": ["À [location]"],
+      "heading13": ["Achetez vos billets maintenant"],
+      "heading14": ["Commander des billets en ligne"],
+      "heading15": ["À [venue]"],
+      "description1":[
+        "Voir [title] au [venue]? Achetez vos tickets maintenant.",
+        "Voir [title] au [venue]? Achetez vos tickets en ligne.",
+        "Voir [title] au [venue]? Achetez des tickets avant le [date]"
+      ],
+      "description2":[
+        "[title] - Découvrez maintenant au [venue].",
+        "[title] - À découvrir dès maintenant le [date] au [venue].",
+        "[title] - Maintenant à découvrir le [date] Visitez [venue].",
+        "[title] - Découvrez-le maintenant au [venue] le [date]."
+      ],
+      "description3":[
+        "[title] - Venez au [venue]. Commandez vos billets en ligne.",
+        "[title]. Venez voir [genre] au [venue]. Achetez vos tickets maintenant.",
+        "[title]. Venez voir [genre] au [venue]. Achetez des tickets avant le [date]",
+        "[title]. Venez voir [genre] au [venue]. Achetez des tickets en ligne avant le [date]"
+      ],
+      "description4":[
+        "Trouvez [title] au [venue].",
+        "Trouvez [title] dans le program de [venue]."
+      ]
+    }]
+  },
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?"
+      ],
+      "heading2": [
+        "Visitez [venueShort]",
+        "[venue]",
+        "Visitez [venue]"
+      ],
+      "heading3": [
+        "le [date]",
+        "[genre] le [date]"
+      ],
+      "heading4": ["le [date] à [location]"],
+      "heading5": ["Regardez-le maintenant"],
+      "heading6": ["Consultez le programme en ligne"],
+      "heading7": ["Planifiez votre visite"],
+      "heading8": ["Découvrez [venue]"],
+      "heading9": [
+        "[venue]",
+        "Venir à [venue]"
+      ],
+      "heading10": ["Voir notre agenda"],
+      "heading11": ["Découvrez nos spectacles"],
+      "heading12": ["À [location]"],
+      "heading13": ["Achetez vos billets maintenant"],
+      "heading14": ["Commander des billets en ligne"],
+      "heading15": ["À [venue]"],
+      "description1":[
+        "Voir [performer] au [venue]? Achetez vos tickets maintenant.",
+        "Voir [performer] au [venue]? Achetez vos tickets en ligne.",
+        "Voir [performer] au [venue]? Achetez des tickets avant le [date]"
+      ],
+      "description2":[
+        "[performer] - Découvrez maintenant au [venue].",
+        "[performer] - À découvrir dès maintenant le [date] au [venue].",
+        "[performer] - Maintenant à découvrir le [date] Visitez [venue].",
+        "[performer] - Découvrez-le maintenant au [venue] le [date]"
+      ],
+      "description3":[
+        "[performer]. Commandez vos billets au [venue].",
+        "[performer]. Commandez vos billets en ligne sur [venue] pour le [date]",
+        "[performer]. Venez à [title]. Commandez des billets pour [date]",
+        "[performer]. Venez à [genreSentence] [title]. Commandez des billets en ligne pour [date]"
+      ],
+      "description4":[
+        "Trouvez [performer] au [venue].",
+        "Trouvez [performer] dans le program de [venue]."
+      ]
+    }]
+  }
+]
