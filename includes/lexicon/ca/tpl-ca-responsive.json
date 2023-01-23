@@ -1,0 +1,115 @@
+[
+  {
+    "type":"title",
+    "ads":[{
+      "heading1":[
+        "[title]",
+        "[title]?",
+        "Vine a veure [title]?"
+      ],
+      "heading2": [
+        "Visita el [venueShort]",
+        "[venue]",
+        "Visita el [venue]"
+      ],
+      "heading3": [
+        "[date]",
+        "[genre] el [date]"
+      ],
+      "heading4": ["[date] al [location]"],
+      "heading5": ["Mira-ho ara"],
+      "heading6": ["Veure el programa en línia"],
+      "heading7": ["Prepara la teva visita"],
+      "heading8": ["Descobreix [venue]"],
+      "heading9": [
+        "[venue]",
+        "Coneix el [venue]"
+      ],
+      "heading10": ["Consulta la nostra agenda"],
+      "heading11": ["Descobreix les actuacions"],
+      "heading12": ["A [location]"],
+      "heading13": ["Compra les teves entrades ara"],
+      "heading14": ["Compra entrades online."],
+      "heading15": ["El [venue]"],
+      "description1":[
+        "Vols anar a veure [title]? Compra entrades.",
+        "Vols anar a veure [title] al [venue]? Compra entrades.",
+        "Vols anar a veure [title] al [venue]? Compra entrades online.",
+        "Vols anar a veure [title] al [venue]? Compra entrades per [date]"
+      ],
+      "description2":[
+        "Descobreix [title] al [venue].",
+        "Descobreix [title] el dia [date] al [venue].",
+        "Vine a veure [title] que tindrà lloc [date] Visita [venue].",
+        "Vine a veure [title] que tindrà lloc [dateFull]. Visita [venue]."
+      ],
+      "description3":[
+        "T'agrada [title]? Compra les teves entrades ara.",
+        "T'agrada [title]? Visita el [venue]. Compra les teves entrades per a [date]",
+        "T'agrada [title]? Visita el [venue]. Compra les teves entrades online per a [date]",
+        "T'agrada [title] a mans del [performer]? Compra les teves entrades per [date]",
+        "T'agrada [title] a mans del [performer]? Compra les teves entrades online per [date]"
+      ],
+      "description4":[
+        "Descobreix [title] al [venue].",
+        "Descobreix [title] en el programa del [venue]."
+      ]
+    }]
+  },
+  {
+    "type":"performer",
+    "ads":[{
+      "heading1":[
+        "[performer]",
+        "[performer]?",
+        "Vine a veure [performer]?"
+      ],
+      "heading2": [
+        "Visita el [venueShort]",
+        "[venue]",
+        "Visita el [venue]"
+      ],
+      "heading3": [
+        "[date]",
+        "[genre] el [date]"
+      ],
+      "heading4": ["[date] al [location]"],
+      "heading5": ["Mira-ho ara"],
+      "heading6": ["Veure el programa en línia"],
+      "heading7": ["Prepara la teva visita"],
+      "heading8": ["Descobreix [venue]"],
+      "heading9": [
+        "[venue]",
+        "Coneix el [venue]"
+      ],
+      "heading10": ["Consulta la nostra agenda"],
+      "heading11": ["Descobreix les actuacions"],
+      "heading12": ["A [location]"],
+      "heading13": ["Compra les teves entrades ara"],
+      "heading14": ["Compra entrades online."],
+      "heading15": ["El [venue]"],
+      "description1":[
+        "Vols anar a veure [performer]? Compra entrades.",
+        "Vols anar a veure [performer] al [venue]? Compra entrades.",
+        "Vols anar a veure [performer] al [venue]? Compra entrades online.",
+        "Vols anar a veure [performer] al [venue]? Compra entrades per [date]"
+      ],
+      "description2":[
+        "Descobreix [performer] al [venue].",
+        "Vine a veure [performer] tocar [date] Visita [venue].",
+        "Descobreix [title] a mans de [performer]. Visita [venue] el [date]"
+      ],
+      "description3":[
+        "T'agrada [performer]? Compra les teves entrades ara.",
+        "T'agrada [performer]? Visita el [venue]. Compra les teves entrades per a [date]",
+        "T'agrada [performer]? Go to [venue]. Compra les teves entrades online per a [date]",
+        "T'agrada [title] amb [performer]? Compra les teves entrades per [date]",
+        "T'agrada [title] amb [performer]? Compra les teves entrades online per [date]"
+      ],
+      "description4":[
+        "Descobreix [performer] al [venue].",
+        "Descobreix [performer] en el programa del [venue]."
+      ]
+    }]
+  }
+]
