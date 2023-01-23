@@ -161,7 +161,7 @@ function getPerformers($url, $tag) {
 	
 	//Convert content on page to plain text
 	$dom = new simple_html_dom(getWebPage($url));
-	
+
 	//Sanitize and remove unnecessary characters like tabs and html tags from string. Convert string to utf-8 format.
 
 	$content = filter_var(trim(html_entity_decode(strip_tags(preg_replace("/\s+/", " ", $dom->plaintext)), ENT_QUOTES, "utf-8")), FILTER_SANITIZE_STRING);
@@ -224,7 +224,8 @@ function getPerformers($url, $tag) {
 							$ckey++;
 						} else {
 							// Split performers line by line. Remove unnecessary tags from string
-							$newItem = preg_replace('#<em[^>]*>.*?</em>#si', '', html_entity_decode(str_replace('&nbsp;', '', $tempItem)));
+							$newItem = preg_replace("/(.+) &#8211; .+(<\/.*>)/", '\1\2', $tempItem);
+							#$newItem = preg_replace('#<em[^>]*>.*?</em>#si', '', html_entity_decode(str_replace('&nbsp;', '', $tempItem)));
 							$newItemArray = preg_split("/(<p>|<\/p>|<span>|<\/span>|<br \/>|,)/", $newItem);
 
 							foreach ($newItemArray as $item) {
@@ -287,35 +288,40 @@ function getPerformers($url, $tag) {
 			}
 						
 			//Only remain names
-			foreach ($credits as $ckey => $credit) {
-				if (preg_match('#[0-9]#', $credit)){
-					unset($credits[$ckey]);
-				} else {
-					$tempstr = explode(' ', trim($credit));
-					//Empty array element
-					$credits[$ckey] = '';
-					
-					//Add relevant string elements as performer name
-					foreach ($tempstr as $tkey => $strelem) {
-						if ($tkey == 0) {
-							$credits[$ckey] .= $strelem;
-						}
-						if ($tkey == 1) {
-							$credits[$ckey] .= ' '.$strelem;
-						}
-						if ($tkey == 2 && ($tempstr[1] == 'van' || $tempstr[1] == 'ten' || $tempstr[1] == 'de' || $tempstr[1] == 'den' || strlen($tempstr[1]) < 10)) {
-							$credits[$ckey] .= ' '.$strelem;
+			if (array_key_exists('type', $tag) && $tag['type'] !== 'subtitle') {
 
-						}
-						if ($tkey == 3 && ($tempstr[1] == 'van' && ($tempstr[2] == 'den') || $tempstr[2] == 'der' || $tempstr[2] == 'het' || $tempstr[2] == "'t")) {
-							$credits[$ckey] .= ' '.$strelem;
-						}
-					}
-					if (strlen($credit) == 0 || count($tempstr) <= 1) {
+				foreach ($credits as $ckey => $credit) {
+					if (preg_match('#[0-9]#', $credit)){
 						unset($credits[$ckey]);
+					} else {
+						$tempstr = explode(' ', trim($credit));
+						//Empty array element
+						$credits[$ckey] = '';
+						
+						//Add relevant string elements as performer name
+						foreach ($tempstr as $tkey => $strelem) {
+							if ($tkey == 0) {
+								$credits[$ckey] .= $strelem;
+							}
+							if ($tkey == 1) {
+								$credits[$ckey] .= ' '.$strelem;
+							}
+							if ($tkey == 2 && ($tempstr[1] == 'van' || $tempstr[1] == 'ten' || $tempstr[1] == 'de' || $tempstr[1] == 'den' || strlen($tempstr[1]) < 10)) {
+								$credits[$ckey] .= ' '.$strelem;
+
+							}
+							if ($tkey == 3 && ($tempstr[1] == 'van' && ($tempstr[2] == 'den') || $tempstr[2] == 'der' || $tempstr[2] == 'het' || $tempstr[2] == "'t")) {
+								$credits[$ckey] .= ' '.$strelem;
+							}
+						}
+						if (strlen($credit) == 0 || count($tempstr) <= 1) {
+							unset($credits[$ckey]);
+						}
 					}
 				}
+
 			}
+
 
 			if (count($credits)>0) {
 				$performers = $credits;
@@ -343,6 +349,9 @@ function getPerformers($url, $tag) {
 		return false;
 	}
 }
+
+#print_r(getPerformers("https://localhost/adwords-automation/includes/methods/web/fasching.html", array("performers"=>".single__content .single__section em")));
+
 #print_r(getPerformers("https://lumiere.nl/films/carmen-lola", array("performers"=>".movie-info.text-indent")));
 
 #print_r(getPerformers("https://www.filmhuisalkmaar.nl/films/becoming-astrid", array("performers"=>".film-header .film-header-info .film-actors")));
@@ -350,4 +359,6 @@ function getPerformers($url, $tag) {
 #print_r(getPerformers("https://www.lantarenvenster.nl/programma/aaron-parks-little-big/", array("performers"=>".page-content .wp_theatre_prod .wp_theatre_prod_director + .page-content .user-content h5")));
 
 #print_r(getPerformers("https://www.filmfestival.nl/films/tagged-2/", array("performers"=>".credits .wrap .part-two .inner .two")));
+#print_r(getPerformers("https://www.munttheater.nl/agenda/nienke-plas/", array("performers"=>"#agenda-detail .center.mobile_full_padding div.top h2.small","type"=>"subtitle")));
+
 ?>

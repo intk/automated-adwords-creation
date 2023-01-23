@@ -3,7 +3,6 @@
 
 function trimString($string) {
 
-	
 	//Remove tabs/unnecessary spaces and sanitize string
 	$string = filter_var(trim(strip_tags(preg_replace("/\s+/", " ", $string))), FILTER_SANITIZE_STRING);
 
@@ -30,7 +29,8 @@ function trimString($string) {
 		$output = str_replace(array("&#39;", "/"), array("'","-"), $string);
 	}
 	*/
-	return iconv("UTF-8","UTF-8//IGNORE",$string);
+	$string = iconv("UTF-8","UTF-8//IGNORE",$string);
+	return $string;
 
 }
 ?>

@@ -138,7 +138,7 @@ if ($xlsx = SimpleXLSX::parse($url)) {
 				$productionObj->performers = preg_split('/(, | i.s.m. )+/i', str_replace(array('/', 'e.a.'), array(',', ''), $production[$tags['cast']]));
 			}
 
-			//print_r($productionObj);
+			print_r($productionObj);
 
 			// Push object to productions array
 			// Exclude productions with irrelevant tags, title or sold out

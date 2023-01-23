@@ -1,6 +1,6 @@
 <?php
 // Crawl XML feed and parse productions
-#ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 
 $source = $url;
 $tempDate = '';
@@ -27,16 +27,16 @@ function dateFromString($string, $lexicon) {
 	#if (substr_count('|') == 1) {
 	#	$string = preg_replace("/\| \d{2}\:\d{2}/", "", $string);
    # }
-	$string = str_replace(array('&nbsp;','&#39;','| '), array('','\'', ', '), $string);
-
+	$string = trim(str_replace(array('','\'','Del', 'de ', 'Vanaf','&nbsp;','&#39;','| ','– ','— ','–'), array('','','','','','','\'', ', ',' - ',' - ','-'), $string));
+		
 	if (strpos($string, ' - ') > -1 && strpos($string, '/') > -1) {
-		$splittedDate = preg_split('/( \| |t\/m|&|tm|au | to| al | and | tot )+/i', $string);
+		$splittedDate = preg_split('/( \| |t\/m|&|tm| a |au | tot | to| al | y | and )+/i', $string);
 	} else {
-		$splittedDate = preg_split('/( \| |t\/m|&|tm| -| - |au | to| al | and | tot )+/i', $string);
+		$splittedDate = preg_split('/( \| |t\/m|\/|&|tm| -| - | a | al | y |au | tot | to| al | and )+/i', $string);
 	}
 
 	// Determine if date and time are separated, choose part with date format
-	if (strpos($splittedDate[count($splittedDate)-1], 'uur') > 1 || strpos($string, ':') > 1) {
+	if (strpos($splittedDate[count($splittedDate)-1], 'uur') > 1 || strpos($string, '/') > 1 || strpos($splittedDate[count($splittedDate)-1], ':') > 1 || strpos($splittedDate[count($splittedDate)-1], '€') > 1) {
 		$date = $splittedDate[0];
 	} else {
 		$date = $splittedDate[count($splittedDate)-1];
@@ -46,8 +46,21 @@ function dateFromString($string, $lexicon) {
 	}
 
 	// Exclude days of the week and their abbreviations
-	$date = trim(preg_replace("/(from|maandag|monday|lun. |mar. |mer. |jeu. |ven. |sam. |dim. | maa |mon|ma |dinsdag|tuesday|din|tue|di|woensdag|wednesday|woe|wed|wo|donderdag|thursday|don|thu|do|vrijdag|friday|vri|fri|vr|zaterdag|saturday|zat|sat|za|zondag|sunday|zon|sun|zo|om)/i", "", $date));
+	$date = trim(preg_replace("/(il |from|maandag|monday|lun. |mar. |mer. |jeu. |ven. |sam. |dim. | maa |mon|ma |dinsdag|tuesday|din|tue|di |woensdag|wednesday|woe|wed|wo|donderdag|thursday|don|thu|do|vrijdag|friday|vri|fri|vr|zaterdag|saturday|zat|sat|za|zondag|sunday|zon|sun|zo|om)/i", "", $date));
 	$date = trim(str_replace(array('d\'', ' de '), array('', ' '), $date));
+
+	//Remove dot on start and end position of string
+	if (strpos($date, '.') == 0) {
+		$date = str_replace('.', '', $date);
+	}
+	if (strpos($date, '.') == strlen($date)-1) {
+		$date = str_replace('.', '', $date);
+	}
+
+	// Determine if date string is sticked to eachother
+	if (preg_match("/(\d+)(\w{3})\d{2}:\d{2}/", $date, $match)) {
+			$date = $match[1]." ".$match[2];
+	}
 
 	//Determine if wrong date format has been used
 	if (substr_count($date, '.') > 1) {
@@ -64,10 +77,15 @@ function dateFromString($string, $lexicon) {
 			$d = DateTime::createFromFormat('d-m-Y', $dateTemp);
 			$time = strtotime($d->format('Y-m-d'));
 		}
+		else if (preg_match("/\d{1}.\d{1}.\d{4}/", $date, $match)) {
+			$dateTemp = trim(str_replace('.','-', $match[0]));
+			$d = DateTime::createFromFormat('d-m-Y', $dateTemp);
+			$time = strtotime($d->format('Y-m-d'));
+		}
 	}
 
 	// If date format is DD.MM, DD-MM or DD/MM
-	if (substr_count($date, '.') == 1 || (preg_match("/\d{2}\-\d{2}|\d{2}\/\d{2}/", $date, $match) && !preg_match("/\d{2}\-\d{2}\-\d{4}/", $date, $match) && !preg_match("/\d{4}\-\d{2}\-\d{2}/", $date, $match))) {
+	if (preg_match("/\d{2}\.\d{2}/", $date, $match) || (preg_match("/\d{2}\-\d{2}|\d{2}\/\d{2}/", $date, $match) && !preg_match("/\d{2}\-\d{2}\-\d{4}/", $date, $match) && !preg_match("/\d{4}\-\d{2}\-\d{2}/", $date, $match))) {
 
 
 		if (preg_match("/\d{2}.\d{2}|\d{2}\-\d{2}|\d{2}\/\d{2}/", $date, $match)) {
@@ -80,8 +98,11 @@ function dateFromString($string, $lexicon) {
 				$tempYear = date('y')+1;
 			}
 
+			echo "DATE: ".$dateTemp.'-'.$tempYear;
+
 			$d = DateTime::createFromFormat('d-m-y', $dateTemp.'-'.$tempYear);
 			$time = strtotime($d->format('Y-m-d'));
+			echo $time;
 		}
 	}
 
@@ -129,7 +150,6 @@ function dateFromString($string, $lexicon) {
 			$time = strtotime($d->format('Y-m-d'));
 		}
 	}
-
 	
 	// Replace months and their abbreviations
 	$date = str_ireplace(array_merge($lexicon->monthFull, array("v.a.", " -", "uur", ".", "th", ",")), 
@@ -146,11 +166,13 @@ function dateFromString($string, $lexicon) {
 	$dateArray = explode(' ', trim($date));
 	$dateArray[1] = str_ireplace(array('01','02','03','04','05','06','07','08','09','10','11 ','12'), array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov ','dec'), $dateArray[1]);
 
+
 	//if (intval($dateArray[0]) < 10 && strpos($dateArray[0], '0') !== false) { $dateArray[0] = substr($dateArray[0], 1); }
     if ($time < time()) {
 
 		//Determine if date string is already a valid date format
-		if (validateDate($dateArray[0]) || validateDate(date('d-m-Y', strtotime($date))) || validateDate($date)) {
+		if (validateDate($dateArray[0]) || (validateDate(date('d-m-Y', strtotime($date))) && date('d-m-Y', strtotime($date)) != '01-01-1970') || validateDate($date)) {
+			
 			if (strpos($date, ':') !== false) {
 				//$time = strtotime($dateArray[0].' '.$dateArray[count($dateArray)-1]);
 				//Define the year
@@ -176,7 +198,6 @@ function dateFromString($string, $lexicon) {
 			}
 
 		} else {
-
 			//Define the year
 			if (strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.date('Y')) < time()) {
 				$year = date('Y')+1;
@@ -188,10 +209,11 @@ function dateFromString($string, $lexicon) {
 			}
 			//$year = '00';
 			//Convert date to timestamp
-			if (strpos($date, ':') !== false) {
+			if (strpos($date, ':') !== false && !preg_match("/\d{1,2} \w+ \d{4}\:/", $date, $match)) {
 				$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year.' '.$dateArray[2]);
-			} else {
-				$time = strtotime($dateArray[0].' '.ucfirst($dateArray[1]).' '.$year);
+			}
+			else {
+				$time = strtotime($dateArray[0]." ".ucfirst(substr($dateArray[1], 0, 3))." ".substr($year, 0, 4));
 			}
 			
 		}
@@ -206,7 +228,7 @@ function listGenres($genre) {
 	if (strpos($genre, ',') > 1) {
 		$genre = explode(',', $genre);
 	}
-	if (count($genre) > 1) {
+	if (is_array($genre) && count($genre) > 1) {
 		foreach ($genre as $genreItem) {
 			array_push($genreArr, trim(filter_var(trim(strtolower($genreItem)), FILTER_SANITIZE_STRING)));
 		}
@@ -259,8 +281,24 @@ for($i=1;$i<=$number;$i++) {
 
 	if (array_key_exists('pagination', $tags)) {
 		$pagination = $paginationString.$i;
-	}
 
+		//If date is used instead of index, loop results by week
+		if (strpos($paginationString, 'date') !== false) {
+			$startDate = date('Y-m-d');
+			$pageDate = strtotime($startDate);
+			$pageDate = strtotime("+".(7*$i)." day", $pageDate);
+			$pagination = $paginationString.date('d-m-Y', $pageDate);
+			echo $pagination;
+		}
+
+		if (strpos($paginationString, 'ym_filter') !== false) {
+			$startDate = date('Y-m-01');
+			$pageDate = strtotime($startDate);
+			$pageDate = strtotime("+".(28*$i)." day", $pageDate);
+			$pagination = $paginationString.date('mY', $pageDate);
+			echo $pagination;
+		}
+	}
 
 		$dom = new simple_html_dom(getWebPage($source.$pagination)); 
 	//}
@@ -323,8 +361,10 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			$title = $production->find($tags['title'], 0)->plaintext;
 		}
 
-		if (strlen($tags['subtitle']) > 0) {
+		if ($production->find($tags['subtitle'])) {
+
 			$subtitle = $production->find($tags['subtitle'], 0)->plaintext;
+
 			if (strpos($subtitle, "&nbsp;") !== false || strlen($subtitle) < 2) {
 				$subtitle = trimString($production->find($tags['subtitle'], 1)->plaintext);
 			}
@@ -335,9 +375,8 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			} else {
 				$subtitle = $production->find($tags['subtitle'], 0)->plaintext;
 			}
+		} 
 
-
-		}
 		if (preg_match("/\d{4}-\d{2}-\d{2}/", $tags['date'], $match)) {
 			$date = trimString($tags['date']);
 			$genre = $production->find($tags['genre'], 0)->plaintext;
@@ -367,7 +406,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 						$date = trimString($production->find($tags['date'], -1)->plaintext);
 					}
 
-					$genre = $production->find($tags['genre'], 0)->plaintext;
+					$genre = $production->find($tags['genre'], -1)->plaintext;
 				}
 			}
 			
@@ -415,15 +454,25 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 	
 	// Determine if given date is invalid
 		if (validateDate($date) == false  || validateDate(date('d-m-Y',$time)) == false) {
-			$link = $production->find($tags['link'], 0)->href;
+
 			if (strlen($tags['link']) < 1)	{
 				$link = $production->href;
+			} 
+			else if (strpos($tags['link'], 'data-more') > -1) {
+				$link = $production->{'data-more'};
+			}
+			else if (strpos($tags['link'], 'data-url') > -1) {
+				$link = $production->{'data-url'};
+			}
+			else {
+				$link = $production->find($tags['link'], 0)->href;
 			}
 
 			// Check for a valid date format in the given url
 			if (preg_match("/\d{2}-\d{2}-\d{4}/", $link, $match)) {
 				$time = strtotime($match[0]);
 
+				/*
 				// Check for valid time format in the given url
 				if (preg_match("/\d{2}-\d{2}-\d{4}-\d{2}-\d{2}/", $link, $match)) {
 					
@@ -431,6 +480,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 					$search = '-';
 					$subject = $match[0];
 					$pos = strpos_all($subject, $search);
+
 					
 					// Add time to date string and create a timestamp of it
 					if($pos !== false) {
@@ -440,6 +490,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 					}
 
 				}
+				*/
 
 				// Check for a valid date format in the given url
 				if (preg_match("/\d{4}-\d{2}-\d{2}/", $link, $match)) {
@@ -450,18 +501,21 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			}
 			
 		}	
-
 	//Determine if date can be found on webpage of performance
-	if (strlen($date) < 1 && strpos($tags['date'], '.') > -1) {
-		$link = $production->find($tags['link'], 0)->href;
+	if (strlen($date) < 1 && strpos($tags['date'], '.') > -1) {		
 		if (strlen($tags['link']) < 1)	{
 			$link = $production->href;
 		}
-
+		else if (strpos($tags['link'], 'data-more') > -1) {
+				$link = $production->{'data-more'};
+		}
+		else if (strpos($tags['link'], 'data-url') > -1) {
+				$link = $production->{'data-url'};
+		}
 		if (strpos($link, $tags['baseUrl']) < -1) {
 			$link = $tags['baseUrl'].$link;
-		}
 
+		}
 
 		$linkElement = $link;
 
@@ -472,6 +526,24 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 		$link = $linkElement;
 		$dom = new simple_html_dom(getWebPage($link));
 		$date = $dom->find($tags['date'], -1)->plaintext;
+
+		//$date = str_replace('.','',explode(',', $date)[1]);
+
+		echo $dom->find($tags['date'], -1);
+
+		// If date is specified in dom element attribute with date declaration
+		if ($dom->find($tags['date'], -1)->datatype) {
+			$date = filter_var($dom->find($tags['date'], -1)->content, FILTER_SANITIZE_STRING);
+		}
+
+		if ($dom->find($tags['date'], -1)->{'data-date'}) {
+			$date = filter_var($dom->find($tags['date'], -1)->{'data-date'}, FILTER_SANITIZE_STRING);
+		}
+
+		// If date is specified in datetime attribute of time element on webpage
+		if ($dom->find($tags['date'], -1)->datetime) {
+			$date = filter_var($dom->find($tags['date'], -1)->datetime, FILTER_SANITIZE_STRING);
+		}
 	}
 
 	// If date is specified in datetime attribute of time element
@@ -482,13 +554,11 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 	// Get last date of production
 	$time = dateFromString($date, $lexiconTemp);
 
-
 	//Custom added 
 	print_r(array($title, $tags['genre'], $production->find($tags['genre'], 0)->plaintext, $tags['subtitle'], $subtitle, $tags['date'], $date, $tempDate, $time, date('Y-m-d', $time), $tags['link'], $link));
 
 	// Filter by month
 	if (((date('Y-m', $time) == $month || strtoupper($month) == "ALL") && $time > time()) || $month == "PAST") {
-
 		
 		//Check if genre exist
 			$productionObj = new stdClass();			
@@ -503,6 +573,12 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				$productionObj->subtitle = $titleParts[1];
 			}
 			$productionObj->venue = $location['venue'];
+
+			// If hall values exist
+			if (array_key_exists('hall', $tags)) {
+				$productionObj->venue[0] = explode(',', $production->find($tags['hall'], 0)->plaintext)[0];
+			}
+
 			$productionObj->location = $location['city'];			
 			
 			$productionObj->genre = listGenres($genre);
@@ -537,6 +613,9 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			if (strlen($tags['link']) < 1)	{
 				$link = $production->href;
 			}
+			else if (strpos($tags['link'], 'data-more') > -1) {
+				$link = $production->{'data-more'};
+		    }
 			 else {
 				$link = $tags['link'];
 			}
@@ -563,6 +642,7 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 						$linkElement = str_replace('//'.parse_url($linkElement)['host'], '', $linkElement);
 					}
 					$productionObj->link = filter_var(trim($tags['baseUrl'].$linkElement), FILTER_SANITIZE_URL);
+
 				}
 			}
 
@@ -571,6 +651,13 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			if (substr_count($productionObj->link, $tags['baseUrl']) > 1) {
 				$productionObj->link = substr($productionObj->link, strpos($productionObj->link, $tags['baseUrl'])+strlen($tags['baseUrl']));
 			}
+
+			// If property is added to item
+			if (strpos($tags['link'], 'data-more') > -1) {
+				$productionObj->link = $production->{'data-more'};
+			}
+
+
 
 			//echo $productionObj->link;
 
@@ -592,8 +679,16 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 			if (strlen($productionObj->subtitle) <= 1 && strlen($tags['subtitle']) > 1) {
 
 				# Suppress warning when function can't be executed
-				$productionObj->subtitle = getPerformers($productionObj->link, array("performers"=>$tags['subtitle']));
-				
+				$subtitle = getPerformers($productionObj->link, array("performers"=>$tags['subtitle'],"type"=>"subtitle"));
+				$productionObj->subtitle = $subtitle[0];
+
+			}
+
+			// If title does not exist in agenda item, try to find performer on the the performance page itself
+			if (strlen($productionObj->title) <= 1 && strlen($tags['title']) > 1) {
+
+				# Suppress warning when function can't be executed
+				$productionObj->title = getPerformers($productionObj->link, array("performers"=>$tags['title']))[0];
 
 			}
 
@@ -606,9 +701,6 @@ foreach ($dom->find($tags['container'].' '.$tags['item']) as $keyA => $productio
 				//$productionObj->venue[0] = trim($locationArr[0]).' '.$productionObj->location;
 
 			}
-
-			//print_r($productionObj);
-
 
 
 			//$productionObj->link = str_replace("https://stadstheater.nl//stadstheater.nl", "https://stadstheater.nl", $productionObj->link);

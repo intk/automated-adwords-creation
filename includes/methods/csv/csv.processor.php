@@ -49,55 +49,47 @@ $data = array (
 	"ConversionAction" => "",*/
 
 	"Headline1" => "",
+	"Headline1Position" => "",
 	"Headline2" => "",
+	"Headline2Position" => "",
 	"Headline3" => "",
+	"Headline3Position" => "",
+	"Headline4" => "",
+	"Headline4Position" => "",
+	"Headline5" => "",
+	"Headline5Position" => "",
+	"Headline6" => "",
+	"Headline6Position" => "",
+	"Headline7" => "",
+	"Headline7Position" => "",
+	"Headline8" => "",
+	"Headline8Position" => "",
+	"Headline9" => "",
+	"Headline9Position" => "",
+	"Headline10" => "",
+	"Headline10Position" => "",
+	"Headline11" => "",
+	"Headline11Position" => "",
+	"Headline12" => "",
+	"Headline12Position" => "",
+	"Headline13" => "",
+	"Headline13Position" => "",
+	"Headline14" => "",
+	"Headline14Position" => "",
+	"Headline15" => "",
+	"Headline15Position" => "",
 	"DescriptionLine1" => "",
+	"DescriptionLine1Position" => "",
 	"DescriptionLine2" => "",
+	"DescriptionLine2Position" => "",
+	"DescriptionLine3" => "",
+	"DescriptionLine3Position" => "",
+	"DescriptionLine4" => "",
+	"DescriptionLine4Position" => "",
 	"path1" => "",
 	"path2" => "",
 	"campaignStatus" => $status
 );
-	
-/*
-$siteLinks = array(
-	array(
-	    "FinalURL" => "https://www.dekom.nl/zakelijk/",
-		"DevicePreference" => "All",
-		"LinkText" => "KOM in zaken",
-		"DescriptionLine1" => "Ontdek hier de mogelijkheden",
-		"DescriptionLine2" => "voor zakelijke events bij DE KOM.",
-		"FeedName" => "Main sitelink feed",
-		"PlatformTargeting" => "All"
-	),
-	array(
-	    "FinalURL" => "https://www.dekom.nl/agenda/kaartverkoop/",
-		"DevicePreference" => "All",
-		"LinkText" => "Kaartverkoop",
-		"DescriptionLine1" => "Lees hier meer informatie over",
-		"DescriptionLine2" => "kaartverkoop bij DE KOM.",
-		"FeedName" => "Main sitelink feed",
-		"PlatformTargeting" => "All"
-	),
-	array(
-	    "FinalURL" => "https://www.dekom.nl/informatie/contact/",
-		"DevicePreference" => "All",
-		"LinkText" => "Contact",
-		"DescriptionLine1" => "Adres, telefoonnummers en het",
-		"DescriptionLine2" => "contactformulier van DE KOM.",
-		"FeedName" => "Main sitelink feed",
-		"PlatformTargeting" => "All"
-	),
-	array(
-	    "FinalURL" => "https://www.dekom.nl/cursussen/",
-		"DevicePreference" => "All",
-		"LinkText" => "Cursusprogramma",
-		"DescriptionLine1" => "Ontdek het uitgebreide cursusaanbod",
-		"DescriptionLine2" => "met muziek, toneel, dans en meer.",
-		"FeedName" => "Main sitelink feed",
-		"PlatformTargeting" => "All"
-	)
-	);
-	*/
 
 $temp = array(); 
 for ($i = 0; $i < count($data); $i++) {
@@ -141,8 +133,35 @@ for ($i = 0; $i < count($package->campaign->adgroup); $i++) {
 		$adArr[array_search("AdGroup", array_keys($data))] = $package->campaign->adgroup[$i]->name;
 		$adArr[array_search("FinalURL", array_keys($data))] = $package->link;
 		$adArr[array_search("Headline1", array_keys($data))] = $ad->heading[0];
+		$adArr[array_search("Headline1Position", array_keys($data))] = "-";
 		$adArr[array_search("Headline2", array_keys($data))] = $ad->heading[1];
+		$adArr[array_search("Headline2Position", array_keys($data))] = "-";
 		$adArr[array_search("Headline3", array_keys($data))] = $ad->heading[2];
+		$adArr[array_search("Headline3Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline4", array_keys($data))] = $ad->heading[3];
+		$adArr[array_search("Headline4Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline5", array_keys($data))] = $ad->heading[4];
+		$adArr[array_search("Headline5Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline6", array_keys($data))] = $ad->heading[5];
+		$adArr[array_search("Headline6Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline7", array_keys($data))] = $ad->heading[6];
+		$adArr[array_search("Headline7Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline8", array_keys($data))] = $ad->heading[7];
+		$adArr[array_search("Headline8Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline9", array_keys($data))] = $ad->heading[8];
+		$adArr[array_search("Headline9Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline10", array_keys($data))] = $ad->heading[9];
+		$adArr[array_search("Headline10Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline11", array_keys($data))] = $ad->heading[10];
+		$adArr[array_search("Headline11Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline12", array_keys($data))] = $ad->heading[11];
+		$adArr[array_search("Headline12Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline13", array_keys($data))] = $ad->heading[12];
+		$adArr[array_search("Headline13Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline14", array_keys($data))] = $ad->heading[13];
+		$adArr[array_search("Headline14Position", array_keys($data))] = "-";
+		$adArr[array_search("Headline15", array_keys($data))] = $ad->heading[14];
+		$adArr[array_search("Headline15Position", array_keys($data))] = "-";
 		$adArr[array_search("path1", array_keys($data))] = $ad->path[0];
 		$adArr[array_search("path2", array_keys($data))] = $ad->path[1];
 
@@ -152,11 +171,17 @@ for ($i = 0; $i < count($package->campaign->adgroup); $i++) {
 			$adArr[array_search("DescriptionLine1", array_keys($data))] = $descriptionParts[0].$descriptionParts[1];
 			$adArr[array_search("DescriptionLine2", array_keys($data))] = $descriptionParts[2].$descriptionParts[3];
 		} else {
-
 			// If first description line has <= characters, use default template for both description lines
 			$adArr[array_search("DescriptionLine1", array_keys($data))] = $ad->description[0];
 			$adArr[array_search("DescriptionLine2", array_keys($data))] = $ad->description[1];
 		}
+		$adArr[array_search("DescriptionLine3", array_keys($data))] = $ad->description[2];
+		$adArr[array_search("DescriptionLine4", array_keys($data))] = $ad->description[3];
+		$adArr[array_search("DescriptionLine1Position", array_keys($data))] = "-";
+		$adArr[array_search("DescriptionLine2Position", array_keys($data))] = "-";
+		$adArr[array_search("DescriptionLine3Position", array_keys($data))] = "-";
+		$adArr[array_search("DescriptionLine4Position", array_keys($data))] = "-";
+			
 
 
 		/*
@@ -206,6 +231,26 @@ if (stripos($location, "Slovenia") !== false) {
 	$LocArr[array_search("ID", array_keys($data))] = "2705";
 	$LocArr[array_search("Location", array_keys($data))] = $location;
 	$LocArr[array_search("Reach", array_keys($data))] = "2270000";
+}
+if (stripos($location, "Poland") !== false) {
+	$LocArr[array_search("ID", array_keys($data))] = "2616";
+	$LocArr[array_search("Location", array_keys($data))] = $location;
+	$LocArr[array_search("Reach", array_keys($data))] = "27100000";
+}
+if (stripos($location, "Sweden") !== false) {
+	$LocArr[array_search("ID", array_keys($data))] = "2752";
+	$LocArr[array_search("Location", array_keys($data))] = $location;
+	$LocArr[array_search("Reach", array_keys($data))] = "8110000";
+}
+if (stripos($location, "Finland") !== false) {
+	$LocArr[array_search("ID", array_keys($data))] = "2246";
+	$LocArr[array_search("Location", array_keys($data))] = $location;
+	$LocArr[array_search("Reach", array_keys($data))] = "5150000";
+}
+if (stripos($location, "Italy") !== false) {
+	$LocArr[array_search("ID", array_keys($data))] = "2380";
+	$LocArr[array_search("Location", array_keys($data))] = $location;
+	$LocArr[array_search("Reach", array_keys($data))] = "48300000";
 }
 
  else {

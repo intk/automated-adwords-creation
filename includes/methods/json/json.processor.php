@@ -8,7 +8,7 @@ header('Content-Type: application/json; charset=utf-8');
 $lexiconTemp = new Lexicon();
 $lexiconMonth = $lexiconTemp->monthFull;
 
-#ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 
 
 //Get date format from string
@@ -48,6 +48,13 @@ function dateFromString($string, $lexiconMonth) {
 			$d = DateTime::createFromFormat('d-m-Y', $dateTemp);
 			$time = strtotime($d->format('Y-m-d'));
 		}
+	}
+
+	// Determine if date format doesn't contain dashes
+	if (substr_count($date, '-') < 1 && strlen($date) == 8) {
+		$dateTemp = $date;
+		$d = DateTime::createFromFormat('Ymd', $dateTemp);
+		$time = strtotime($d->format('Y-m-d'));
 	}
 
 	if (substr_count($date, '.') == 1) {
@@ -222,6 +229,7 @@ function listGenres($genre) {
 function toPath($xml, $string) {
 	$parts = explode('/', $string);
 	$path = $xml;
+
 	foreach ($parts as $property) {
 		// Determine if the path string has a defined key and use it
 		if (preg_match_all("/\[([^\]]*)\]/", $property, $matches)) {
@@ -270,7 +278,6 @@ for($i=1;$i<=$number;$i++) {
 $json = preg_replace("/\s+/", " ", file_get_contents($source.$pagination));
 $sourceArray = json_decode($json);
 
-
 // If productions are subitems of parent element
 if (strlen($tags['item']) > 1) {
 	$sourceArray = toPath($sourceArray, $tags['item']);
@@ -283,10 +290,11 @@ foreach ($sourceArray as $production) {
 	} else {
 		// Determine if the time has been given
 		if (strpos($tags['date'], '.') <= -1) {
+
 			if (array_key_exists('time', $tags) && strlen($tags['time']) > 1) {
 				$time = strtotime(toPath($production, $tags['date']).' '.toPath($production, $tags['time']));
 			} else {
-				$time = strtotime(toPath($production, $tags['date']));
+				$time = strtotime(str_replace('/','-', toPath($production, $tags['date'])));
 			}
 
 			// Check if date is not given
@@ -296,15 +304,33 @@ foreach ($sourceArray as $production) {
 		}
 
 	// Determine if date string is already a timestamp
-	if (strpos($tags['date'], '.') <= -1 && (preg_match('~^[1-9][0-9]*$~', trimString(toPath($production, $tags['date']))) == 1)) {
+	if (strpos($tags['date'], '.') <= -1 && (preg_match('~^[1-9][0-9]*$~', trimString(toPath($production, $tags['date']))) == 1) && strlen(toPath($production, $tags['date'])) == 10) {
 		$time = trimString(toPath($production, $tags['date']));
+		//Determine if date string doesn't have dashes
+		/*
+		if (preg_match("/\d{4}\d{2}\d{2}/", $time, $match)) {
+			$time = dateFromString($time, $lexiconMonth);
+			echo $time;
+		}
+		*/
 	}
 
 	//Determine if date can be found on webpage of performance
 	if (strpos($tags['date'], '.') > -1) {
 		$dom = new simple_html_dom(getWebPage(toPath($production, $tags['link'])));
+		//print_r($production->dates[0]);
+		//echo dateFromString(str_replace('/','-', $production->dates[0]->startDate), $lexiconMonth);
 		$time = dateFromString($dom->find($tags['date'], 0)->plaintext, $lexiconMonth);
+		/*
+		if (strlen($production->dates[0]->endDate) > 1) {
+			$time =  dateFromString(str_replace('/','-', $production->dates[0]->endDate), $lexiconMonth);
+		} else {
+			$time =  dateFromString(str_replace('/','-', $production->dates[0]->startDate), $lexiconMonth);
+		}
+		*/
 	}
+
+	echo $time;
 
 
 		// Determine if given date is invalid
@@ -336,7 +362,7 @@ foreach ($sourceArray as $production) {
 
 	}
 
-	#print_r(array(trimString(toPath($production, $tags['title'])), trimString(toPath($production, $tags['subtitle'])), date('Y-m', $time)));
+	print_r(array(trimString(toPath($production, $tags['title'])), trimString(toPath($production, $tags['subtitle'])),$time, date('Y-m-d', $time)));
 
 	// Filter by month
 	if (date('Y-m', $time) == $month || date('Y-m-d', $time) == $month || strtoupper($month) == "ALL" && $time > time()) {	
@@ -476,6 +502,8 @@ foreach ($sourceArray as $production) {
 				
 				if ($excludeFound == false) {
 					*/
+					$productionObj->title = str_replace('--', '', $productionObj->title);
+					$productionObj->subtitle = str_replace('--', '', $productionObj->subtitle);
 					array_push($productions, $productionObj);
 					
 				//}

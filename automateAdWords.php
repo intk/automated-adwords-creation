@@ -25,6 +25,22 @@
 <body>
 <?php
 */
+
+function raw_json_encode($input, $flags = 0) {
+    $fails = implode('|', array_filter(array(
+        '\\\\',
+        $flags & JSON_HEX_TAG ? 'u003[CE]' : '',
+        $flags & JSON_HEX_AMP ? 'u0026' : '',
+        $flags & JSON_HEX_APOS ? 'u0027' : '',
+        $flags & JSON_HEX_QUOT ? 'u0022' : '',
+    )));
+    $pattern = "/\\\\(?:(?:$fails)(*SKIP)(*FAIL)|u([0-9a-fA-F]{4}))/";
+    $callback = function ($m) {
+        return html_entity_decode("&#x$m[1];", ENT_QUOTES, 'UTF-8');
+    };
+    return preg_replace_callback($pattern, $callback, json_encode($input, $flags));
+}
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 include('includes/config.inc.php');
@@ -86,12 +102,12 @@ if ($_GET['client']) {
 
 	//Get custom templates by organisation ID and organisation type
 	$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = theaters.id AND templates.type = theaters.type WHERE templates.language = '".$lang."' AND (theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['client'])."%' OR theaters.googleAds = '".mysqli_real_escape_string($connect, $_GET['client'])."')");
-	if (mysqli_num_rows($query) < 1) {
+	if ($query && mysqli_num_rows($query) < 1) {
 		// If no custom template is available, use default template
 		$query = mysqli_query($connect, "SELECT * FROM theaters JOIN templates ON templates.theaterId = 0 AND templates.type = theaters.type WHERE templates.language = '".$lang."' AND (theaters.alias LIKE '%".mysqli_real_escape_string($connect, $_GET['client'])."%' OR theaters.googleAds = '".mysqli_real_escape_string($connect, $_GET['client'])."')");
 	}
 	
-	if (mysqli_num_rows($query) >= 1) {
+	if ($query && mysqli_num_rows($query) >= 1) {
 		$result = mysqli_fetch_array($query);
 		
 		// Assign template for ads
@@ -172,7 +188,9 @@ if ($_GET['client']) {
 
 
 			}
-			echo json_encode($theater);
+			$encodedData = json_encode($theater, JSON_INVALID_UTF8_IGNORE);
+			echo $encodedData;
+
 
 		}
 	}

@@ -457,97 +457,83 @@ class Campaign {
 			# Choose template that has the same type as the type argument
 			if ($template->type == $type) {
 
+				#### CREATE ADD CONTENT ####
+
 				# Iterate ads template
 				foreach($template->ads as $adkey => $adProperties) {
 
+					// Iterate through each ad field
+					$headingnum = 0;
+					$descriptionnum = 0;
+					foreach ($adProperties as $property => $value) {
 
-					#### CREATE ADD CONTENT ####
+						//Sort heading field length from short to long. Needed to fit the 30 characters.
+						if (strpos($property, 'heading') > -1) {
 
-					//Sort first heading length from short to long. Needed to iterate them to fit the 30 characters.
-					foreach ($adProperties->heading1 as $heading1) {
-						$heading = $this->replaceTpl($heading1, $replace, $replacement, 30);
-
-						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($heading) <= 30 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && stripos($heading, '{KeyWord:') > -1 && strlen($heading) <= 40)) {
-							$ad[$adkey]->heading[0] = $heading;
-						}
-
-					}
-
-					//Sort second heading length from short to long. Needed to iterate them to fit the 30 characters.
-					foreach ($adProperties->heading2 as $heading2) {
-						$heading = $this->replaceTpl($heading2, $replace, $replacement, 30);
-
-						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && stripos($heading, '{KeyWord:') > -1 && strlen($heading) <= 40)) {
-							$ad[$adkey]->heading[1] = $heading;
-						}
-
-					}
-					
-					//Sort third heading length from short to long. Needed to iterate them to fit the 30 characters.
-					foreach ($adProperties->heading3 as $heading3) {
-						$heading = $this->replaceTpl($heading3, $replace, $replacement, 30);
-
-						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($heading) <= 30 || (count($this->performers) > $this->maxPerformers && stripos($heading, '{KeyWord:') > -1 && strlen($heading) <= 40)) {
-							$ad[$adkey]->heading[2] = $heading;
-						}
-
-					}
-
-					// Remove first ad description with performer variable if performer doesn't exist
-					if (strlen($performer) <= 0) {
-						foreach($adProperties->description1 as $key => $value) {
-							if (strpos($value, '[performer]') !== false) {
-								unset($adProperties->description1[$key]);
+							// Remove first ad description with genre variable if genre doesn't exist
+							if (strlen($tLabel[1]) <= 0) {
+								foreach($value as $key => $line) {
+									if (strpos($line, '[genre]') !== false) {
+										unset($value[$key]);
+									}
+								}
 							}
-						}
-					}
 
-					// Remove second ad description with performer variable if performer doesn't exist
-					if (strlen($performer) <= 0) {
-						foreach($adProperties->description2 as $key => $value) {
-							if (strpos($value, '[performer]') !== false) {
-								unset($adProperties->description2[$key]);
+							foreach ($value as $headingString) {
+								$heading = $this->replaceTpl($headingString, $replace, $replacement, 30);
+
+								# Assign template text to ad headline if it fit the 30 characters, excluding keyword insertion variable
+								if (strlen($heading) <= 30 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && stripos($heading, '{KeyWord:') > -1 && strlen($heading) <= 40)) {
+									$ad[$adkey]->heading[$headingnum] = $heading;
+								}
+
 							}
-						}
-					}
+							$headingnum++;
 
-					//Sort first description length from short to long. Needed to iterate them to fit the 90 characters.
-					foreach ($adProperties->description1 as $description1) {
-
-						$description = $this->replaceTpl($description1, $replace, $replacement, 90);
-						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($description) <= 90 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
-							$ad[$adkey]->description[0] = $description;
-						}
-						// Try to add the full title to the description if it fits the 90 characters
-						$tempReplacement = $replacement;
-						$tempReplacement[1] = $this->title;
-						$description = $this->replaceTpl($description1, $replace, $tempReplacement, 90);
-						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($description) <= 90 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
-							$ad[$adkey]->description[0] = $description;
 						}
 
-					}
 
-					//Sort second description length from short to long. Needed to iterate them to fit the 90 characters.
-					foreach ($adProperties->description2 as $description2) {
-						$description = $this->replaceTpl($description2, $replace, $replacement, 90);
-						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($description) <= 90 || (count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
-							$ad[$adkey]->description[1] = $description;
-						}
+						//Sort description field length from short to long. Needed to fit the 90 characters.
+						if (strpos($property, 'description') > -1) {
+							$descriptionArray = $value;
 
-						// Try to add the full title to the description if it fits the 90 characters
-						$tempReplacement = $replacement;
-						$tempReplacement[1] = $this->title;
-						$description = $this->replaceTpl($description2, $replace, $tempReplacement, 90);
-						# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
-						if (strlen($description) <= 90 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
-							$ad[$adkey]->description[1] = $description;
+							// Remove first ad description with performer variable if performer doesn't exist
+							if (strlen($performer) <= 0) {
+								foreach($descriptionArray as $key => $value) {
+									if (strpos($value, '[performer]') !== false) {
+										unset($descriptionArray[$key]);
+									}
+								}
+							}
+
+							// Remove first ad description with genre variable if genre doesn't exist
+							if (strlen($tLabel[1]) <= 0) {
+								foreach($descriptionArray as $key => $value) {
+									if (strpos($value, '[genre]') !== false) {
+										unset($descriptionArray[$key]);
+									}
+								}
+							}
+
+							//Sort first description length from short to long. Needed to iterate them to fit the 90 characters.
+							foreach ($descriptionArray as $descriptionString) {
+
+								$description = $this->replaceTpl($descriptionString, $replace, $replacement, 90);
+								# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
+								if (strlen($description) <= 90 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
+									$ad[$adkey]->description[$descriptionnum] = $description;
+								}
+								// Try to add the full title to the description if it fits the 90 characters
+								$tempReplacement = $replacement;
+								$tempReplacement[1] = $this->title;
+								$description = $this->replaceTpl($descriptionString, $replace, $tempReplacement, 90);
+								# Assign template text to ad description if it fit the 90 characters, excluding keyword insertion variable
+								if (strlen($description) <= 90 || ($this->performers !== false && count($this->performers) > $this->maxPerformers && strlen($description) <= 100)) {
+									$ad[$adkey]->description[$descriptionnum] = $description;
+								}
+
+							}
+							$descriptionnum++;
 						}
 
 					}
@@ -644,7 +630,7 @@ class Campaign {
 
 							//If both paths still have more than 15 characters, split them by their inner parts
 							if (strlen($ad[$adkey]->path[0]) > 15) {
-								$wordSplit = json_decode(file_get_contents("https://picturage.nl/intk/theaterads/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$adkey]->path[0]));
+								$wordSplit = json_decode(file_get_contents("https://localhost/adwords-automation/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$adkey]->path[0]));
 								if (strlen($wordSplit[0]) <= 15 && strlen($wordSplit[0]) > 1) {
 									$ad[$adkey]->path[0] = $wordSplit[0];
 									$ad[$adkey]->path[1] = $wordSplit[1];
@@ -652,7 +638,7 @@ class Campaign {
 							}
 
 							if (strlen($ad[$adkey]->path[1]) > 15) {
-								$wordSplit = json_decode(file_get_contents("https://picturage.nl/intk/theaterads/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$adkey]->path[1]));
+								$wordSplit = json_decode(file_get_contents("https://localhost/adwords-automation/includes/methods/dictionary/dictionary.processor.php?word=".$ad[$adkey]->path[1]));
 								if (strlen($wordSplit[0]) <= 15 && strlen($wordSplit[0]) > 1) {
 									$ad[$adkey]->path[0] = $wordSplit[0];
 									$ad[$adkey]->path[1] = $wordSplit[1];
@@ -679,7 +665,7 @@ class Campaign {
 
 		}
 			
-		
+		print_r($ad);
 		return $ad;
 	}
 	

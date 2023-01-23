@@ -6,7 +6,15 @@ class Keywords {
 	private $charLimit;
 	private $lexicon;
 	public function __construct($title, $venue, $city, $placements, $type) {
+		echo "Keyword: ".$title;
 		// Don't use title longer than 80 characters
+		if (strpos($title, "Pulpettikino-lyhytelokuvanäytös 2022") > -1) {
+			$title = 'Lyhytelokuvanäytös 2022';
+		}
+
+		if (strpos($title, "Tekenen, schilderen, knutselen 4-8 jr") > -1) {
+			$title = 'Tekenen, schilderen, knutselen';
+		}
 
 		$this->type = $type;
 		$this->title = $title;
@@ -340,14 +348,14 @@ class Keywords {
 				}
 
 				// Placements will be placed after the keyword, so it becomes a new keyword
-				$outputArray[$key] = array_merge(array("name"=>$tempKeyword,"type"=>$this->type, "keywords"=>array_merge(array(strtolower(str_replace(',', '', $tempKeyword))), array_map(
+				$outputArray[$key] = array_merge(array("name"=>$tempKeyword,"type"=>$this->type, "keywords"=>array_merge(array(mb_strtolower(str_replace(',', '', $tempKeyword), 'UTF-8')), array_map(
 					function($placement, $keyword) {
 						// Determine if placement doesn't partly match the keyword
 						if (stripos($keyword, $placement) === false) {
 							// Remove invalid usage of commas from keyword
-							return strtolower(str_replace(',', '', $keyword .' '.$placement));
+							return mb_strtolower(str_replace(',', '', $keyword .' '.$placement), 'UTF-8');
 						} else {
-							return strtolower(str_replace(',', '', $keyword));
+							return mb_strtolower(str_replace(',', '', $keyword), 'UTF-8');
 						}
 					}, $placements, $DuplicateKeywords
 				
